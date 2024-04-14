@@ -2,16 +2,20 @@
 
 Socket::Socket(u_int16_t port)
 {
-    m_socketListener = CreateSocketListenerToIpv4();
-    if (m_socketListener < 0)
+    auto socketListenerResult = CreateSocketListenerToIpv4();
+    if (std::holds_alternative<Error>(socketListenerResult))
     {
+        m_error = std::get<Error>(socketListenerResult);
         m_status = SocketStatus::Fail;
         return;
     }
 
-    int bindResult = BindSocketListenerToPort(m_socketListener, port);
-    if (bindResult < 0)
+    m_socketListener = std::get<int>(socketListenerResult);
+
+    auto bindResult = BindSocketListenerToPort(m_socketListener, port);
+    if (bindResult.has_value())
     {
+        m_error = bindResult.value();
         m_status = SocketStatus::Fail;
         return;
     }
@@ -30,7 +34,7 @@ void Socket::Listen()
 
     if (listen(m_socketListener, SOMAXCONN) == -1)
     {
-        // std::cerr << "Can't listen";
+        m_error = Error("Cannot listen", ErrorType::Unexpected);
         m_status = SocketStatus::Fail;
     }
     else
@@ -47,19 +51,18 @@ SocketStatus Socket::GetStatus() const
     return m_status;
 }
 
-int Socket::CreateSocketListenerToIpv4()
+std::variant<int, Error> Socket::CreateSocketListenerToIpv4()
 {
     int socketListener = socket(AF_INET, SOCK_STREAM, 0);
-    // if (socketListener == -1)
-    // {
-    //     std::cerr << "Error to create socket listener";
-    //     return -1;
-    // }
+    if (socketListener == -1)
+    {
+        return Error("Error to create socket listener", ErrorType::Unexpected);
+    }
 
     return socketListener;
 }
 
-int Socket::BindSocketListenerToPort(int socketListener, u_int16_t port)
+std::optional<Error> Socket::BindSocketListenerToPort(int socketListener, u_int16_t port)
 {
     sockaddr_in hint;
     hint.sin_family = AF_INET;
@@ -68,9 +71,8 @@ int Socket::BindSocketListenerToPort(int socketListener, u_int16_t port)
 
     if (bind(socketListener, (sockaddr *)&hint, sizeof(hint)) == -1)
     {
-        // std::cerr << "Can't bind to IP/port";
-        return -2;
+        return Error("Can't bind to IP/port", ErrorType::Unexpected);
     }
 
-    return 1;
+    return std::nullopt;
 }

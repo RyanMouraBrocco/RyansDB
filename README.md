@@ -2,11 +2,11 @@
 
 ## What is RyansDB?
 
-This project was designed to be a database (I haven't determined its core principle yet!) and handle all connections using its own protocol (which hasn't been developed yet).
+This project was designed to be a relational database and handle all connections using its own protocol (which hasn't been developed yet).
 
 The main goal of this code is to teach (and primarily learn) about how a database operates behind the scenes. The idea here is to be as simple as possible to convey the idea of teaching about databases.
 
-Of course, I would like to add something more unique into the project,  and probably will when I define the core principle of the database
+Of course, I would like to add something more unique into the project, and i this database would be a relational database GPU-based
 
 
 ## What do we have ?

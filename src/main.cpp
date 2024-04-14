@@ -1,7 +1,7 @@
 // C++ libraries
 #include <iostream>
-#include "Socket/socket.hpp"
-#include "Socket/Connections/connection.hpp"
+#include "TcpServer/Socket/socket.hpp"
+#include "TcpServer/Socket/Connections/connection.hpp"
 #include <thread>
 
 void EndPointsListener(Connection *connection)

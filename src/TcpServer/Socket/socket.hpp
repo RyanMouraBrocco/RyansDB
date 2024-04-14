@@ -7,6 +7,11 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 
+#include "../../Error/error.hpp"
+
+#include <variant>
+#include <optional>
+
 enum class SocketStatus
 {
     Closed,
@@ -19,9 +24,10 @@ class Socket
 private:
     int m_socketListener;
     SocketStatus m_status;
+    Error m_error;
 
-    int CreateSocketListenerToIpv4();
-    int BindSocketListenerToPort(int socketListener, u_int16_t port);
+    std::variant<int, Error> CreateSocketListenerToIpv4();
+    std::optional<Error> BindSocketListenerToPort(int socketListener, u_int16_t port);
 
 public:
     Socket(u_int16_t port);
