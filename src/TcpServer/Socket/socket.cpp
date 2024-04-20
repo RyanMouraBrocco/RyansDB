@@ -5,7 +5,7 @@ Socket::Socket(u_int16_t port)
     auto socketListenerResult = CreateSocketListenerToIpv4();
     if (std::holds_alternative<Error>(socketListenerResult))
     {
-        m_error = std::get<Error>(socketListenerResult);
+        UpsertError(std::get<Error>(socketListenerResult));
         m_status = SocketStatus::Fail;
         return;
     }
@@ -15,7 +15,7 @@ Socket::Socket(u_int16_t port)
     auto bindResult = BindSocketListenerToPort(m_socketListener, port);
     if (bindResult.has_value())
     {
-        m_error = bindResult.value();
+        UpsertError(bindResult.value());
         m_status = SocketStatus::Fail;
         return;
     }
@@ -34,7 +34,7 @@ void Socket::Listen()
 
     if (listen(m_socketListener, SOMAXCONN) == -1)
     {
-        m_error = Error("Cannot listen", ErrorType::Unexpected);
+        UpsertError(Error("Cannot listen", ErrorType::Unexpected));
         m_status = SocketStatus::Fail;
     }
     else
@@ -75,4 +75,12 @@ std::optional<Error> Socket::BindSocketListenerToPort(int socketListener, u_int1
     }
 
     return std::nullopt;
+}
+
+void Socket::UpsertError(Error error)
+{
+    if (p_error == nullptr)
+        p_error = std::make_shared<Error>(error);
+    else
+        *p_error = error;
 }

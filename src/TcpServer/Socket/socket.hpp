@@ -12,6 +12,8 @@
 #include <variant>
 #include <optional>
 
+#include <memory>
+
 enum class SocketStatus
 {
     Closed,
@@ -24,8 +26,9 @@ class Socket
 private:
     int m_socketListener;
     SocketStatus m_status;
-    Error m_error;
+    std::shared_ptr<Error> p_error = nullptr;
 
+    void UpsertError(Error error);
     std::variant<int, Error> CreateSocketListenerToIpv4();
     std::optional<Error> BindSocketListenerToPort(int socketListener, u_int16_t port);
 

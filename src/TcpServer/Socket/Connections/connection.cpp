@@ -22,7 +22,7 @@ ConnectionStatus Connection::GetStatus() const
     return m_status;
 }
 
-std::string Connection::ReceiveBytes(const int &&size)
+std::optional<std::string> Connection::ReceiveBytes(const int &&size)
 {
     char buffer[size];
     memset(buffer, 0, size);
@@ -30,24 +30,34 @@ std::string Connection::ReceiveBytes(const int &&size)
 
     if (bytesRecv == -1)
     {
-        // std::cerr << "There was a connection issue" << std::endl;
+        UpsertError(Error("There was a connection issue", ErrorType::Unexpected));
         m_status = ConnectionStatus::Fail;
-        return nullptr;
+        return std::nullopt;
     }
 
     if (bytesRecv == 0)
     {
-        // std::cout << "The client disconnected" << std::endl;
+        UpsertError(Error("The client disconnected", ErrorType::Unexpected));
         m_status = ConnectionStatus::Closed;
-        return nullptr;
+        return std::nullopt;
     }
 
     return std::string(buffer, 0, bytesRecv);
 }
 
-void Connection::SendBytes(char *buffer, const int &&size)
+ConnectionStatus Connection::SendBytes(char *buffer, const int &&size)
 {
     int result = send(m_clientSocket, buffer, size + 1, 0);
     if (result == -1)
         m_status = ConnectionStatus::Fail;
+
+    return m_status;
+}
+
+void Socket::UpsertError(Error error)
+{
+    if (p_error == nullptr)
+        p_error = std::make_shared<Error>(error);
+    else
+        *p_error = error;
 }
