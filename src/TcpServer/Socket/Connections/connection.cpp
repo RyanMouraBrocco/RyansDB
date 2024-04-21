@@ -54,7 +54,7 @@ ConnectionStatus Connection::SendBytes(char *buffer, const int &&size)
     return m_status;
 }
 
-void Socket::UpsertError(Error error)
+void Connection::UpsertError(Error error)
 {
     if (p_error == nullptr)
         p_error = std::make_shared<Error>(error);

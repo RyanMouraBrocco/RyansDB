@@ -6,29 +6,36 @@
 
 void EndPointsListener(Connection *connection)
 {
-    connection->AcceptForNewAccess();
-
-    char buf[4096];
     while (true)
     {
-        auto textResult = connection->ReceiveBytes(4096);
-        if (textResult.has_value())
-        {
-            if (connection->GetStatus() != ConnectionStatus::Connected)
-                break;
+        connection->AcceptForNewAccess();
 
-            connection->SendBytes("12345678", 8);
-        }
-        else
+        char buf[4096];
+        while (connection->GetStatus() == ConnectionStatus::Connected)
         {
-            std::cout << "Something went wrong !!!";
+            auto textResult = connection->ReceiveBytes(4096);
+            if (textResult.has_value())
+            {
+                if (connection->GetStatus() != ConnectionStatus::Connected)
+                    break;
+
+                connection->SendBytes(((std::string) "12345678").data(), 8);
+            }
+            else if (connection->GetStatus() == ConnectionStatus::Fail)
+            {
+                std::cout << "Connection Fails" << std::endl;
+            }
+            else
+            {
+                std::cout << "Client has disconnected" << std::endl;
+            }
         }
     }
 }
 
 int main()
 {
-    Socket socket = Socket(5432);
+    Socket socket = Socket(5007);
     socket.Listen();
     if (socket.GetStatus() != SocketStatus::Opened)
     {

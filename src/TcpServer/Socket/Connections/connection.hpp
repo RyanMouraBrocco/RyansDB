@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Socket/socket.hpp"
-#include "../../Error/error.hpp"
+#include "../socket.hpp"
+#include "../../../Error/error.hpp"
 #include <netdb.h>
 #include <unistd.h>
 #include <string>
