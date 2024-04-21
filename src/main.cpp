@@ -11,12 +11,18 @@ void EndPointsListener(Connection *connection)
     char buf[4096];
     while (true)
     {
-        std::string text = connection->ReceiveBytes(4096);
+        auto textResult = connection->ReceiveBytes(4096);
+        if (textResult.has_value())
+        {
+            if (connection->GetStatus() != ConnectionStatus::Connected)
+                break;
 
-        if (connection->GetStatus() != ConnectionStatus::Connected)
-            break;
-
-        connection->SendBytes("12345678", 8);
+            connection->SendBytes("12345678", 8);
+        }
+        else
+        {
+            std::cout << "Something went wrong !!!";
+        }
     }
 }
 
