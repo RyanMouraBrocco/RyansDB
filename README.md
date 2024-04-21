@@ -15,7 +15,7 @@ We have abstractions of the socket and TCP connections.
 
 ## TO DO
 
-[] Ensure connection stability even when something in the network goes wrong.<br/>
+[X] Ensure connection stability even when something in the network goes wrong.<br/>
 [X] Begin using the ResultPattern to handle errors more effectively.<br/>
 [] Create a protocol to receive commands and return results.<br/>
 [] Create a file of configurations. <br/>
