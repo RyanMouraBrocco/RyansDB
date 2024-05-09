@@ -5,10 +5,10 @@ RyansProtocol is the protocol designed to communicate with RyansDB in a normaliz
 Some questions have been raised about what the protocol should look like:
 
 - [X] Control Version
-- [ ] A charset config ?
-- [ ] A Content-Encoding ? Such as accepting gzip, compress, etc.
-- [ ] A Content-Type ? I don't think so (it'll always be a string)
-- [ ] A custom headers communication ?
+- [X] A charset config ? yes! always will be utf-8
+- [ ] A Content-Encoding Such as accepting gzip, compress, etc ? maybe just gzip 
+- [X] A Content-Type ? yes! just string
+- [X] A custom headers communication ? yes!!!!!
 
 I'm still pondering these questions, but they aren't hindering me from designing the first version of the protocol.
 
