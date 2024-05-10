@@ -12,4 +12,5 @@ add_executable(RyansDBServer
                 ./src/main.cpp
                 ./src/Error/error.cpp
                 ./src/TcpServer/Socket/socket.cpp
-                ./src/TcpServer/Socket/Connections/connection.cpp)
+                ./src/TcpServer/Socket/Connections/connection.cpp
+                ./src/Protocol/Request/RequestProtocol.cpp)
