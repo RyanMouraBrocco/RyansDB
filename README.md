@@ -17,6 +17,6 @@ We have abstractions of the socket and TCP connections.
 
 - [X] Ensure connection stability even when something in the network goes wrong.
 - [X] Begin using the ResultPattern to handle errors more effectively
-- [ ] Create a protocol to receive commands and return results.
+- [X] Create a protocol to receive commands and return results.
 - [ ] Create a file of configurations.
 - [ ] Apply the rule 0-3-5 in all class.
