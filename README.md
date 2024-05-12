@@ -2,16 +2,14 @@
 
 ## What is RyansDB?
 
-This project was designed to be a relational database and handle all connections using its own protocol (The RyansProtocol ([learn more](./src/Protocol/README.md))).
+This project was designed to be a relational database. The main goal of this code is to teach (and primarily learn) about how a database operates behind the scenes. The idea here is to be as simple as possible to convey the idea of teaching about databases.
 
-The main goal of this code is to teach (and primarily learn) about how a database operates behind the scenes. The idea here is to be as simple as possible to convey the idea of teaching about databases.
-
-Of course, I would like to add something more unique into the project, and i this database would be a relational database GPU-based
-
+### **Do you want to know more ? See our [Wiki](https://github.com/RyanMouraBrocco/RyansDB/wiki)**
 
 ## What do we have ?
 
-We have abstractions of the socket and TCP connections.
+1. We have abstractions of the socket and TCP connections.
+2. A protocol to communication
 
 ## TO DO
 
