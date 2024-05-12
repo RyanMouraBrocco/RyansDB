@@ -9,7 +9,7 @@ This project was designed to be a relational database. The main goal of this cod
 ## What do we have ?
 
 1. We have abstractions of the socket and TCP connections.
-2. A protocol to communication
+2. A protocol for communication
 
 ## TO DO
 
