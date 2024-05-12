@@ -12,6 +12,7 @@ private:
 
 public:
     ProtocolTemplate(){};
+
     const std::string GetVersion() const
     {
         return m_version;
