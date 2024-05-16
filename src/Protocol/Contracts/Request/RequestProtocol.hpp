@@ -2,6 +2,7 @@
 
 #include "../ProtocolTemplate.hpp"
 #include <unordered_set>
+#include <memory>
 
 enum class RequestProtocolCommandType
 {

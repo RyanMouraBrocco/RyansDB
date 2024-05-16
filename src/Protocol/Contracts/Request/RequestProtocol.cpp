@@ -19,3 +19,14 @@ const void RequestProtocol::AddHeader(std::string &key, std::string &value)
     if (m_headersWhiteList.find(value) != m_headersWhiteList.end())
         ProtocolTemplate::AddHeader(key, value);
 }
+
+void SetValues(std::shared_ptr<char> buffer, int length)
+{
+    for (int i = 0; i < length; i++)
+    {
+        auto currentChar = buffer.get()[i];
+        if (currentChar == ';')
+        {
+        }
+    }
+}
