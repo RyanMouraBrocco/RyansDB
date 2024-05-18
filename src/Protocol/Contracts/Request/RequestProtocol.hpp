@@ -22,7 +22,7 @@ private:
 
 public:
     RequestProtocol();
-    const void AddHeader(std::string &key, std::string &value) override;
+    const void AddHeader(std::string key, std::string value) override;
     const RequestProtocolCommandType GetCommandType() const;
     const void SetCommandType(RequestProtocolCommandType commandType);
 };

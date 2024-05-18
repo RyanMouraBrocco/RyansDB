@@ -21,9 +21,9 @@ private:
 
 public:
     ResponseProtocol();
-    const void AddHeader(std::string &key, std::string &value) override;
+    const void AddHeader(std::string key, std::string value) override;
     const ResponseProtocolStatusCode GetStatusCode() const;
     const void SetStatusCode(ResponseProtocolStatusCode statusCode);
     const std::string GetErrorDescription() const;
-    const void SetErrorDescription(std::string &errorDescription);
+    const void SetErrorDescription(std::string errorDescription);
 };

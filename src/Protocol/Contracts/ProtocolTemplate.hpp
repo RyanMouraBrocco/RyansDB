@@ -28,17 +28,17 @@ public:
         return m_message;
     }
 
-    const void SetVersion(std::string &version)
+    const void SetVersion(std::string version)
     {
         m_version = version;
     }
 
-    const void SetMessage(std::string &message)
+    const void SetMessage(std::string message)
     {
         m_message = message;
     }
 
-    virtual const void AddHeader(std::string &key, std::string &value)
+    virtual const void AddHeader(std::string key, std::string value)
     {
         if (m_headers.find(key) == m_headers.end())
             m_headers.insert({key, value});
