@@ -34,7 +34,7 @@ void Socket::Listen()
 
     if (listen(m_socketListener, SOMAXCONN) == -1)
     {
-        UpsertError(Error("Cannot listen", ErrorType::Unexpected));
+        UpsertError(Error(ErrorType::Unexpected, "Cannot listen the socket port"));
         m_status = SocketStatus::Fail;
     }
     else
@@ -56,7 +56,7 @@ std::variant<int, Error> Socket::CreateSocketListenerToIpv4()
     int socketListener = socket(AF_INET, SOCK_STREAM, 0);
     if (socketListener == -1)
     {
-        return Error("Error to create socket listener", ErrorType::Unexpected);
+        return Error(ErrorType::Unexpected, "Error to create socket listener");
     }
 
     return socketListener;
@@ -71,7 +71,7 @@ std::optional<Error> Socket::BindSocketListenerToPort(int socketListener, u_int1
 
     if (bind(socketListener, (sockaddr *)&hint, sizeof(hint)) == -1)
     {
-        return Error("Can't bind to IP/port", ErrorType::Unexpected);
+        return Error(ErrorType::Unexpected, "Cannot bind the socket listener to IP/port " + std::to_string(port));
     }
 
     return std::nullopt;

@@ -3,7 +3,8 @@
 
 enum class ErrorType
 {
-    Unexpected
+    ProtocolFormat = 400,
+    Unexpected = 500
 };
 
 class Error
@@ -12,5 +13,5 @@ class Error
     ErrorType m_type;
 
 public:
-    Error(std::string description, ErrorType type);
+    Error(ErrorType type, std::string description);
 };

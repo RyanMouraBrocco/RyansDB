@@ -16,7 +16,7 @@ class IRequestProtocolDeserializerState
 {
 protected:
     std::unique_ptr<RequestProtocolDeserializer> p_deserializer;
-
+    bool IsValidIndexInContent(std::string &content, int &index) const;
 public:
     virtual std::optional<Error> Execute(RequestProtocolBuilder &builder, std::stringstream &stringBuilder, std::string &content, int &index) = 0;
 };

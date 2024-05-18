@@ -8,7 +8,7 @@ RequestProtocolDeserializer::RequestProtocolDeserializer(std::string content) : 
 
 std::optional<Error> RequestProtocolDeserializer::TransmitState(std::shared_ptr<IRequestProtocolDeserializerState> state)
 {
-    p_state = nullptr;
+    p_state = state;
     return p_state->Execute(m_protocolBuilder, m_stringBuilder, m_content, m_index);
 }
 
@@ -21,122 +21,133 @@ std::variant<RequestProtocol, Error> RequestProtocolDeserializer::Deserialize()
     return m_protocolBuilder.Build();
 }
 
+bool IRequestProtocolDeserializerState::IsValidIndexInContent(std::string &content, int &index) const
+{
+    return index < content.length();
+}
+
 std::optional<Error> RequestProtocolDeserializerStartState::Execute(RequestProtocolBuilder &builder, std::stringstream &stringBuilder, std::string &content, int &index)
 {
-    if (isdigit(content[index]))
+    if (IsValidIndexInContent(content, index) && isdigit(content[index]))
     {
-        index++;
         stringBuilder << content[index];
+        index++;
         return p_deserializer->TransmitState(std::make_shared<RequestProtocolDeserializerGetVersionState>());
     }
-    else
-        return Error("The version doesn't start with a number", ErrorType::Unexpected); // I need to improve this one
+
+    return Error(ErrorType::ProtocolFormat, "The version doesn't start with a number");
 }
 
 std::optional<Error> RequestProtocolDeserializerGetVersionState::Execute(RequestProtocolBuilder &builder, std::stringstream &stringBuilder, std::string &content, int &index)
 {
-    while (isdigit(content[index]) || content[index] == '.')
+    while (IsValidIndexInContent(content, index) && (isdigit(content[index]) || content[index] == '.'))
     {
-        index++;
         stringBuilder << content[index];
-    }
-
-    if (content[index] == ';')
-    {
         index++;
-        builder.AddVersion(stringBuilder.str());
-        stringBuilder.str("");
-        stringBuilder.clear();
-        return p_deserializer->TransmitState(std::make_shared<RequestProtocolDeserializerGetCommandTypeState>());
     }
 
-    return Error("The version doesn't start with a number", ErrorType::Unexpected); // I need to improve this one
+    if (!IsValidIndexInContent(content, index))
+        return Error(ErrorType::ProtocolFormat, "The content finished before complete the version");
+
+    if (content[index] != ';')
+        return Error(ErrorType::ProtocolFormat, "Invalid version format or transition");
+
+    index++;
+    builder.AddVersion(stringBuilder.str());
+    stringBuilder.str("");
+    stringBuilder.clear();
+    return p_deserializer->TransmitState(std::make_shared<RequestProtocolDeserializerGetCommandTypeState>());
 }
 
 std::optional<Error> RequestProtocolDeserializerGetCommandTypeState::Execute(RequestProtocolBuilder &builder, std::stringstream &stringBuilder, std::string &content, int &index)
 {
-    while (isdigit(content[index]) || isalpha(content[index]))
+    while (IsValidIndexInContent(content, index) && (isdigit(content[index]) || isalpha(content[index])))
     {
-        index++;
         stringBuilder << content[index];
-    }
-
-    if (content[index] == ';')
-    {
         index++;
-        std::string commandTypeText = stringBuilder.str();
-        if (commandTypeText == "RawQuery" || commandTypeText == "StoredProcedure")
-        {
-            builder.AddCommandType(commandTypeText == "RawQuery" ? RequestProtocolCommandType::RawQuery : RequestProtocolCommandType::StoredProcedure);
-            stringBuilder.str("");
-            stringBuilder.clear();
-            return p_deserializer->TransmitState(std::make_shared<RequestProtocolDeserializerGetHeaderNameState>());
-        }
     }
 
-    return Error("The version doesn't start with a number", ErrorType::Unexpected); // I need to improve this one
+    if (!IsValidIndexInContent(content, index))
+        return Error(ErrorType::ProtocolFormat, "The content finished before complete the commandtype");
+
+    if (content[index] != ';')
+        return Error(ErrorType::ProtocolFormat, "Invalid commandtype format or transition");
+
+    index++;
+    std::string commandTypeText = stringBuilder.str();
+    if (commandTypeText != "RawQuery" && commandTypeText != "StoredProcedure")
+        return Error(ErrorType::ProtocolFormat, "CommandType " + commandTypeText + " is not allowed");
+
+    builder.AddCommandType(commandTypeText == "RawQuery" ? RequestProtocolCommandType::RawQuery : RequestProtocolCommandType::StoredProcedure);
+    stringBuilder.str("");
+    stringBuilder.clear();
+    return p_deserializer->TransmitState(std::make_shared<RequestProtocolDeserializerGetHeaderNameState>());
 }
 
 std::optional<Error> RequestProtocolDeserializerGetHeaderNameState::Execute(RequestProtocolBuilder &builder, std::stringstream &stringBuilder, std::string &content, int &index)
 {
-    while (isdigit(content[index]) || isalpha(content[index]))
+    while (IsValidIndexInContent(content, index) && (isdigit(content[index]) || isalpha(content[index])))
     {
-        index++;
         stringBuilder << content[index];
+        index++;
     }
 
-    if (content[index] == ':')
+    if (!IsValidIndexInContent(content, index))
+        return Error(ErrorType::ProtocolFormat, "The content finished before complete the headers");
+
+    std::string currentStringBuilderValue = stringBuilder.str();
+    int currentStringBuilderLength = currentStringBuilderValue.length();
+    if (content[index] == ':' && currentStringBuilderLength > 0)
     {
         index++;
-        builder.AddHeaderName(stringBuilder.str());
+        builder.AddHeaderName(currentStringBuilderValue);
         stringBuilder.str("");
         stringBuilder.clear();
         return p_deserializer->TransmitState(std::make_shared<RequestProtocolDeserializerGetHeaderValueState>());
     }
-    else if (content[index] == ';' && stringBuilder.str().length() == 0)
+    else if (content[index] == ';' && currentStringBuilderLength == 0)
     {
         index++;
         return p_deserializer->TransmitState(std::make_shared<RequestProtocolDeserializerGetMessageState>());
     }
 
-    return Error("The version doesn't start with a number", ErrorType::Unexpected); // I need to improve this one
+    return Error(ErrorType::ProtocolFormat, "Invalid headers format or transition");
 }
 
 std::optional<Error> RequestProtocolDeserializerGetHeaderValueState::Execute(RequestProtocolBuilder &builder, std::stringstream &stringBuilder, std::string &content, int &index)
 {
-    while (isdigit(content[index]) || isalpha(content[index]))
+    while (IsValidIndexInContent(content, index) && (isdigit(content[index]) || isalpha(content[index])))
     {
-        index++;
         stringBuilder << content[index];
-    }
-
-    if (content[index] == ';')
-    {
         index++;
-        builder.AddHeaderValue(stringBuilder.str());
-        stringBuilder.str("");
-        stringBuilder.clear();
-        return p_deserializer->TransmitState(std::make_shared<RequestProtocolDeserializerGetHeaderNameState>());
     }
 
-    return Error("The version doesn't start with a number", ErrorType::Unexpected); // I need to improve this one
+    if (!IsValidIndexInContent(content, index))
+        return Error(ErrorType::ProtocolFormat, "The content finished before complete the headers");
+
+    if (content[index] != ';')
+        return Error(ErrorType::ProtocolFormat, "Invalid headers format or transition");
+
+    index++;
+    builder.AddHeaderValue(stringBuilder.str());
+    stringBuilder.str("");
+    stringBuilder.clear();
+    return p_deserializer->TransmitState(std::make_shared<RequestProtocolDeserializerGetHeaderNameState>());
 }
 
 std::optional<Error> RequestProtocolDeserializerGetMessageState::Execute(RequestProtocolBuilder &builder, std::stringstream &stringBuilder, std::string &content, int &index)
 {
-    while (isdigit(content[index]) || isalpha(content[index]))
+    while (IsValidIndexInContent(content, index) && (isdigit(content[index]) || isalpha(content[index])))
     {
-        index++;
         stringBuilder << content[index];
+        index++;
     }
 
-    if (index == content.length() - 1)
-    {
-        builder.AddMessage(stringBuilder.str());
-        stringBuilder.str("");
-        stringBuilder.clear();
-        return std::nullopt;
-    }
+    if (index < content.length())
+        return Error(ErrorType::ProtocolFormat, "Invalid message");
 
-    return Error("The version doesn't start with a number", ErrorType::Unexpected); // I need to improve this one
+    builder.AddMessage(stringBuilder.str());
+    stringBuilder.str("");
+    stringBuilder.clear();
+    return std::nullopt;
 }

@@ -30,14 +30,14 @@ std::optional<std::string> Connection::ReceiveBytes(const int &&size)
 
     if (bytesRecv == -1)
     {
-        UpsertError(Error("There was a connection issue", ErrorType::Unexpected));
+        UpsertError(Error(ErrorType::Unexpected, "There was a connection issue"));
         m_status = ConnectionStatus::Fail;
         return std::nullopt;
     }
 
     if (bytesRecv == 0)
     {
-        UpsertError(Error("The client disconnected", ErrorType::Unexpected));
+        UpsertError(Error(ErrorType::Unexpected, "The client disconnected"));
         m_status = ConnectionStatus::Closed;
         return std::nullopt;
     }
