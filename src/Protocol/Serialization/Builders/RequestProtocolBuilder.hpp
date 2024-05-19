@@ -12,6 +12,8 @@ private:
     std::string m_headerNameCache;
 
 public:
+    RequestProtocolBuilder();
+
     void AddVersion(std::string protocol);
     void AddCommandType(RequestProtocolCommandType commandType);
     void AddHeaderName(std::string headerName);

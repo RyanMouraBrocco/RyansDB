@@ -2,19 +2,21 @@
 
 RequestProtocolDeserializer::RequestProtocolDeserializer(std::string content) : m_content(content)
 {
-    p_state = std::make_shared<RequestProtocolDeserializerStartState>();
+    p_state = nullptr;
     m_index = 0;
 }
 
-std::optional<Error> RequestProtocolDeserializer::TransmitState(std::shared_ptr<IRequestProtocolDeserializerState> state)
+std::optional<Error> RequestProtocolDeserializer::TransmitState(IRequestProtocolDeserializerState *state)
 {
-    p_state = state;
+    // auto oldPointer = p_state;
+    state->SetDeserializer(this);
+    p_state.reset(state);
     return p_state->Execute(m_protocolBuilder, m_stringBuilder, m_content, m_index);
 }
 
 std::variant<RequestProtocol, Error> RequestProtocolDeserializer::Deserialize()
 {
-    auto response = TransmitState(std::make_shared<RequestProtocolDeserializerStartState>());
+    auto response = TransmitState(new RequestProtocolDeserializerStartState());
     if (response.has_value())
         return response.value();
 
@@ -32,7 +34,7 @@ std::optional<Error> RequestProtocolDeserializerStartState::Execute(RequestProto
     {
         stringBuilder << content[index];
         index++;
-        return p_deserializer->TransmitState(std::make_shared<RequestProtocolDeserializerGetVersionState>());
+        return p_deserializer->TransmitState(new RequestProtocolDeserializerGetVersionState());
     }
 
     return Error(ErrorType::ProtocolFormat, "The version doesn't start with a number");
@@ -56,7 +58,7 @@ std::optional<Error> RequestProtocolDeserializerGetVersionState::Execute(Request
     builder.AddVersion(stringBuilder.str());
     stringBuilder.str("");
     stringBuilder.clear();
-    return p_deserializer->TransmitState(std::make_shared<RequestProtocolDeserializerGetCommandTypeState>());
+    return p_deserializer->TransmitState(new RequestProtocolDeserializerGetCommandTypeState());
 }
 
 std::optional<Error> RequestProtocolDeserializerGetCommandTypeState::Execute(RequestProtocolBuilder &builder, std::stringstream &stringBuilder, std::string &content, int &index)
@@ -81,7 +83,7 @@ std::optional<Error> RequestProtocolDeserializerGetCommandTypeState::Execute(Req
     builder.AddCommandType(commandTypeText == "RawQuery" ? RequestProtocolCommandType::RawQuery : RequestProtocolCommandType::StoredProcedure);
     stringBuilder.str("");
     stringBuilder.clear();
-    return p_deserializer->TransmitState(std::make_shared<RequestProtocolDeserializerGetHeaderNameState>());
+    return p_deserializer->TransmitState(new RequestProtocolDeserializerGetHeaderNameState());
 }
 
 std::optional<Error> RequestProtocolDeserializerGetHeaderNameState::Execute(RequestProtocolBuilder &builder, std::stringstream &stringBuilder, std::string &content, int &index)
@@ -103,12 +105,12 @@ std::optional<Error> RequestProtocolDeserializerGetHeaderNameState::Execute(Requ
         builder.AddHeaderName(currentStringBuilderValue);
         stringBuilder.str("");
         stringBuilder.clear();
-        return p_deserializer->TransmitState(std::make_shared<RequestProtocolDeserializerGetHeaderValueState>());
+        return p_deserializer->TransmitState(new RequestProtocolDeserializerGetHeaderValueState());
     }
     else if (content[index] == ';' && currentStringBuilderLength == 0)
     {
         index++;
-        return p_deserializer->TransmitState(std::make_shared<RequestProtocolDeserializerGetMessageState>());
+        return p_deserializer->TransmitState(new RequestProtocolDeserializerGetMessageState());
     }
 
     return Error(ErrorType::ProtocolFormat, "Invalid headers format or transition");
@@ -132,12 +134,12 @@ std::optional<Error> RequestProtocolDeserializerGetHeaderValueState::Execute(Req
     builder.AddHeaderValue(stringBuilder.str());
     stringBuilder.str("");
     stringBuilder.clear();
-    return p_deserializer->TransmitState(std::make_shared<RequestProtocolDeserializerGetHeaderNameState>());
+    return p_deserializer->TransmitState(new RequestProtocolDeserializerGetHeaderNameState());
 }
 
 std::optional<Error> RequestProtocolDeserializerGetMessageState::Execute(RequestProtocolBuilder &builder, std::stringstream &stringBuilder, std::string &content, int &index)
 {
-    while (IsValidIndexInContent(content, index) && (isdigit(content[index]) || isalpha(content[index])))
+    while (IsValidIndexInContent(content, index) && (isdigit(content[index]) || isalpha(content[index]) || content[index] == ' ' || content[index] == '*' || content[index] == '='))
     {
         stringBuilder << content[index];
         index++;

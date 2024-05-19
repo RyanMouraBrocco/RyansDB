@@ -15,9 +15,19 @@ class RequestProtocolDeserializer;
 class IRequestProtocolDeserializerState
 {
 protected:
-    std::unique_ptr<RequestProtocolDeserializer> p_deserializer;
+    RequestProtocolDeserializer *p_deserializer;
     bool IsValidIndexInContent(std::string &content, int &index) const;
+
 public:
+    virtual ~IRequestProtocolDeserializerState()
+    {
+    }
+
+    void SetDeserializer(RequestProtocolDeserializer *deserializer)
+    {
+        p_deserializer = deserializer;
+    }
+
     virtual std::optional<Error> Execute(RequestProtocolBuilder &builder, std::stringstream &stringBuilder, std::string &content, int &index) = 0;
 };
 
@@ -32,7 +42,7 @@ private:
 
 public:
     RequestProtocolDeserializer(std::string content);
-    std::optional<Error> TransmitState(std::shared_ptr<IRequestProtocolDeserializerState> state);
+    std::optional<Error> TransmitState(IRequestProtocolDeserializerState *state);
     std::variant<RequestProtocol, Error> Deserialize();
 };
 

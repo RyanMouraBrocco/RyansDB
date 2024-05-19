@@ -2,6 +2,8 @@
 #include <iostream>
 #include "TcpServer/Socket/socket.hpp"
 #include "TcpServer/Socket/Connections/connection.hpp"
+#include "Protocol/Serialization/RequestProtocolDeserializer.hpp"
+#include "Protocol/Contracts/Request/RequestProtocol.hpp"
 #include <thread>
 
 void EndPointsListener(Connection *connection)
@@ -18,6 +20,13 @@ void EndPointsListener(Connection *connection)
             {
                 if (connection->GetStatus() != ConnectionStatus::Connected)
                     break;
+
+                auto deserializer = RequestProtocolDeserializer(textResult.value());
+                auto requestProtocolResult = deserializer.Deserialize();
+                if (std::holds_alternative<RequestProtocol>(requestProtocolResult))
+                {
+                    auto protocol = std::get<RequestProtocol>(requestProtocolResult);
+                }
 
                 connection->SendBytes(((std::string) "12345678").data(), 8);
             }
@@ -42,7 +51,7 @@ int main()
         return -1;
     }
 
-    short connectionPool = 40;
+    short connectionPool = 1;
 
     Connection **connections = new Connection *[connectionPool];
     std::thread **threads = new std::thread *[connectionPool];

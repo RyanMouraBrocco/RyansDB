@@ -1,5 +1,10 @@
 #include "RequestProtocolBuilder.hpp"
 
+RequestProtocolBuilder::RequestProtocolBuilder()
+{
+    m_protocol = std::make_shared<RequestProtocol>();
+}
+
 void RequestProtocolBuilder::AddVersion(std::string protocol)
 {
     m_protocol->SetVersion(protocol);
