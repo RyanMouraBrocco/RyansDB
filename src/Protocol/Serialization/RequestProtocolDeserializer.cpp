@@ -8,7 +8,6 @@ RequestProtocolDeserializer::RequestProtocolDeserializer(std::string content) : 
 
 std::optional<Error> RequestProtocolDeserializer::TransmitState(IRequestProtocolDeserializerState *state)
 {
-    // auto oldPointer = p_state;
     state->SetDeserializer(this);
     p_state.reset(state);
     return p_state->Execute(m_protocolBuilder, m_stringBuilder, m_content, m_index);
