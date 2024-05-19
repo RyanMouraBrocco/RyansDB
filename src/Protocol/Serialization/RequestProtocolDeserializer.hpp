@@ -74,4 +74,5 @@ class RequestProtocolDeserializerGetHeaderValueState : public IRequestProtocolDe
 class RequestProtocolDeserializerGetMessageState : public IRequestProtocolDeserializerState
 {
     std::optional<Error> Execute(RequestProtocolBuilder &builder, std::stringstream &stringBuilder, std::string &content, int &index) override;
+    bool CheckAllowedSpecialCharacters(char character) const;
 };

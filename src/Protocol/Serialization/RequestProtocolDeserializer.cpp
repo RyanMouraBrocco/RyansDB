@@ -87,7 +87,7 @@ std::optional<Error> RequestProtocolDeserializerGetCommandTypeState::Execute(Req
 
 std::optional<Error> RequestProtocolDeserializerGetHeaderNameState::Execute(RequestProtocolBuilder &builder, std::stringstream &stringBuilder, std::string &content, int &index)
 {
-    while (IsValidIndexInContent(content, index) && (isdigit(content[index]) || isalpha(content[index])))
+    while (IsValidIndexInContent(content, index) && (isdigit(content[index]) || isalpha(content[index]) || content[index] == '-'))
     {
         stringBuilder << content[index];
         index++;
@@ -117,7 +117,7 @@ std::optional<Error> RequestProtocolDeserializerGetHeaderNameState::Execute(Requ
 
 std::optional<Error> RequestProtocolDeserializerGetHeaderValueState::Execute(RequestProtocolBuilder &builder, std::stringstream &stringBuilder, std::string &content, int &index)
 {
-    while (IsValidIndexInContent(content, index) && (isdigit(content[index]) || isalpha(content[index])))
+    while (IsValidIndexInContent(content, index) && (isdigit(content[index]) || isalpha(content[index]) || content[index] == '-'))
     {
         stringBuilder << content[index];
         index++;
@@ -138,7 +138,11 @@ std::optional<Error> RequestProtocolDeserializerGetHeaderValueState::Execute(Req
 
 std::optional<Error> RequestProtocolDeserializerGetMessageState::Execute(RequestProtocolBuilder &builder, std::stringstream &stringBuilder, std::string &content, int &index)
 {
-    while (IsValidIndexInContent(content, index) && (isdigit(content[index]) || isalpha(content[index]) || content[index] == ' ' || content[index] == '*' || content[index] == '='))
+
+    while (IsValidIndexInContent(content, index) &&
+           (isdigit(content[index]) ||
+            isalpha(content[index]) ||
+            CheckAllowedSpecialCharacters(content[index])))
     {
         stringBuilder << content[index];
         index++;
@@ -151,4 +155,16 @@ std::optional<Error> RequestProtocolDeserializerGetMessageState::Execute(Request
     stringBuilder.str("");
     stringBuilder.clear();
     return std::nullopt;
+}
+
+bool RequestProtocolDeserializerGetMessageState::CheckAllowedSpecialCharacters(char character) const
+{
+    const char allowedSpecialCharacters[18] = {' ', '*', '=', '>', '<', '(', ')', '.', ',', '[', ']', '+', '-', '/', ';', '_', '\'', '"'};
+    for (unsigned char i = 0; i < 18; i++)
+    {
+        if (allowedSpecialCharacters[i] == character)
+            return true;
+    }
+
+    return false;
 }
