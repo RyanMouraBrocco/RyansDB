@@ -4,10 +4,12 @@
 #include "TcpServer/Socket/Connections/connection.hpp"
 #include "Protocol/Serialization/RequestProtocolDeserializer.hpp"
 #include "Protocol/Contracts/Request/RequestProtocol.hpp"
+#include "Orchestrator/RequestOrchestrator.hpp"
 #include <thread>
 
 void EndPointsListener(Connection *connection)
 {
+    auto orchestrator = RequestOrchestrator();
     while (true)
     {
         connection->AcceptForNewAccess();
@@ -21,12 +23,7 @@ void EndPointsListener(Connection *connection)
                 if (connection->GetStatus() != ConnectionStatus::Connected)
                     break;
 
-                auto deserializer = RequestProtocolDeserializer(textResult.value());
-                auto requestProtocolResult = deserializer.Deserialize();
-                if (std::holds_alternative<RequestProtocol>(requestProtocolResult))
-                {
-                    auto protocol = std::get<RequestProtocol>(requestProtocolResult);
-                }
+                orchestrator.Consume(textResult.value());
 
                 connection->SendBytes(((std::string) "12345678").data(), 8);
             }

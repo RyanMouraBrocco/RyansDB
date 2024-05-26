@@ -16,4 +16,5 @@ add_executable(RyansDBServer
                 ./src/Protocol/Contracts/Request/RequestProtocol.cpp
                 ./src/Protocol/Contracts/Response/ResponseProtocol.cpp
                 ./src/Protocol/Serialization/RequestProtocolDeserializer.cpp
-                ./src/Protocol/Serialization/Builders/RequestProtocolBuilder.cpp)
+                ./src/Protocol/Serialization/Builders/RequestProtocolBuilder.cpp
+                ./src/Orchestrator/RequestOrchestrator.cpp)
