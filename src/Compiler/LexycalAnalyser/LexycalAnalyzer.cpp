@@ -21,36 +21,159 @@ bool LexycalAnalyzer::Execute(std::string query)
         {
             if (IsReservedStatement(query, index, length))
                 continue;
+
+            SaveIdentifierStatement(query, index);
         }
         else if (isdigit(query[index]))
         {
+            SaveNumberStatement(query, index);
         }
         else if (query[index] == '@')
         {
+            SaveVariableStatement(query, index);
         }
         else if (query[index] == '\'')
         {
-            std::stringstream stringBuilder;
-            while (index < length || query[index] != '\'')
-            {
-                stringBuilder << query[index];
-                index++;
-            }
-
-            if (index >= length)
-                return false;
-
-            index++;
-
-            p_symbolTable->AddToken(stringBuilder.str(), Token::STRING);
+            SaveStringStatement(query, index);
         }
-        else if (IsSpecialCharacter())
+        else if (IsValidSpecialCharacter(query, index))
         {
         }
         else
         {
         }
     }
+
+    return true;
+}
+
+bool LexycalAnalyzer::IsEndTokenChar(const char &value) const
+{
+    return value == ' ' ||
+           value == ' '; //
+}
+
+bool LexycalAnalyzer::SaveNumberStatement(const std::string &query, int &index)
+{
+    Token token = Token::INTEGER_NUMBER;
+
+    std::stringstream stringBuilder;
+    while (isdigit(query[index]))
+    {
+        stringBuilder << query[index];
+        index++;
+    }
+
+    if (query[index] == '.')
+    {
+        stringBuilder << query[index];
+        index++;
+        while (isdigit(query[index]))
+        {
+            stringBuilder << query[index];
+            index++;
+        }
+
+        token = Token::DECIMAL_NUMBER;
+    }
+
+    if (!IsEndTokenChar(query[index]))
+        return false;
+
+    p_symbolTable->AddToken(stringBuilder.str(), token);
+
+    return true;
+}
+
+bool LexycalAnalyzer::IsValidSpecialCharacter(const std::string &query, int &index)
+{
+    std::map<char, Token> specialCharacterTokens =
+        {
+            {'*', Token::ASTERISK},
+            {',', Token::COMMA},
+            {'.', Token::DOT},
+            {';', Token::SEMICOLON},
+            {'=', Token::EQUAL},
+            {'[', Token::LEFT_BRACKET},
+            {']', Token::RIGHT_BRACKET},
+            {'(', Token::LEFT_PARENTHESIS},
+            {')', Token::RIGHT_PARENTHESIS},
+        };
+
+    if (specialCharacterTokens[query[index]] != specialCharacterTokens.end())
+    {
+        p_symbolTable->AddToken(str(1, query[index]), specialCharacterTokens[query[index]]);
+        index++;
+        return true;
+    }
+    else if (query[index] == '>' || query[index] == '<')
+    {
+        bool isGreaterThanSymbol = query[index] == '>';
+        if (index + 1 < query.length() && query[index + 1] == '=')
+        {
+            p_symbolTable->AddToken(isGreaterThanSymbol ? ">=" : "<=", isGreaterThanSymbol ? Token::GREATER_OR_EQUAL_THAN : Token::LESS_OR_EQUAL_THAN);
+            index += 2;
+        }
+        else
+        {
+            p_symbolTable->AddToken(str(1, query[index]), isGreaterThanSymbol ? Token::GREATER_THAN : Token::LESS_THAN);
+            index++;
+        }
+    }
+
+    return false;
+}
+
+bool LexycalAnalyzer::SaveVariableStatement(const std::string &query, int &index)
+{
+    int length = query.length();
+    std::stringstream stringBuilder;
+
+    stringBuilder << query[index];
+    index++;
+
+    while (index < length && !isdigit(query[index]) && !IsEndTokenChar(query[index]))
+    {
+        stringBuilder << query[index];
+        index++;
+    }
+
+    p_symbolTable->AddToken(stringBuilder.str(), Token::VARIABLE);
+    return true;
+}
+
+bool LexycalAnalyzer::SaveIdentifierStatement(const std::string &query, int &index)
+{
+    int length = query.length();
+    std::stringstream stringBuilder;
+    while (index < length && !isdigit(query[index]) && !IsEndTokenChar(query[index]))
+    {
+        stringBuilder << query[index];
+        index++;
+    }
+
+    p_symbolTable->AddToken(stringBuilder.str(), Token::IDENTIFIER);
+    return true;
+}
+
+bool LexycalAnalyzer::SaveStringStatement(const std::string &query, int &index)
+{
+    int length = query.length();
+    index++; // skip first \'
+
+    std::stringstream stringBuilder;
+    while (index < length && query[index] != '\'')
+    {
+        stringBuilder << query[index];
+        index++;
+    }
+
+    if (index >= length)
+        return false;
+
+    index++; // skip the second \'
+
+    p_symbolTable->AddToken(stringBuilder.str(), Token::STRING);
 
     return true;
 }

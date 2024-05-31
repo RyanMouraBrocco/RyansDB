@@ -28,7 +28,8 @@ enum class Token
     LEFT_BRACKET,
     RIGHT_BRACKET,
     LEFT_PARENTHESIS,
-    RIGHT_PARENTHESIS
+    RIGHT_PARENTHESIS,
+    VARIABLE
 };
 
 class SymbolTable
