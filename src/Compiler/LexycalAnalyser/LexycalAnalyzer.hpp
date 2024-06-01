@@ -1,28 +1,34 @@
-#pragma onde;
+#pragma once
 
 #include <memory>
 #include "../SymbolTable/SymbolTable.hpp"
+#include "../../Error/error.hpp"
 #include <string>
 #include <sstream>
 #include <ctype.h>
 #include <vector>
 #include <map>
+#include <optional>
+#include <tuple>
 
 class LexycalAnalyzer
 {
 private:
     std::shared_ptr<SymbolTable> p_symbolTable;
 
+    bool IsSkippableChar(const char &value) const;
     bool IsEndTokenChar(const char &value) const;
-    bool IsReservedStatement(std::string &query, int &index, int &queryLength);
-    bool IsStatement(const std::string &&expectedStatement, const std::string &query, const int &index) const;
-    bool SaveStringStatement(const std::string &query, int &index);
-    bool SaveVariableStatement(const std::string &query, int &index);
-    bool SaveIdentifierStatement(const std::string &query, int &index);
-    bool IsValidSpecialCharacter(const std::string &query, int &index);
-    bool SaveNumberStatement(const std::string &query, int &index);
+    bool IsStatement(const std::string &expectedStatement, const std::string &query, const int &index) const;
+
+    std::optional<Error> SaveAlphaStatement(const std::string &query, int &index);
+    std::optional<Error> SaveReservedStatement(const std::string &query, int &index);
+    std::optional<Error> SaveIdentifierStatement(const std::string &query, int &index);
+    std::optional<Error> SaveNumberStatement(const std::string &query, int &index);
+    std::optional<Error> SaveVariableStatement(const std::string &query, int &index);
+    std::optional<Error> SaveStringStatement(const std::string &query, int &index);
+    std::optional<Error> SaveSpecialCharacter(const std::string &query, int &index);
 
 public:
     LexycalAnalyzer(std::shared_ptr<SymbolTable> symbolTable);
-    bool Execute(std::string query);
+    std::optional<Error> Execute(std::string query);
 };

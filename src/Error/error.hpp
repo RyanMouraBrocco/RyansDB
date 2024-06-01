@@ -3,8 +3,20 @@
 
 enum class ErrorType
 {
+    // START Protocol Error
     ProtocolFormat = 400,
-    Unexpected = 500
+    // END Protocol Error
+
+    Unexpected = 500,
+    // START Compiler Error
+    InvalidReservedStatement = 600,
+    InvalidIdentifierStatement = 601,
+    InvalidVariableStatement = 602,
+    InvalidStringStatement = 603,
+    InvalidCharacter = 604,
+    InvalidNumberStatement = 605,
+    // END Compiler Error
+
 };
 
 class Error
