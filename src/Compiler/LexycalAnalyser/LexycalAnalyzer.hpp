@@ -26,7 +26,8 @@ private:
     std::optional<Error> SaveNumberStatement(const std::string &query, int &index);
     std::optional<Error> SaveVariableStatement(const std::string &query, int &index);
     std::optional<Error> SaveStringStatement(const std::string &query, int &index);
-    std::optional<Error> SaveSpecialCharacter(const std::string &query, int &index);
+    std::optional<Error> SaveSpecialCharacterStatement(const std::string &query, int &index);
+    std::optional<Error> SaveGreaterOrLessThanStatement(const std::string &query, int &index);
 
 public:
     LexycalAnalyzer(std::shared_ptr<SymbolTable> symbolTable);

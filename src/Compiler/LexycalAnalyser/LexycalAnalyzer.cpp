@@ -28,7 +28,7 @@ std::optional<Error> LexycalAnalyzer::Execute(std::string query)
         else if (query[index] == '\'')
             errorResult = SaveStringStatement(query, index);
         else
-            errorResult = SaveSpecialCharacter(query, index);
+            errorResult = SaveSpecialCharacterStatement(query, index);
 
         if (errorResult.has_value())
             return errorResult.value();
@@ -199,7 +199,7 @@ std::optional<Error> LexycalAnalyzer::SaveStringStatement(const std::string &que
     return std::nullopt;
 }
 
-std::optional<Error> LexycalAnalyzer::SaveSpecialCharacter(const std::string &query, int &index)
+std::optional<Error> LexycalAnalyzer::SaveSpecialCharacterStatement(const std::string &query, int &index)
 {
     std::map<char, Token> specialCharacterTokens =
         {
@@ -221,19 +221,24 @@ std::optional<Error> LexycalAnalyzer::SaveSpecialCharacter(const std::string &qu
         return std::nullopt;
     }
     else if (query[index] == '>' || query[index] == '<')
-    {
-        bool isGreaterThanSymbol = query[index] == '>';
-        if (index + 1 < query.length() && query[index + 1] == '=')
-        {
-            p_symbolTable->AddToken(isGreaterThanSymbol ? ">=" : "<=", isGreaterThanSymbol ? Token::GREATER_OR_EQUAL_THAN : Token::LESS_OR_EQUAL_THAN);
-            index += 2;
-        }
-        else
-        {
-            p_symbolTable->AddToken(std::string(1, query[index]), isGreaterThanSymbol ? Token::GREATER_THAN : Token::LESS_THAN);
-            index++;
-        }
-    }
+        return SaveGreaterOrLessThanStatement(query, index);
 
     return Error(ErrorType::InvalidCharacter, "Invalid char in sentence: " + query[index]);
+}
+
+std::optional<Error> LexycalAnalyzer::SaveGreaterOrLessThanStatement(const std::string &query, int &index)
+{
+    bool isGreaterThanSymbol = query[index] == '>';
+    if (index + 1 < query.length() && query[index + 1] == '=')
+    {
+        p_symbolTable->AddToken(isGreaterThanSymbol ? ">=" : "<=", isGreaterThanSymbol ? Token::GREATER_OR_EQUAL_THAN : Token::LESS_OR_EQUAL_THAN);
+        index += 2;
+    }
+    else
+    {
+        p_symbolTable->AddToken(std::string(1, query[index]), isGreaterThanSymbol ? Token::GREATER_THAN : Token::LESS_THAN);
+        index++;
+    }
+
+    return std::nullopt;
 }
