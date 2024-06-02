@@ -29,13 +29,37 @@ enum class Token
     RIGHT_BRACKET,
     LEFT_PARENTHESIS,
     RIGHT_PARENTHESIS,
-    VARIABLE
+    VARIABLE,
+    INSERT,
+    UPDATE,
+    DELETE,
+    SET,
+    INTO,
+    VALUES,
+    DECLARE,
+    INT,
+    NVARCHAR,
+    VARCHAR,
+    BIT,
+    NCHAR,
+    CHAR,
+    PRIMARY,
+    FOREIGN,
+    KEY,
+    CREATE,
+    TABLE,
+    DROP,
+    ALTER,
+    ADD,
+    CONSTRAINT,
+    UNIQUE,
+    INDEX,
 };
 
 class SymbolTable
 {
 private:
-     std::vector<std::tuple<std::string, Token>> m_tokens;
+    std::vector<std::tuple<std::string, Token>> m_tokens;
 
 public:
     SymbolTable();
