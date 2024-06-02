@@ -64,7 +64,7 @@ bool LexycalAnalyzer::IsStatement(const std::string &expectedStatement,
         if (query[index + i] != expectedStatement[i])
             return false;
     }
-    return index + expextedStatementLen + 1 >= queryLen || IsEndTokenChar(query[index + expextedStatementLen + 1]);
+    return index + expextedStatementLen >= queryLen || IsEndTokenChar(query[index + expextedStatementLen]);
 }
 
 std::optional<Error> LexycalAnalyzer::SaveAlphaStatement(const std::string &query, int &index)
@@ -91,11 +91,11 @@ std::optional<Error> LexycalAnalyzer::SaveReservedStatement(const std::string &q
     for (std::tuple<std::string, Token> statement : reservedStatements)
     {
         std::string text = std::get<0>(statement);
-        Token token = std::get<1>(statement);
         if (IsStatement(text, query, index))
         {
+            Token token = std::get<1>(statement);
             p_symbolTable->AddToken(text, token);
-            index += 5;
+            index += text.length();
             return std::nullopt;
         }
     }
@@ -107,7 +107,7 @@ std::optional<Error> LexycalAnalyzer::SaveIdentifierStatement(const std::string 
 {
     int length = query.length();
     std::stringstream stringBuilder;
-    while (index < length && !isdigit(query[index]) && !IsEndTokenChar(query[index]))
+    while (index < length && isalpha(query[index]) && !IsEndTokenChar(query[index]))
     {
         stringBuilder << query[index];
         index++;
@@ -136,7 +136,7 @@ std::optional<Error> LexycalAnalyzer::SaveNumberStatement(const std::string &que
         stringBuilder << query[index];
         index++;
 
-        if (isdigit(query[index]))
+        if (!isdigit(query[index]))
             return Error(ErrorType::InvalidNumberStatement, "Invalid number close sentence: " + query[index]);
 
         while (isdigit(query[index]))
@@ -148,7 +148,7 @@ std::optional<Error> LexycalAnalyzer::SaveNumberStatement(const std::string &que
         token = Token::DECIMAL_NUMBER;
     }
 
-    if (!IsEndTokenChar(query[index]))
+    if (index < query.length() && !IsEndTokenChar(query[index]))
         return Error(ErrorType::InvalidNumberStatement, "Invalid number close sentence: " + query[index]);
 
     p_symbolTable->AddToken(stringBuilder.str(), token);
@@ -164,7 +164,7 @@ std::optional<Error> LexycalAnalyzer::SaveVariableStatement(const std::string &q
     stringBuilder << query[index];
     index++;
 
-    while (index < length && !isdigit(query[index]) && !IsEndTokenChar(query[index]))
+    while (index < length && isalpha(query[index]) && !IsEndTokenChar(query[index]))
     {
         stringBuilder << query[index];
         index++;

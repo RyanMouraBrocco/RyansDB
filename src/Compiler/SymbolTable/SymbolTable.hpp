@@ -35,7 +35,7 @@ enum class Token
 class SymbolTable
 {
 private:
-    std::vector<std::tuple<std::string, Token>> m_tokens;
+     std::vector<std::tuple<std::string, Token>> m_tokens;
 
 public:
     SymbolTable();

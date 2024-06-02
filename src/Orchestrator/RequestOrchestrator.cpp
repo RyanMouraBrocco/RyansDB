@@ -9,5 +9,7 @@ void RequestOrchestrator::Consume(std::string requestMessage)
     if (std::holds_alternative<RequestProtocol>(requestProtocolResult))
     {
         auto protocol = std::get<RequestProtocol>(requestProtocolResult);
+        auto compiler = Compiler();
+        compiler.Build(protocol.GetMessage());
     }
 }

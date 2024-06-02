@@ -2,6 +2,7 @@
 
 #include <string>
 #include "../Protocol/Serialization/RequestProtocolDeserializer.hpp"
+#include "../Compiler/Compiler.hpp"
 
 class RequestOrchestrator
 {
