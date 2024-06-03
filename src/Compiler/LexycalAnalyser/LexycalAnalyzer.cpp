@@ -23,6 +23,8 @@ std::optional<Error> LexycalAnalyzer::Execute(std::string query)
             errorResult = SaveAlphaStatement(query, index);
         else if (isdigit(query[index]))
             errorResult = SaveNumberStatement(query, index);
+        else if (query[index] == '[')
+            SaveIdentifierStatement(query, index);
         else if (query[index] == '@')
             errorResult = SaveVariableStatement(query, index);
         else if (query[index] == '\'')
@@ -131,13 +133,28 @@ std::optional<Error> LexycalAnalyzer::SaveIdentifierStatement(const std::string 
 {
     int length = query.length();
     std::stringstream stringBuilder;
+
+    bool isUsingBrackets = false;
+    if (query[index] == '[')
+    {
+        isUsingBrackets = true;
+        index++;
+    }
+
     while (index < length && isalpha(query[index]) && !IsEndTokenChar(query[index]))
     {
         stringBuilder << query[index];
         index++;
     }
 
-    if (index < length && !IsEndTokenChar(query[index]))
+    if (isUsingBrackets)
+    {
+        if (index >= length || query[index] != ']')
+            return Error(ErrorType::InvalidIdentifierStatement, "Invalid identifier is missing a ]");
+
+        index++; // skipping ]
+    }
+    else if (index < length && !IsEndTokenChar(query[index]))
         return Error(ErrorType::InvalidIdentifierStatement, "Invalid identifier close the sentence: " + query[index]);
 
     p_symbolTable->AddToken(stringBuilder.str(), Token::IDENTIFIER);
