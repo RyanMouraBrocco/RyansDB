@@ -232,8 +232,6 @@ std::optional<Error> LexycalAnalyzer::SaveSpecialCharacterStatement(const std::s
             {'.', Token::DOT},
             {';', Token::SEMICOLON},
             {'=', Token::EQUAL},
-            {'[', Token::LEFT_BRACKET},
-            {']', Token::RIGHT_BRACKET},
             {'(', Token::LEFT_PARENTHESIS},
             {')', Token::RIGHT_PARENTHESIS},
         };
