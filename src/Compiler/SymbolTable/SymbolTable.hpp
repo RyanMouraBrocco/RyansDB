@@ -57,6 +57,9 @@ enum class Token
     CONSTRAINT,
     UNIQUE,
     INDEX,
+    DATABASE,
+    AND,
+    OR,
 };
 
 class LexemeTokenDefinition
@@ -87,6 +90,7 @@ public:
     SymbolTable();
     void AddToken(const std::string value, const Token key);
 
+    static bool IsSpecialCharacterToken(const char &value);
     static std::variant<Token, Error> GetSpecialCharacterToken(const char &value);
     static std::shared_ptr<std::vector<LexemeTokenDefinition>> GetReservedStatementsDefinitions();
 };

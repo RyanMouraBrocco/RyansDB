@@ -41,14 +41,18 @@ std::optional<Error> LexycalAnalyzer::Execute(std::string query)
 
 bool LexycalAnalyzer::IsSkippableChar(const char &value) const
 {
-    return IsEndTokenChar(value) || value == '\t';
+    return value == ' ' ||
+           value == '\n' ||
+           value == '\r' ||
+           value == '\t';
 }
 
 bool LexycalAnalyzer::IsEndTokenChar(const char &value) const
 {
     return value == ' ' ||
            value == '\n' ||
-           value == '\r';
+           value == '\r' ||
+           SymbolTable::IsSpecialCharacterToken(value);
 }
 
 bool LexycalAnalyzer::IsStatement(const LexemeTokenDefinition &statementDefinition,

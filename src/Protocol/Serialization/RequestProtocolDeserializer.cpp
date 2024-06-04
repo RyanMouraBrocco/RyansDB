@@ -159,8 +159,8 @@ std::optional<Error> RequestProtocolDeserializerGetMessageState::Execute(Request
 
 bool RequestProtocolDeserializerGetMessageState::CheckAllowedSpecialCharacters(char character) const
 {
-    const char allowedSpecialCharacters[18] = {' ', '*', '=', '>', '<', '(', ')', '.', ',', '[', ']', '+', '-', '/', ';', '_', '\'', '"'};
-    for (unsigned char i = 0; i < 18; i++)
+    const char allowedSpecialCharacters[21] = {' ', '*', '=', '>', '<', '(', ')', '.', ',', '[', ']', '+', '-', '/', ';', '_', '\'', '"', '\n', '\r', '\t'};
+    for (unsigned char i = 0; i < 21; i++)
     {
         if (allowedSpecialCharacters[i] == character)
             return true;

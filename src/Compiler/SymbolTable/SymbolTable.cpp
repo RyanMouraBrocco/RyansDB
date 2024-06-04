@@ -40,9 +40,14 @@ void SymbolTable::AddToken(const std::string value, const Token token)
     m_tokens.push_back(std::make_tuple(value, token));
 }
 
+bool SymbolTable::IsSpecialCharacterToken(const char &value)
+{
+    return SymbolTable::m_specialCharacterTokens.find(value) != SymbolTable::m_specialCharacterTokens.end();
+}
+
 std::variant<Token, Error> SymbolTable::GetSpecialCharacterToken(const char &value)
 {
-    if (SymbolTable::m_specialCharacterTokens.find(value) != SymbolTable::m_specialCharacterTokens.end())
+    if (IsSpecialCharacterToken(value))
         return SymbolTable::m_specialCharacterTokens[value];
 
     return Error(ErrorType::InvalidCharacter, "Invalid character");
@@ -85,6 +90,9 @@ std::shared_ptr<std::vector<LexemeTokenDefinition>> SymbolTable::m_reservedState
         LexemeTokenDefinition(Token::CONSTRAINT, "constraint", "CONSTRAINT"),
         LexemeTokenDefinition(Token::UNIQUE, "unique", "UNIQUE"),
         LexemeTokenDefinition(Token::INDEX, "index", "INDEX"),
+        LexemeTokenDefinition(Token::DATABASE, "database", "DATABASE"),
+        LexemeTokenDefinition(Token::AND, "and", "AND"),
+        LexemeTokenDefinition(Token::OR, "or", "OR"),
     });
 
 std::map<char, Token> SymbolTable::m_specialCharacterTokens = {
