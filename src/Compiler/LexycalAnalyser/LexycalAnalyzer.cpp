@@ -41,7 +41,7 @@ std::optional<Error> LexycalAnalyzer::Execute(std::string query)
 
 bool LexycalAnalyzer::IsSkippableChar(const char &value) const
 {
-    return value == ' ' || value == '\n' || value == '\t' || value == '\r';
+    return IsEndTokenChar(value) || value == '\t';
 }
 
 bool LexycalAnalyzer::IsEndTokenChar(const char &value) const
@@ -51,11 +51,11 @@ bool LexycalAnalyzer::IsEndTokenChar(const char &value) const
            value == '\r';
 }
 
-bool LexycalAnalyzer::IsStatement(const std::string &expectedStatement,
+bool LexycalAnalyzer::IsStatement(const LexemeTokenDefinition &statementDefinition,
                                   const std::string &query,
                                   const int &index) const
 {
-    int expextedStatementLen = expectedStatement.length();
+    int expextedStatementLen = statementDefinition.LexemeLength();
     int queryLen = query.length();
 
     if (index + expextedStatementLen >= queryLen)
@@ -63,9 +63,10 @@ bool LexycalAnalyzer::IsStatement(const std::string &expectedStatement,
 
     for (int8_t i = 0; i < expextedStatementLen; i++)
     {
-        if (query[index + i] != expectedStatement[i])
+        if (!statementDefinition.IsValidCharacterInTheIndex(query[index + i], i))
             return false;
     }
+
     return index + expextedStatementLen >= queryLen || IsEndTokenChar(query[index + expextedStatementLen]);
 }
 
@@ -80,47 +81,12 @@ std::optional<Error> LexycalAnalyzer::SaveAlphaStatement(const std::string &quer
 
 std::optional<Error> LexycalAnalyzer::SaveReservedStatement(const std::string &query, int &index)
 {
-    std::vector<std::tuple<std::string, Token>> reservedStatements =
-        {
-            std::tuple<std::string, Token>("SELECT", Token::SELECT),
-            std::tuple<std::string, Token>("FROM", Token::FROM),
-            std::tuple<std::string, Token>("WHERE", Token::WHERE),
-            std::tuple<std::string, Token>("NULL", Token::NULL_VALUE),
-            std::tuple<std::string, Token>("NOT", Token::NOT),
-            std::tuple<std::string, Token>("IS", Token::IS),
-            std::tuple<std::string, Token>("INSERT", Token::INSERT),
-            std::tuple<std::string, Token>("UPDATE", Token::UPDATE),
-            std::tuple<std::string, Token>("DELETE", Token::DELETE),
-            std::tuple<std::string, Token>("SET", Token::SET),
-            std::tuple<std::string, Token>("INTO", Token::INTO),
-            std::tuple<std::string, Token>("VALUES", Token::VALUES),
-            std::tuple<std::string, Token>("DECLARE", Token::DECLARE),
-            std::tuple<std::string, Token>("INT", Token::INT),
-            std::tuple<std::string, Token>("NVARCHAR", Token::NVARCHAR),
-            std::tuple<std::string, Token>("VARCHAR", Token::VARCHAR),
-            std::tuple<std::string, Token>("BIT", Token::BIT),
-            std::tuple<std::string, Token>("NCHAR", Token::NCHAR),
-            std::tuple<std::string, Token>("CHAR", Token::CHAR),
-            std::tuple<std::string, Token>("PRIMARY", Token::PRIMARY),
-            std::tuple<std::string, Token>("FOREIGN", Token::FOREIGN),
-            std::tuple<std::string, Token>("KEY", Token::KEY),
-            std::tuple<std::string, Token>("CREATE", Token::CREATE),
-            std::tuple<std::string, Token>("TABLE", Token::TABLE),
-            std::tuple<std::string, Token>("DROP", Token::DROP),
-            std::tuple<std::string, Token>("ALTER", Token::ALTER),
-            std::tuple<std::string, Token>("ADD", Token::ADD),
-            std::tuple<std::string, Token>("CONSTRAINT", Token::CONSTRAINT),
-            std::tuple<std::string, Token>("UNIQUE", Token::UNIQUE),
-            std::tuple<std::string, Token>("INDEX", Token::INDEX),
-        };
-
-    for (std::tuple<std::string, Token> statement : reservedStatements)
+    for (LexemeTokenDefinition statementDefinition : *SymbolTable::GetReservedStatementsDefinitions())
     {
-        std::string text = std::get<0>(statement);
-        if (IsStatement(text, query, index))
+        if (IsStatement(statementDefinition, query, index))
         {
-            Token token = std::get<1>(statement);
-            p_symbolTable->AddToken(text, token);
+            std::string text = statementDefinition.GetUpperCaseLexeme();
+            p_symbolTable->AddToken(text, statementDefinition.GetToken());
             index += text.length();
             return std::nullopt;
         }
@@ -242,20 +208,10 @@ std::optional<Error> LexycalAnalyzer::SaveStringStatement(const std::string &que
 
 std::optional<Error> LexycalAnalyzer::SaveSpecialCharacterStatement(const std::string &query, int &index)
 {
-    std::map<char, Token> specialCharacterTokens =
-        {
-            {'*', Token::ASTERISK},
-            {',', Token::COMMA},
-            {'.', Token::DOT},
-            {';', Token::SEMICOLON},
-            {'=', Token::EQUAL},
-            {'(', Token::LEFT_PARENTHESIS},
-            {')', Token::RIGHT_PARENTHESIS},
-        };
-
-    if (specialCharacterTokens.find(query[index]) != specialCharacterTokens.end())
+    auto getSpecialCharacterResult = SymbolTable::GetSpecialCharacterToken(query[index]);
+    if (std::holds_alternative<Token>(getSpecialCharacterResult))
     {
-        p_symbolTable->AddToken(std::string(1, query[index]), specialCharacterTokens[query[index]]);
+        p_symbolTable->AddToken(std::string(1, query[index]), std::get<Token>(getSpecialCharacterResult));
         index++;
         return std::nullopt;
     }

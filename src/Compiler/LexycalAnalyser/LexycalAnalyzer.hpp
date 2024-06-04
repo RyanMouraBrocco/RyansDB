@@ -18,7 +18,7 @@ private:
 
     bool IsSkippableChar(const char &value) const;
     bool IsEndTokenChar(const char &value) const;
-    bool IsStatement(const std::string &expectedStatement, const std::string &query, const int &index) const;
+    bool IsStatement(const LexemeTokenDefinition &statementDefinition, const std::string &query, const int &index) const;
 
     std::optional<Error> SaveAlphaStatement(const std::string &query, int &index);
     std::optional<Error> SaveReservedStatement(const std::string &query, int &index);
