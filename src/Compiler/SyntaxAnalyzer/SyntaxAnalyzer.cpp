@@ -127,7 +127,10 @@ std::optional<Error> SyntaxAnalyzer::CheckTokenExpression(const std::vector<Toke
     if (tokens[index].GetToken() == Token::NOT)
     {
         Consume(tokens[index].GetToken(), Token::NOT, index);
-        // MORE HERE
+        if (tokens[index].GetToken() == Token::NULL_VALUE)
+            Consume(tokens[index].GetToken(), Token::NULL_VALUE, index);
+        else
+            CheckFactorExpression(tokens, index);
     }
     else if (tokens[index].GetToken() == Token::LEFT_PARENTHESIS)
     {
@@ -141,22 +144,28 @@ std::optional<Error> SyntaxAnalyzer::CheckTokenExpression(const std::vector<Toke
 
 std::optional<Error> SyntaxAnalyzer::CheckComparisonExpression(const std::vector<TokenDefinition> &tokens, int &index) const
 {
-    CheckFactorExpression();
-    if (IsValidComparisonToken())
+    CheckFactorExpression(tokens, index);
+    if (SymbolTable::IsComparisionToken(tokens[index].GetToken()))
     {
-        CheckCompareAction();
-        CheckFactorExpression();
+        CheckCompareAction(tokens, index);
+        CheckFactorExpression(tokens, index);
     }
 }
 
 std::optional<Error> SyntaxAnalyzer::CheckCompareAction(const std::vector<TokenDefinition> &tokens, int &index) const
 {
-    
+    if (SymbolTable::IsComparisionToken(tokens[index].GetToken()))
+        return Consume(tokens[index].GetToken(), tokens[index].GetToken(), index);
 }
 
 std::optional<Error> SyntaxAnalyzer::CheckFactorExpression(const std::vector<TokenDefinition> &tokens, int &index) const
 {
-    const validFactorsExpression = 
+    if (tokens[index].GetToken() == Token::IDENTIFIER)
+        CheckIdentifierAttribute(tokens, index);
+    else if (tokens[index].GetToken() == Token::NULL_VALUE)
+        Consume(tokens[index].GetToken(), Token::NULL_VALUE, index);
+    else if (SymbolTable::IsFactorToken(tokens[index].GetToken()))
+        Consume(tokens[index].GetToken(), tokens[index].GetToken(), index);
 }
 
 std::optional<Error> SyntaxAnalyzer::CheckIdentifierAttribute(const std::vector<TokenDefinition> &tokens, int &index) const

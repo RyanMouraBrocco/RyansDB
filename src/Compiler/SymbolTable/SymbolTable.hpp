@@ -9,6 +9,7 @@
 #include <stdexcept>
 #include <algorithm>
 #include <cctype>
+#include <unordered_set>
 #include "../../Error/error.hpp"
 
 enum class Token
@@ -88,6 +89,8 @@ private:
 
     static std::shared_ptr<std::vector<TokenDefinition>> m_reservedStatements;
     static std::map<char, Token> m_specialCharacterTokens;
+    static std::unordered_set<Token> m_comparisionTokens;
+    static std::unordered_set<Token> m_factorTokens;
 
 public:
     SymbolTable();
@@ -97,4 +100,6 @@ public:
     static bool IsSpecialCharacterToken(const char &value);
     static std::variant<Token, Error> GetSpecialCharacterToken(const char &value);
     static std::shared_ptr<std::vector<TokenDefinition>> GetReservedStatementsDefinitions();
+    static bool IsComparisionToken(Token token);
+    static bool IsFactorToken(Token token);
 };

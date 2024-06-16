@@ -74,6 +74,16 @@ std::shared_ptr<std::vector<TokenDefinition>> SymbolTable::GetReservedStatements
     return SymbolTable::m_reservedStatements;
 }
 
+bool SymbolTable::IsComparisionToken(Token token)
+{
+    return SymbolTable::m_comparisionTokens.find(token) != SymbolTable::m_comparisionTokens.end();
+}
+
+bool SymbolTable::IsFactorToken(Token token)
+{
+    return SymbolTable::m_factorTokens.find(token) != SymbolTable::m_factorTokens.end();
+}
+
 std::shared_ptr<std::vector<TokenDefinition>> SymbolTable::m_reservedStatements = std::make_shared<std::vector<TokenDefinition>>(
     std::initializer_list<TokenDefinition>{
         TokenDefinition(Token::SELECT, "select", "SELECT"),
@@ -119,4 +129,19 @@ std::map<char, Token> SymbolTable::m_specialCharacterTokens = {
     {'=', Token::EQUAL},
     {'(', Token::LEFT_PARENTHESIS},
     {')', Token::RIGHT_PARENTHESIS},
+};
+
+std::unordered_set<Token> SymbolTable::m_comparisionTokens = {
+    {Token::EQUAL},
+    {Token::GREATER_THAN},
+    {Token::GREATER_OR_EQUAL_THAN},
+    {Token::LESS_THAN},
+    {Token::LESS_OR_EQUAL_THAN},
+};
+
+std::unordered_set<Token> SymbolTable::m_factorTokens = {
+    {Token::INTEGER_NUMBER},
+    {Token::DECIMAL_NUMBER},
+    {Token::STRING},
+    {Token::VARIABLE},
 };
