@@ -7,6 +7,8 @@
 #include <variant>
 #include <memory>
 #include <stdexcept>
+#include <algorithm>
+#include <cctype>
 #include "../../Error/error.hpp"
 
 enum class Token
@@ -62,7 +64,7 @@ enum class Token
     OR,
 };
 
-class LexemeTokenDefinition
+class TokenDefinition
 {
 private:
     Token m_token;
@@ -71,7 +73,8 @@ private:
     int m_lexemeLength;
 
 public:
-    LexemeTokenDefinition(Token token, std::string lowerCaseLexeme, std::string upperCaseLexeme);
+    TokenDefinition(Token token, std::string lexeme);
+    TokenDefinition(Token token, std::string lowerCaseLexeme, std::string upperCaseLexeme);
     Token GetToken() const;
     std::string GetUpperCaseLexeme() const;
     int LexemeLength() const;
@@ -81,16 +84,17 @@ public:
 class SymbolTable
 {
 private:
-    std::vector<std::tuple<std::string, Token>> m_tokens;
+    std::shared_ptr<std::vector<TokenDefinition>> p_tokens;
 
-    static std::shared_ptr<std::vector<LexemeTokenDefinition>> m_reservedStatements;
+    static std::shared_ptr<std::vector<TokenDefinition>> m_reservedStatements;
     static std::map<char, Token> m_specialCharacterTokens;
 
 public:
     SymbolTable();
     void AddToken(const std::string value, const Token key);
+    std::shared_ptr<std::vector<TokenDefinition>> GetSortTokens() const;
 
     static bool IsSpecialCharacterToken(const char &value);
     static std::variant<Token, Error> GetSpecialCharacterToken(const char &value);
-    static std::shared_ptr<std::vector<LexemeTokenDefinition>> GetReservedStatementsDefinitions();
+    static std::shared_ptr<std::vector<TokenDefinition>> GetReservedStatementsDefinitions();
 };

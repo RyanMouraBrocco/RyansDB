@@ -15,6 +15,7 @@ enum class ErrorType
     InvalidStringStatement = 603,
     InvalidCharacter = 604,
     InvalidNumberStatement = 605,
+    InvalidToken = 606,
     // END Compiler Error
 
 };

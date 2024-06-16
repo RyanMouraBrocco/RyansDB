@@ -1,6 +1,6 @@
 #pragma once
 
-#include "./LexycalAnalyser/LexycalAnalyzer.hpp"
+#include "./LexycalAnalyzer/LexycalAnalyzer.hpp"
 #include <memory>
 
 class Compiler
