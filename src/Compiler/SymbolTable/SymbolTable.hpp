@@ -63,6 +63,9 @@ enum class Token
     DATABASE,
     AND,
     OR,
+    INNER,
+    JOIN,
+    ON,
 };
 
 class TokenDefinition

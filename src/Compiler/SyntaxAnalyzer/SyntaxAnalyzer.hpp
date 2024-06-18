@@ -9,7 +9,7 @@ class SyntaxAnalyzer
 private:
     std::shared_ptr<SymbolTable> p_symbolTable;
 
-    std::optional<Error> Consume(const Token &token, const Token &&expextedToken, int &index) const;
+    std::optional<Error> Consume(const TokenDefinition &tokenDefinition, const Token &&expextedToken, int &index) const;
     std::optional<Error> CheckSelectStatement(const std::vector<TokenDefinition> &tokens, int &index) const;
     std::optional<Error> CheckSelectItems(const std::vector<TokenDefinition> &tokens, int &index) const;
     std::optional<Error> CheckFrom(const std::vector<TokenDefinition> &tokens, int &index) const;

@@ -119,6 +119,9 @@ std::shared_ptr<std::vector<TokenDefinition>> SymbolTable::m_reservedStatements 
         TokenDefinition(Token::DATABASE, "database", "DATABASE"),
         TokenDefinition(Token::AND, "and", "AND"),
         TokenDefinition(Token::OR, "or", "OR"),
+        TokenDefinition(Token::INNER, "inner", "INNER"),
+        TokenDefinition(Token::JOIN, "join", "JOIN"),
+        TokenDefinition(Token::ON, "on", "ON"),
     });
 
 std::map<char, Token> SymbolTable::m_specialCharacterTokens = {
