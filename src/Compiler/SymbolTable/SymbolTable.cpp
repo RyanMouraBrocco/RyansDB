@@ -1,9 +1,11 @@
 #include "SymbolTable.hpp"
 
-TokenDefinition::TokenDefinition(Token token, std::string lexeme)
+TokenDefinition::TokenDefinition(Token token, std::string lexeme) : m_token(token)
 {
-    std::transform(lexeme.begin(), lexeme.end(), m_lowerCaseLexeme.begin(), ::tolower);
-    std::transform(lexeme.begin(), lexeme.end(), m_upperCaseLexeme.begin(), ::toupper);
+    std::transform(lexeme.begin(), lexeme.end(), lexeme.begin(), ::tolower);
+    m_lowerCaseLexeme = lexeme;
+    std::transform(lexeme.begin(), lexeme.end(), lexeme.begin(), ::toupper);
+    m_upperCaseLexeme = lexeme;
     if (m_lowerCaseLexeme.length() != m_upperCaseLexeme.length())
         throw std::invalid_argument("INVALID LEXEME DEFINITION: lowerCase: '" + m_lowerCaseLexeme + "' and upperCase: '" + m_upperCaseLexeme + "' must have same length");
 

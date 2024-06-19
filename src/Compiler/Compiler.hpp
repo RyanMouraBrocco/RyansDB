@@ -1,12 +1,13 @@
 #pragma once
 
 #include "./LexycalAnalyzer/LexycalAnalyzer.hpp"
+#include "./SyntaxAnalyzer/SyntaxAnalyzer.hpp"
 #include <memory>
 
 class Compiler
 {
 private:
-    LexycalAnalyzer m_lexicalAnalyzer;
+    std::shared_ptr<SymbolTable> p_symbolTable;
 
 public:
     Compiler();
