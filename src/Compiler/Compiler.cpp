@@ -13,4 +13,6 @@ std::optional<Error> Compiler::Build(std::string query)
 
     auto syntaxAnalyzer = SyntaxAnalyzer(p_symbolTable);
     auto syntaxResult = syntaxAnalyzer.Execute();
+
+    return std::nullopt;
 }
