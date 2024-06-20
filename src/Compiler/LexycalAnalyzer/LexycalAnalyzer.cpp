@@ -55,7 +55,7 @@ bool LexycalAnalyzer::IsEndTokenChar(const char &value) const
            SymbolTable::IsSpecialCharacterToken(value);
 }
 
-bool LexycalAnalyzer::IsStatement(const LexemeTokenDefinition &statementDefinition,
+bool LexycalAnalyzer::IsStatement(const TokenDefinition &statementDefinition,
                                   const std::string &query,
                                   const int &index) const
 {
@@ -85,7 +85,7 @@ std::optional<Error> LexycalAnalyzer::SaveAlphaStatement(const std::string &quer
 
 std::optional<Error> LexycalAnalyzer::SaveReservedStatement(const std::string &query, int &index)
 {
-    for (LexemeTokenDefinition statementDefinition : *SymbolTable::GetReservedStatementsDefinitions())
+    for (TokenDefinition statementDefinition : *SymbolTable::GetReservedStatementsDefinitions())
     {
         if (IsStatement(statementDefinition, query, index))
         {

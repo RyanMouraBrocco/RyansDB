@@ -1,10 +1,18 @@
 #include "Compiler.hpp"
 
-Compiler::Compiler() : m_lexicalAnalyzer(std::make_shared<SymbolTable>())
+Compiler::Compiler() : p_symbolTable(std::make_shared<SymbolTable>())
 {
 }
 
 std::optional<Error> Compiler::Build(std::string query)
 {
-    return m_lexicalAnalyzer.Execute(query);
+    auto lexycalAnalyzer = LexycalAnalyzer(p_symbolTable);
+    auto lexycalResult = lexycalAnalyzer.Execute(query);
+    if (lexycalResult.has_value())
+        return lexycalResult;
+
+    auto syntaxAnalyzer = SyntaxAnalyzer(p_symbolTable);
+    auto syntaxResult = syntaxAnalyzer.Execute();
+
+    return std::nullopt;
 }
