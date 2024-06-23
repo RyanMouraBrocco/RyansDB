@@ -19,6 +19,8 @@ add_executable(RyansDBServer
                 ./src/Protocol/Serialization/Builders/RequestProtocolBuilder.cpp
                 ./src/Orchestrator/RequestOrchestrator.cpp
                 ./src/Compiler/Compiler.cpp
+                ./src/Compiler/SymbolTable/TokenDefinition/TokenDefinition.cpp
+                ./src/Compiler/SymbolTable/ParserTree/ParserTree.cpp
                 ./src/Compiler/SymbolTable/SymbolTable.cpp
                 ./src/Compiler/LexycalAnalyzer/LexycalAnalyzer.cpp
                 ./src/Compiler/SyntaxAnalyzer/SyntaxAnalyzer.cpp)

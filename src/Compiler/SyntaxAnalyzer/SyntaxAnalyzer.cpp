@@ -30,6 +30,8 @@ std::optional<Error> SyntaxAnalyzer::Consume(const std::vector<TokenDefinition> 
     if (tokens[index].GetToken() != expextedToken)
         return Error(ErrorType::InvalidToken, "It was expected a <HERE> but was found a " + tokens[index].GetUpperCaseLexeme());
 
+    // p_symbolTable->AddNode(tokens[index]);
+
     index++;
 
     return std::nullopt;
