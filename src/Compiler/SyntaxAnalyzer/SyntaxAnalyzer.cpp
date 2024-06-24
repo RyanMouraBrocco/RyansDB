@@ -30,7 +30,7 @@ std::optional<Error> SyntaxAnalyzer::Consume(const std::vector<TokenDefinition> 
     if (tokens[index].GetToken() != expextedToken)
         return Error(ErrorType::InvalidToken, "It was expected a <HERE> but was found a " + tokens[index].GetUpperCaseLexeme());
 
-    // p_symbolTable->AddNode(tokens[index]);
+    p_symbolTable->AddNode(tokens[index]);
 
     index++;
 
@@ -39,6 +39,8 @@ std::optional<Error> SyntaxAnalyzer::Consume(const std::vector<TokenDefinition> 
 
 std::optional<Error> SyntaxAnalyzer::CheckSelectStatement(const std::vector<TokenDefinition> &tokens, int &index) const
 {
+    p_symbolTable->AddNode(NonTerminalToken::SELECT);
+
     std::optional<Error> errorResult = std::nullopt;
     errorResult = Consume(tokens, Token::SELECT, index);
     if (errorResult.has_value())
@@ -67,7 +69,13 @@ std::optional<Error> SyntaxAnalyzer::CheckSelectStatement(const std::vector<Toke
             return errorResult;
     }
 
-    return Consume(tokens, Token::SEMICOLON, index);
+    errorResult = Consume(tokens, Token::SEMICOLON, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    p_symbolTable->TierUp();
+
+    return std::nullopt;
 }
 
 std::optional<Error> SyntaxAnalyzer::CheckSelectItems(const std::vector<TokenDefinition> &tokens, int &index) const
@@ -75,6 +83,7 @@ std::optional<Error> SyntaxAnalyzer::CheckSelectItems(const std::vector<TokenDef
     bool mustRepeat;
     std::optional<Error> errorResult = std::nullopt;
 
+    p_symbolTable->AddNode(NonTerminalToken::SELECT_ITEM);
     do
     {
         mustRepeat = false;
@@ -101,17 +110,23 @@ std::optional<Error> SyntaxAnalyzer::CheckSelectItems(const std::vector<TokenDef
         }
     } while (mustRepeat);
 
+    p_symbolTable->TierUp();
+
     return std::nullopt;
 }
 
 std::optional<Error> SyntaxAnalyzer::CheckFrom(const std::vector<TokenDefinition> &tokens, int &index) const
 {
+    p_symbolTable->AddNode(NonTerminalToken::FROM);
+
     std::optional<Error> errorResult = CheckTableName(tokens, index);
     if (errorResult.has_value())
         return errorResult;
 
     if (tokens[index].GetToken() == Token::INNER)
         return CheckJoin(tokens, index);
+
+    p_symbolTable->TierUp();
 
     return std::nullopt;
 }
@@ -121,6 +136,8 @@ std::optional<Error> SyntaxAnalyzer::CheckJoin(const std::vector<TokenDefinition
     std::optional<Error> errorResult = std::nullopt;
     do
     {
+        p_symbolTable->AddNode(NonTerminalToken::JOIN);
+
         errorResult = Consume(tokens, Token::INNER, index);
         if (errorResult.has_value())
             return errorResult;
@@ -141,6 +158,8 @@ std::optional<Error> SyntaxAnalyzer::CheckJoin(const std::vector<TokenDefinition
         if (errorResult.has_value())
             return errorResult;
 
+        p_symbolTable->AddNode(NonTerminalToken::JOIN);
+
     } while (tokens[index].GetToken() == Token::INNER);
 
     return std::nullopt;
@@ -148,6 +167,8 @@ std::optional<Error> SyntaxAnalyzer::CheckJoin(const std::vector<TokenDefinition
 
 std::optional<Error> SyntaxAnalyzer::CheckTableName(const std::vector<TokenDefinition> &tokens, int &index) const
 {
+    p_symbolTable->AddNode(NonTerminalToken::TABLE_NAME);
+
     std::optional<Error> errorResult = Consume(tokens, Token::IDENTIFIER, index);
     if (errorResult.has_value())
         return errorResult;
@@ -159,6 +180,8 @@ std::optional<Error> SyntaxAnalyzer::CheckTableName(const std::vector<TokenDefin
             return errorResult;
     }
 
+    p_symbolTable->TierUp();
+
     return std::nullopt;
 }
 
@@ -166,10 +189,14 @@ std::optional<Error> SyntaxAnalyzer::CheckLogicalExpression(const std::vector<To
 {
     bool mustRepeat;
     std::optional<Error> errorResult = std::nullopt;
+    int depthNonTerminalToken = 0;
 
     do
     {
+        p_symbolTable->AddNode(NonTerminalToken::LOGICAL_EXPRESSION);
+        depthNonTerminalToken++;
         mustRepeat = false;
+
         errorResult = CheckAndOperation(tokens, index);
         if (errorResult.has_value())
             return errorResult;
@@ -184,6 +211,9 @@ std::optional<Error> SyntaxAnalyzer::CheckLogicalExpression(const std::vector<To
         }
     } while (mustRepeat);
 
+    for (int i = 0; i < depthNonTerminalToken; i++)
+        p_symbolTable->TierUp();
+
     return std::nullopt;
 }
 
@@ -191,10 +221,14 @@ std::optional<Error> SyntaxAnalyzer::CheckAndOperation(const std::vector<TokenDe
 {
     bool mustRepeat;
     std::optional<Error> errorResult = std::nullopt;
+    int depthNonTerminalToken = 0;
 
     do
     {
+        p_symbolTable->AddNode(NonTerminalToken::AND_EXPRESSION);
+        depthNonTerminalToken++;
         mustRepeat = false;
+
         errorResult = CheckTokenExpression(tokens, index);
         if (errorResult.has_value())
             return errorResult;
@@ -209,11 +243,16 @@ std::optional<Error> SyntaxAnalyzer::CheckAndOperation(const std::vector<TokenDe
         }
     } while (mustRepeat);
 
+    for (int i = 0; i < depthNonTerminalToken; i++)
+        p_symbolTable->TierUp();
+
     return std::nullopt;
 }
 
 std::optional<Error> SyntaxAnalyzer::CheckTokenExpression(const std::vector<TokenDefinition> &tokens, int &index) const
 {
+    p_symbolTable->AddNode(NonTerminalToken::TOKEN_EXPRESSION);
+
     std::optional<Error> errorResult = std::nullopt;
     if (tokens[index].GetToken() == Token::NOT)
     {
@@ -228,7 +267,9 @@ std::optional<Error> SyntaxAnalyzer::CheckTokenExpression(const std::vector<Toke
                 return errorResult;
         }
 
-        return CheckFactorExpression(tokens, index);
+        errorResult = CheckFactorExpression(tokens, index);
+        if (errorResult.has_value())
+            return errorResult;
     }
     else if (tokens[index].GetToken() == Token::LEFT_PARENTHESIS)
     {
@@ -240,14 +281,25 @@ std::optional<Error> SyntaxAnalyzer::CheckTokenExpression(const std::vector<Toke
         if (errorResult.has_value())
             return errorResult;
 
-        return Consume(tokens, Token::RIGHT_PARENTHESIS, index);
+        errorResult = Consume(tokens, Token::RIGHT_PARENTHESIS, index);
+        if (errorResult.has_value())
+            return errorResult;
     }
     else
-        return CheckComparisonExpression(tokens, index);
+    {
+        errorResult = CheckComparisonExpression(tokens, index);
+        if (errorResult.has_value())
+            return errorResult;
+    }
+
+    p_symbolTable->TierUp();
+    return std::nullopt;
 }
 
 std::optional<Error> SyntaxAnalyzer::CheckComparisonExpression(const std::vector<TokenDefinition> &tokens, int &index) const
 {
+    p_symbolTable->AddNode(NonTerminalToken::COMPARISON_EXPRESSION);
+
     std::optional<Error> errorResult = std::nullopt;
     errorResult = CheckFactorExpression(tokens, index);
     if (errorResult.has_value())
@@ -264,31 +316,45 @@ std::optional<Error> SyntaxAnalyzer::CheckComparisonExpression(const std::vector
             return errorResult;
     }
 
+    p_symbolTable->TierUp();
     return std::nullopt;
 }
 
 std::optional<Error> SyntaxAnalyzer::CheckCompareAction(const std::vector<TokenDefinition> &tokens, int &index) const
 {
-    if (SymbolTable::IsComparisionToken(tokens[index].GetToken()))
-        return Consume(tokens, tokens[index].GetToken(), index);
+    p_symbolTable->AddNode(NonTerminalToken::COMPARE_ACTION);
+    std::optional<Error> errorResult = std::nullopt;
 
-    return Error(ErrorType::InvalidToken, "It as expected a valid comparison token but receive a " + tokens[index].GetUpperCaseLexeme());
+    if (SymbolTable::IsComparisionToken(tokens[index].GetToken()))
+        errorResult = Consume(tokens, tokens[index].GetToken(), index);
+    else
+        errorResult = Error(ErrorType::InvalidToken, "It as expected a valid comparison token but receive a " + tokens[index].GetUpperCaseLexeme());
+
+    p_symbolTable->TierUp();
+    return errorResult;
 }
 
 std::optional<Error> SyntaxAnalyzer::CheckFactorExpression(const std::vector<TokenDefinition> &tokens, int &index) const
 {
-    if (tokens[index].GetToken() == Token::IDENTIFIER)
-        return CheckIdentifierAttribute(tokens, index);
-    else if (tokens[index].GetToken() == Token::NULL_VALUE)
-        return Consume(tokens, Token::NULL_VALUE, index);
-    else if (SymbolTable::IsFactorToken(tokens[index].GetToken()))
-        return Consume(tokens, tokens[index].GetToken(), index);
+    p_symbolTable->AddNode(NonTerminalToken::FACTOR_EXPRESSION);
+    std::optional<Error> errorResult = std::nullopt;
 
-    return Error(ErrorType::InvalidToken, "It as expected a valid factor but receive a " + tokens[index].GetUpperCaseLexeme());
+    if (tokens[index].GetToken() == Token::IDENTIFIER)
+        errorResult = CheckIdentifierAttribute(tokens, index);
+    else if (tokens[index].GetToken() == Token::NULL_VALUE)
+        errorResult = Consume(tokens, Token::NULL_VALUE, index);
+    else if (SymbolTable::IsFactorToken(tokens[index].GetToken()))
+        errorResult = Consume(tokens, tokens[index].GetToken(), index);
+    else
+        errorResult = Error(ErrorType::InvalidToken, "It as expected a valid factor but receive a " + tokens[index].GetUpperCaseLexeme());
+
+    p_symbolTable->TierUp();
+    return errorResult;
 }
 
 std::optional<Error> SyntaxAnalyzer::CheckIdentifierAttribute(const std::vector<TokenDefinition> &tokens, int &index) const
 {
+    p_symbolTable->AddNode(NonTerminalToken::IDENTIFIER_ATTRIBUTE);
     std::optional<Error> errorResult = std::nullopt;
     errorResult = Consume(tokens, Token::IDENTIFIER, index);
     if (errorResult.has_value())
@@ -304,6 +370,8 @@ std::optional<Error> SyntaxAnalyzer::CheckIdentifierAttribute(const std::vector<
         if (errorResult.has_value())
             return errorResult;
     }
+
+    p_symbolTable->TierUp();
 
     return std::nullopt;
 }

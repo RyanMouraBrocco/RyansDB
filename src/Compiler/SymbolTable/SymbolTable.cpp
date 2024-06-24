@@ -15,6 +15,21 @@ std::shared_ptr<std::vector<TokenDefinition>> SymbolTable::GetSortTokens() const
     return p_tokens;
 }
 
+void SymbolTable::AddNode(TokenDefinition token)
+{
+    return m_parserTreeBuilder.AddNodeInCurrentTier(token);
+}
+
+void SymbolTable::AddNode(NonTerminalToken token)
+{
+    return m_parserTreeBuilder.AddNodeInCurrentTier(token);
+}
+
+void SymbolTable::TierUp()
+{
+    m_parserTreeBuilder.TierUp();
+}
+
 bool SymbolTable::IsSpecialCharacterToken(const char &value)
 {
     return SymbolTable::m_specialCharacterTokens.find(value) != SymbolTable::m_specialCharacterTokens.end();

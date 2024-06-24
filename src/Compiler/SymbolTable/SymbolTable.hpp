@@ -8,12 +8,13 @@
 #include <unordered_set>
 #include "../../Error/error.hpp"
 #include "./TokenDefinition/TokenDefinition.hpp"
-#include "ParserTree/ParserTree.hpp"
+#include "./ParserTree/Builder/ParserTreeBuilder.hpp"
 
 class SymbolTable
 {
 private:
     std::shared_ptr<std::vector<TokenDefinition>> p_tokens;
+    ParserTreeBuider m_parserTreeBuilder;
 
     static std::shared_ptr<std::vector<TokenDefinition>> m_reservedStatements;
     static std::map<char, Token> m_specialCharacterTokens;
@@ -25,6 +26,8 @@ public:
     void AddToken(const std::string value, const Token key);
     std::shared_ptr<std::vector<TokenDefinition>> GetSortTokens() const;
     void AddNode(TokenDefinition token);
+    void AddNode(NonTerminalToken nonTerminalToken);
+    void TierUp();
 
     static bool IsSpecialCharacterToken(const char &value);
     static std::variant<Token, Error> GetSpecialCharacterToken(const char &value);

@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <memory>
-#include <stack>
 #include <optional>
 #include "../TokenDefinition/TokenDefinition.hpp"
 
@@ -36,18 +35,4 @@ public:
     ParserTreeNode(ParserToken token);
 
     void AddChild(const std::shared_ptr<ParserTreeNode> child);
-};
-
-class ParserTree
-{
-private:
-    std::shared_ptr<ParserTreeNode> p_root = nullptr;
-    std::stack<std::shared_ptr<ParserTreeNode>> m_nonTerminalLevel;
-
-public:
-    ParserTree();
-
-    void AddNodeInCurrentTier(TokenDefinition token);
-    void AddNodeInCurrentTier(NonTerminalToken token);
-    void TierUp();
 };
