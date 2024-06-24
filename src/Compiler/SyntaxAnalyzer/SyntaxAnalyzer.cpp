@@ -24,7 +24,7 @@ std::optional<Error> SyntaxAnalyzer::Execute()
 
 std::optional<Error> SyntaxAnalyzer::Consume(const std::vector<TokenDefinition> &tokens, const Token &&expextedToken, int &index) const
 {
-    if (index > tokens.size())
+    if (index >= tokens.size())
         return Error(ErrorType::InvalidToken, "The command finished but it was expected a " + tokens[index].GetUpperCaseLexeme());
 
     if (tokens[index].GetToken() != expextedToken)
@@ -124,7 +124,11 @@ std::optional<Error> SyntaxAnalyzer::CheckFrom(const std::vector<TokenDefinition
         return errorResult;
 
     if (tokens[index].GetToken() == Token::INNER)
-        return CheckJoin(tokens, index);
+    {
+        std::optional<Error> errorResult = CheckJoin(tokens, index);
+        if (errorResult.has_value())
+            return errorResult;
+    }
 
     p_symbolTable->TierUp();
 
@@ -134,9 +138,12 @@ std::optional<Error> SyntaxAnalyzer::CheckFrom(const std::vector<TokenDefinition
 std::optional<Error> SyntaxAnalyzer::CheckJoin(const std::vector<TokenDefinition> &tokens, int &index) const
 {
     std::optional<Error> errorResult = std::nullopt;
+    int depthNonTerminalToken = 0;
+
     do
     {
         p_symbolTable->AddNode(NonTerminalToken::JOIN);
+        depthNonTerminalToken++;
 
         errorResult = Consume(tokens, Token::INNER, index);
         if (errorResult.has_value())
@@ -158,9 +165,10 @@ std::optional<Error> SyntaxAnalyzer::CheckJoin(const std::vector<TokenDefinition
         if (errorResult.has_value())
             return errorResult;
 
-        p_symbolTable->AddNode(NonTerminalToken::JOIN);
-
     } while (tokens[index].GetToken() == Token::INNER);
+
+    for (int i = 0; i < depthNonTerminalToken; i++)
+        p_symbolTable->TierUp();
 
     return std::nullopt;
 }
