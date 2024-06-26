@@ -14,6 +14,8 @@ std::optional<Error> SyntaxAnalyzer::Execute()
     {
         if (tokens[index].GetToken() == Token::SELECT)
             errorResult = CheckSelectStatement(tokens, index);
+        else if (tokens[index].GetToken() == Token::INSERT)
+            errorResult = CheckInsertStatement(tokens, index);
 
         if (errorResult != std::nullopt)
             return errorResult;
@@ -378,6 +380,124 @@ std::optional<Error> SyntaxAnalyzer::CheckIdentifierAttribute(const std::vector<
         if (errorResult.has_value())
             return errorResult;
     }
+
+    p_symbolTable->TierUp();
+
+    return std::nullopt;
+}
+
+std::optional<Error> SyntaxAnalyzer::CheckInsertStatement(const std::vector<TokenDefinition> &tokens, int &index) const
+{
+    bool mustRepeat;
+    std::optional<Error> errorResult = std::nullopt;
+
+    p_symbolTable->AddNode(NonTerminalToken::INSERT);
+
+    errorResult = Consume(tokens, Token::INSERT, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::INTO, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::IDENTIFIER, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::VALUES, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::LEFT_PARENTHESIS, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = CheckInsertValues(tokens, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::RIGHT_PARENTHESIS, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::SEMICOLON, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    p_symbolTable->TierUp();
+
+    return std::nullopt;
+}
+
+std::optional<Error> SyntaxAnalyzer::CheckInsertValues(const std::vector<TokenDefinition> &tokens, int &index) const
+{
+    bool mustRepeat;
+    std::optional<Error> errorResult = std::nullopt;
+
+    p_symbolTable->AddNode(NonTerminalToken::INSERT_VALUES);
+    do
+    {
+        mustRepeat = false;
+
+        errorResult = CheckInsertValue(tokens, index);
+        if (errorResult.has_value())
+            return errorResult;
+
+        if (tokens[index].GetToken() == Token::COMMA)
+        {
+            errorResult = Consume(tokens, Token::COMMA, index);
+            if (errorResult.has_value())
+                return errorResult;
+
+            mustRepeat = true;
+        }
+    } while (mustRepeat);
+
+    p_symbolTable->TierUp();
+
+    return std::nullopt;
+}
+
+std::optional<Error> SyntaxAnalyzer::CheckInsertValue(const std::vector<TokenDefinition> &tokens, int &index) const
+{
+    switch (tokens[index].GetToken())
+    {
+    case Token::IDENTIFIER:
+    case Token::VARIABLE:
+    case Token::STRING:
+    case Token::INTEGER_NUMBER:
+    case Token::DECIMAL_NUMBER:
+    case Token::NULL_VALUE:
+        return Consume(tokens, tokens[index].GetToken(), index);
+    default:
+        return Error(ErrorType::InvalidToken, "It was expected a valid insertable value");
+    }
+}
+
+std::optional<Error> SyntaxAnalyzer::CheckInsertIdentifiers(const std::vector<TokenDefinition> &tokens, int &index) const
+{
+    bool mustRepeat;
+    std::optional<Error> errorResult = std::nullopt;
+
+    p_symbolTable->AddNode(NonTerminalToken::INSERT_IDENTIFIERS);
+    do
+    {
+        mustRepeat = false;
+
+        errorResult = Consume(tokens, Token::IDENTIFIER, index);
+        if (errorResult.has_value())
+            return errorResult;
+
+        if (tokens[index].GetToken() == Token::COMMA)
+        {
+            errorResult = Consume(tokens, Token::COMMA, index);
+            if (errorResult.has_value())
+                return errorResult;
+
+            mustRepeat = true;
+        }
+    } while (mustRepeat);
 
     p_symbolTable->TierUp();
 

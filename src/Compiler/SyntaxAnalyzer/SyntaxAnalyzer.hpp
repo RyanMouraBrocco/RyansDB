@@ -22,6 +22,10 @@ private:
     std::optional<Error> CheckCompareAction(const std::vector<TokenDefinition> &tokens, int &index) const;
     std::optional<Error> CheckFactorExpression(const std::vector<TokenDefinition> &tokens, int &index) const;
     std::optional<Error> CheckIdentifierAttribute(const std::vector<TokenDefinition> &tokens, int &index) const;
+    std::optional<Error> CheckInsertStatement(const std::vector<TokenDefinition> &tokens, int &index) const;
+    std::optional<Error> CheckInsertValues(const std::vector<TokenDefinition> &tokens, int &index) const;
+    std::optional<Error> CheckInsertValue(const std::vector<TokenDefinition> &tokens, int &index) const;
+    std::optional<Error> CheckInsertIdentifiers(const std::vector<TokenDefinition> &tokens, int &index) const;
 
 public:
     SyntaxAnalyzer(std::shared_ptr<SymbolTable> symbolTable);
