@@ -503,3 +503,104 @@ std::optional<Error> SyntaxAnalyzer::CheckInsertIdentifiers(const std::vector<To
 
     return std::nullopt;
 }
+
+std::optional<Error> SyntaxAnalyzer::CheckUpdateStatement(const std::vector<TokenDefinition> &tokens, int &index) const
+{
+    bool mustRepeat;
+    std::optional<Error> errorResult = std::nullopt;
+
+    p_symbolTable->AddNode(NonTerminalToken::UPDATE);
+
+    errorResult = Consume(tokens, Token::UPDATE, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::IDENTIFIER, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::SET, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = CheckUpdateSet(tokens, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::WHERE, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = CheckLogicalExpression(tokens, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    p_symbolTable->TierUp();
+
+    return std::nullopt;
+}
+
+std::optional<Error> SyntaxAnalyzer::CheckUpdateSet(const std::vector<TokenDefinition> &tokens, int &index) const
+{
+    bool mustRepeat;
+    std::optional<Error> errorResult = std::nullopt;
+
+    p_symbolTable->AddNode(NonTerminalToken::UPDATE_SET);
+
+    do
+    {
+        mustRepeat = false;
+
+        errorResult = CheckIdentifierAttribute(tokens, index);
+        if (errorResult.has_value())
+            return errorResult;
+
+        errorResult = Consume(tokens, Token::EQUAL, index);
+        if (errorResult.has_value())
+            return errorResult;
+
+        errorResult = CheckFactorExpression(tokens, index);
+        if (errorResult.has_value())
+            return errorResult;
+
+        if (tokens[index].GetToken() == Token::COMMA)
+        {
+            errorResult = Consume(tokens, Token::COMMA, index);
+            if (errorResult.has_value())
+                return errorResult;
+
+            mustRepeat = true;
+        }
+    } while (mustRepeat);
+
+    p_symbolTable->TierUp();
+
+    return std::nullopt;
+}
+
+std::optional<Error> SyntaxAnalyzer::CheckDeleteStatement(const std::vector<TokenDefinition> &tokens, int &index) const
+{
+    std::optional<Error> errorResult = std::nullopt;
+
+    p_symbolTable->AddNode(NonTerminalToken::UPDATE_SET);
+
+    errorResult = Consume(tokens, Token::DELETE, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::IDENTIFIER, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::WHERE, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = CheckLogicalExpression(tokens, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    p_symbolTable->TierUp();
+
+    return std::nullopt;
+}
