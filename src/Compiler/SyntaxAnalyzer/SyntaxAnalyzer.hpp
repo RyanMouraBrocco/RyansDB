@@ -29,6 +29,8 @@ private:
     std::optional<Error> CheckUpdateStatement(const std::vector<TokenDefinition> &tokens, int &index) const;
     std::optional<Error> CheckUpdateSet(const std::vector<TokenDefinition> &tokens, int &index) const;
     std::optional<Error> CheckDeleteStatement(const std::vector<TokenDefinition> &tokens, int &index) const;
+    std::optional<Error> CheckCreateDatabaseStatement(const std::vector<TokenDefinition> &tokens, int &index) const;
+    std::optional<Error> CheckDropDatabaseStatement(const std::vector<TokenDefinition> &tokens, int &index) const;
 
 public:
     SyntaxAnalyzer(std::shared_ptr<SymbolTable> symbolTable);

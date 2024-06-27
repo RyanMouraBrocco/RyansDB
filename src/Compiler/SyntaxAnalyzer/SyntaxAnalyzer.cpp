@@ -535,6 +535,10 @@ std::optional<Error> SyntaxAnalyzer::CheckUpdateStatement(const std::vector<Toke
     if (errorResult.has_value())
         return errorResult;
 
+    errorResult = Consume(tokens, Token::SEMICOLON, index);
+    if (errorResult.has_value())
+        return errorResult;
+
     p_symbolTable->TierUp();
 
     return std::nullopt;
@@ -597,6 +601,64 @@ std::optional<Error> SyntaxAnalyzer::CheckDeleteStatement(const std::vector<Toke
         return errorResult;
 
     errorResult = CheckLogicalExpression(tokens, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::SEMICOLON, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    p_symbolTable->TierUp();
+
+    return std::nullopt;
+}
+
+std::optional<Error> SyntaxAnalyzer::CheckCreateDatabaseStatement(const std::vector<TokenDefinition> &tokens, int &index) const
+{
+    std::optional<Error> errorResult = std::nullopt;
+
+    p_symbolTable->AddNode(NonTerminalToken::UPDATE_SET);
+
+    errorResult = Consume(tokens, Token::CREATE, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::DATABASE, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::IDENTIFIER, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::SEMICOLON, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    p_symbolTable->TierUp();
+
+    return std::nullopt;
+}
+
+std::optional<Error> SyntaxAnalyzer::CheckDropDatabaseStatement(const std::vector<TokenDefinition> &tokens, int &index) const
+{
+    std::optional<Error> errorResult = std::nullopt;
+
+    p_symbolTable->AddNode(NonTerminalToken::UPDATE_SET);
+
+    errorResult = Consume(tokens, Token::DROP, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::DATABASE, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::IDENTIFIER, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::SEMICOLON, index);
     if (errorResult.has_value())
         return errorResult;
 
