@@ -39,6 +39,10 @@ private:
     std::optional<Error> CheckColumnContraints(const std::vector<TokenDefinition> &tokens, int &index) const;
     bool IsColumnConstraint(const std::vector<TokenDefinition> &tokens, const int &index) const;
     std::optional<Error> CheckColumnContraint(const std::vector<TokenDefinition> &tokens, int &index) const;
+    std::optional<Error> CheckAlterTableStatement(const std::vector<TokenDefinition> &tokens, int &index) const;
+    std::optional<Error> CheckAlterCommand(const std::vector<TokenDefinition> &tokens, int &index) const;
+    std::optional<Error> ConsumeAddForeignKey(const std::vector<TokenDefinition> &tokens, int &index) const;
+    std::optional<Error> CheckDropTableStatement(const std::vector<TokenDefinition> &tokens, int &index) const;
 
 public:
     SyntaxAnalyzer(std::shared_ptr<SymbolTable> symbolTable);

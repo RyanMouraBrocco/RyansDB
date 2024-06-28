@@ -96,6 +96,8 @@ std::shared_ptr<std::vector<TokenDefinition>> SymbolTable::m_reservedStatements 
         TokenDefinition(Token::INNER, "inner", "INNER"),
         TokenDefinition(Token::JOIN, "join", "JOIN"),
         TokenDefinition(Token::ON, "on", "ON"),
+        TokenDefinition(Token::COLUMN, "column", "COLUMN"),
+        TokenDefinition(Token::REFERENCES, "references", "REFERENCES"),
     });
 
 std::map<char, Token> SymbolTable::m_specialCharacterTokens = {

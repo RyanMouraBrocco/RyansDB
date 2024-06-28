@@ -59,6 +59,8 @@ enum class Token
     INNER,
     JOIN,
     ON,
+    COLUMN,
+    REFERENCES,
 };
 
 enum class NonTerminalToken

@@ -882,3 +882,150 @@ std::optional<Error> SyntaxAnalyzer::CheckColumnContraint(const std::vector<Toke
 
     return std::nullopt;
 }
+
+std::optional<Error> SyntaxAnalyzer::CheckAlterTableStatement(const std::vector<TokenDefinition> &tokens, int &index) const
+{
+    std::optional<Error> errorResult = std::nullopt;
+
+    p_symbolTable->AddNode(NonTerminalToken::ALTER_TABLE);
+
+    errorResult = Consume(tokens, Token::ALTER, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::TABLE, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::IDENTIFIER, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = CheckAlterCommand(tokens, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::SEMICOLON, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    p_symbolTable->TierUp();
+
+    return std::nullopt;
+}
+
+std::optional<Error> SyntaxAnalyzer::CheckAlterCommand(const std::vector<TokenDefinition> &tokens, int &index) const
+{
+    std::optional<Error> errorResult = std::nullopt;
+
+    p_symbolTable->AddNode(NonTerminalToken::ALTER_COMMAND);
+
+    if (tokens[index].GetToken() == Token::ADD)
+    {
+        errorResult = Consume(tokens, Token::ADD, index);
+        if (errorResult.has_value())
+            return errorResult;
+
+        if (tokens[index].GetToken() == Token::FOREIGN)
+        {
+            errorResult = ConsumeAddForeignKey(tokens, index);
+            if (errorResult.has_value())
+                return errorResult;
+        }
+        else
+        {
+            errorResult = Consume(tokens, Token::COLUMN, index);
+            if (errorResult.has_value())
+                return errorResult;
+
+            errorResult = CheckColumnDefinition(tokens, index);
+            if (errorResult.has_value())
+                return errorResult;
+        }
+    }
+    else if (tokens[index].GetToken() == Token::DROP)
+    {
+        errorResult = Consume(tokens, Token::DROP, index);
+        if (errorResult.has_value())
+            return errorResult;
+
+        errorResult = Consume(tokens, Token::COLUMN, index);
+        if (errorResult.has_value())
+            return errorResult;
+
+        errorResult = Consume(tokens, Token::IDENTIFIER, index);
+        if (errorResult.has_value())
+            return errorResult;
+    }
+    else
+        return Error(ErrorType::InvalidToken, "It was expected a valid insertable value");
+
+    p_symbolTable->TierUp();
+
+    return std::nullopt;
+}
+
+std::optional<Error> SyntaxAnalyzer::ConsumeAddForeignKey(const std::vector<TokenDefinition> &tokens, int &index) const
+{
+    std::optional<Error> errorResult = std::nullopt;
+    errorResult = Consume(tokens, Token::FOREIGN, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::KEY, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::IDENTIFIER, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::REFERENCES, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::IDENTIFIER, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::LEFT_PARENTHESIS, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::IDENTIFIER, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::RIGHT_PARENTHESIS, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    return std::nullopt;
+}
+
+std::optional<Error> SyntaxAnalyzer::CheckDropTableStatement(const std::vector<TokenDefinition> &tokens, int &index) const
+{
+    std::optional<Error> errorResult = std::nullopt;
+
+    p_symbolTable->AddNode(NonTerminalToken::DROP_TABLE);
+
+    errorResult = Consume(tokens, Token::DROP, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::TABLE, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::IDENTIFIER, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::SEMICOLON, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    p_symbolTable->TierUp();
+
+    return std::nullopt;
+}
