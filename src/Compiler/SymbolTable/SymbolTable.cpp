@@ -1,48 +1,5 @@
 #include "SymbolTable.hpp"
 
-TokenDefinition::TokenDefinition(Token token, std::string lexeme) : m_token(token)
-{
-    std::transform(lexeme.begin(), lexeme.end(), lexeme.begin(), ::tolower);
-    m_lowerCaseLexeme = lexeme;
-    std::transform(lexeme.begin(), lexeme.end(), lexeme.begin(), ::toupper);
-    m_upperCaseLexeme = lexeme;
-    if (m_lowerCaseLexeme.length() != m_upperCaseLexeme.length())
-        throw std::invalid_argument("INVALID LEXEME DEFINITION: lowerCase: '" + m_lowerCaseLexeme + "' and upperCase: '" + m_upperCaseLexeme + "' must have same length");
-
-    m_lexemeLength = m_lowerCaseLexeme.length();
-}
-
-TokenDefinition::TokenDefinition(Token token, std::string lowerCaseLexeme, std::string upperCaseLexeme) : m_token(token), m_lowerCaseLexeme(lowerCaseLexeme), m_upperCaseLexeme(upperCaseLexeme)
-{
-    if (m_lowerCaseLexeme.length() != m_upperCaseLexeme.length())
-        throw std::invalid_argument("INVALID LEXEME DEFINITION: lowerCase: '" + m_lowerCaseLexeme + "' and upperCase: '" + m_upperCaseLexeme + "' must have same length");
-
-    m_lexemeLength = m_lowerCaseLexeme.length();
-}
-
-Token TokenDefinition::GetToken() const
-{
-    return m_token;
-}
-
-std::string TokenDefinition::GetUpperCaseLexeme() const
-{
-    return m_upperCaseLexeme;
-}
-
-int TokenDefinition::LexemeLength() const
-{
-    return m_lexemeLength;
-}
-
-bool TokenDefinition::IsValidCharacterInTheIndex(const char &value, const int &index) const
-{
-    if (index >= m_lowerCaseLexeme.length() || index >= m_upperCaseLexeme.length())
-        return false;
-
-    return value == m_lowerCaseLexeme[index] || value == m_upperCaseLexeme[index];
-}
-
 SymbolTable::SymbolTable()
 {
     p_tokens = std::make_shared<std::vector<TokenDefinition>>();
@@ -56,6 +13,21 @@ void SymbolTable::AddToken(const std::string value, const Token token)
 std::shared_ptr<std::vector<TokenDefinition>> SymbolTable::GetSortTokens() const
 {
     return p_tokens;
+}
+
+void SymbolTable::AddNode(TokenDefinition token)
+{
+    return m_parserTreeBuilder.AddNodeInCurrentTier(token);
+}
+
+void SymbolTable::AddNode(NonTerminalToken token)
+{
+    return m_parserTreeBuilder.AddNodeInCurrentTier(token);
+}
+
+void SymbolTable::TierUp()
+{
+    m_parserTreeBuilder.TierUp();
 }
 
 bool SymbolTable::IsSpecialCharacterToken(const char &value)
@@ -124,6 +96,8 @@ std::shared_ptr<std::vector<TokenDefinition>> SymbolTable::m_reservedStatements 
         TokenDefinition(Token::INNER, "inner", "INNER"),
         TokenDefinition(Token::JOIN, "join", "JOIN"),
         TokenDefinition(Token::ON, "on", "ON"),
+        TokenDefinition(Token::COLUMN, "column", "COLUMN"),
+        TokenDefinition(Token::REFERENCES, "references", "REFERENCES"),
     });
 
 std::map<char, Token> SymbolTable::m_specialCharacterTokens = {
