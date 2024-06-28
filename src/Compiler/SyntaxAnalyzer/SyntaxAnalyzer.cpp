@@ -463,7 +463,6 @@ std::optional<Error> SyntaxAnalyzer::CheckInsertValue(const std::vector<TokenDef
 {
     switch (tokens[index].GetToken())
     {
-    case Token::IDENTIFIER:
     case Token::VARIABLE:
     case Token::STRING:
     case Token::INTEGER_NUMBER:
@@ -586,7 +585,7 @@ std::optional<Error> SyntaxAnalyzer::CheckDeleteStatement(const std::vector<Toke
 {
     std::optional<Error> errorResult = std::nullopt;
 
-    p_symbolTable->AddNode(NonTerminalToken::UPDATE_SET);
+    p_symbolTable->AddNode(NonTerminalToken::DELETE);
 
     errorResult = Consume(tokens, Token::DELETE, index);
     if (errorResult.has_value())
@@ -617,7 +616,7 @@ std::optional<Error> SyntaxAnalyzer::CheckCreateDatabaseStatement(const std::vec
 {
     std::optional<Error> errorResult = std::nullopt;
 
-    p_symbolTable->AddNode(NonTerminalToken::UPDATE_SET);
+    p_symbolTable->AddNode(NonTerminalToken::CREATE_DATABASE);
 
     errorResult = Consume(tokens, Token::CREATE, index);
     if (errorResult.has_value())
@@ -644,7 +643,7 @@ std::optional<Error> SyntaxAnalyzer::CheckDropDatabaseStatement(const std::vecto
 {
     std::optional<Error> errorResult = std::nullopt;
 
-    p_symbolTable->AddNode(NonTerminalToken::UPDATE_SET);
+    p_symbolTable->AddNode(NonTerminalToken::DROP_DATABASE);
 
     errorResult = Consume(tokens, Token::DROP, index);
     if (errorResult.has_value())
@@ -661,6 +660,223 @@ std::optional<Error> SyntaxAnalyzer::CheckDropDatabaseStatement(const std::vecto
     errorResult = Consume(tokens, Token::SEMICOLON, index);
     if (errorResult.has_value())
         return errorResult;
+
+    p_symbolTable->TierUp();
+
+    return std::nullopt;
+}
+
+std::optional<Error> SyntaxAnalyzer::CheckCreateTableStatement(const std::vector<TokenDefinition> &tokens, int &index) const
+{
+    std::optional<Error> errorResult = std::nullopt;
+
+    p_symbolTable->AddNode(NonTerminalToken::CREATE_TABLE);
+
+    errorResult = Consume(tokens, Token::CREATE, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::TABLE, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::IDENTIFIER, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::LEFT_PARENTHESIS, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = CheckColumnsDefinitions(tokens, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::RIGHT_PARENTHESIS, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    errorResult = Consume(tokens, Token::SEMICOLON, index);
+    if (errorResult.has_value())
+        return errorResult;
+
+    p_symbolTable->TierUp();
+
+    return std::nullopt;
+}
+
+std::optional<Error> SyntaxAnalyzer::CheckColumnsDefinitions(const std::vector<TokenDefinition> &tokens, int &index) const
+{
+    bool mustRepeat;
+    std::optional<Error> errorResult = std::nullopt;
+
+    p_symbolTable->AddNode(NonTerminalToken::COLUMNS_DEFINITIONS);
+
+    do
+    {
+        mustRepeat = false;
+
+        errorResult = Consume(tokens, Token::IDENTIFIER, index);
+        if (errorResult.has_value())
+            return errorResult;
+
+        errorResult = CheckColumnDefinition(tokens, index);
+        if (errorResult.has_value())
+            return errorResult;
+
+        if (tokens[index].GetToken() == Token::COMMA)
+        {
+            errorResult = Consume(tokens, Token::COMMA, index);
+            if (errorResult.has_value())
+                return errorResult;
+
+            mustRepeat = true;
+        }
+    } while (mustRepeat);
+
+    p_symbolTable->TierUp();
+
+    return std::nullopt;
+}
+
+std::optional<Error> SyntaxAnalyzer::CheckColumnDefinition(const std::vector<TokenDefinition> &tokens, int &index) const
+{
+    bool mustRepeat;
+    std::optional<Error> errorResult = std::nullopt;
+
+    p_symbolTable->AddNode(NonTerminalToken::COLUMN_DEFINITION);
+
+    if (IsColumnConstraint(tokens, index))
+        CheckColumnContraints(tokens, index);
+
+    CheckTextType(tokens, index);
+
+    if (IsColumnConstraint(tokens, index))
+        CheckColumnContraints(tokens, index);
+
+    p_symbolTable->TierUp();
+
+    return std::nullopt;
+}
+
+std::optional<Error> SyntaxAnalyzer::CheckColumnType(const std::vector<TokenDefinition> &tokens, int &index) const
+{
+    std::optional<Error> errorResult = std::nullopt;
+
+    p_symbolTable->AddNode(NonTerminalToken::COLUMN_TYPE);
+
+    Token currentToken = tokens[index].GetToken();
+    if (currentToken == Token::INTEGER_NUMBER || currentToken == Token::DECIMAL_NUMBER)
+    {
+        errorResult = Consume(tokens, tokens[index].GetToken(), index);
+        if (errorResult.has_value())
+            return errorResult;
+    }
+    else
+    {
+        errorResult = CheckTextType(tokens, index);
+        if (errorResult.has_value())
+            return errorResult;
+
+        errorResult = Consume(tokens, Token::LEFT_PARENTHESIS, index);
+        if (errorResult.has_value())
+            return errorResult;
+
+        errorResult = Consume(tokens, Token::INTEGER_NUMBER, index);
+        if (errorResult.has_value())
+            return errorResult;
+
+        errorResult = Consume(tokens, Token::RIGHT_PARENTHESIS, index);
+        if (errorResult.has_value())
+            return errorResult;
+    }
+
+    p_symbolTable->TierUp();
+
+    return std::nullopt;
+}
+
+std::optional<Error> SyntaxAnalyzer::CheckTextType(const std::vector<TokenDefinition> &tokens, int &index) const
+{
+    std::optional<Error> errorResult = std::nullopt;
+
+    p_symbolTable->AddNode(NonTerminalToken::TEXT_TYPE);
+
+    switch (tokens[index].GetToken())
+    {
+    case Token::NVARCHAR:
+    case Token::VARCHAR:
+    case Token::CHAR:
+    case Token::NCHAR:
+        return Consume(tokens, tokens[index].GetToken(), index);
+    default:
+        return Error(ErrorType::InvalidToken, "It was expected a valid insertable value");
+    }
+
+    p_symbolTable->TierUp();
+
+    return std::nullopt;
+}
+
+std::optional<Error> SyntaxAnalyzer::CheckColumnContraints(const std::vector<TokenDefinition> &tokens, int &index) const
+{
+    p_symbolTable->AddNode(NonTerminalToken::COLUMN_CONSTRAINTS);
+
+    do
+    {
+        auto errorResult = CheckColumnContraint(tokens, index);
+        if (errorResult.has_value())
+            return errorResult;
+    } while (IsColumnConstraint(tokens, index));
+
+    p_symbolTable->TierUp();
+
+    return std::nullopt;
+}
+
+bool SyntaxAnalyzer::IsColumnConstraint(const std::vector<TokenDefinition> &tokens, const int &index) const
+{
+    Token currentToken = tokens[index].GetToken();
+    return currentToken == Token::PRIMARY ||
+           currentToken == Token::NULL_VALUE ||
+           currentToken == Token::NOT ||
+           currentToken == Token::UNIQUE;
+}
+
+std::optional<Error> SyntaxAnalyzer::CheckColumnContraint(const std::vector<TokenDefinition> &tokens, int &index) const
+{
+    std::optional<Error> errorResult = std::nullopt;
+
+    p_symbolTable->AddNode(NonTerminalToken::COLUMN_CONSTRAINT);
+
+    if (tokens[index].GetToken() == Token::PRIMARY)
+    {
+        errorResult = Consume(tokens, Token::PRIMARY, index);
+        if (errorResult.has_value())
+            return errorResult;
+
+        errorResult = Consume(tokens, Token::KEY, index);
+        if (errorResult.has_value())
+            return errorResult;
+    }
+    else if (tokens[index].GetToken() == Token::NOT)
+    {
+        errorResult = Consume(tokens, Token::NOT, index);
+        if (errorResult.has_value())
+            return errorResult;
+
+        errorResult = Consume(tokens, Token::NULL_VALUE, index);
+        if (errorResult.has_value())
+            return errorResult;
+    }
+    else if (tokens[index].GetToken() == Token::UNIQUE || tokens[index].GetToken() == Token::NULL_VALUE)
+    {
+        errorResult = Consume(tokens, tokens[index].GetToken(), index);
+        if (errorResult.has_value())
+            return errorResult;
+    }
+    else
+        return Error(ErrorType::InvalidToken, "It was expected a valid insertable value");
 
     p_symbolTable->TierUp();
 
