@@ -16,6 +16,23 @@ std::optional<Error> SyntaxAnalyzer::Execute()
             errorResult = CheckSelectStatement(tokens, index);
         else if (tokens[index].GetToken() == Token::INSERT)
             errorResult = CheckInsertStatement(tokens, index);
+        else if (tokens[index].GetToken() == Token::UPDATE)
+            errorResult = CheckUpdateStatement(tokens, index);
+        else if (tokens[index].GetToken() == Token::DELETE)
+            errorResult = CheckDeleteStatement(tokens, index);
+        else if (tokens[index].GetToken() == Token::ALTER)
+            errorResult = CheckAlterCommand(tokens, index);
+        else if (index + 1 < tokens.size())
+        {
+            if (tokens[index].GetToken() == Token::CREATE && tokens[index + 1].GetToken() == Token::DATABASE)
+                errorResult = CheckCreateDatabaseStatement(tokens, index);
+            else if (tokens[index].GetToken() == Token::DROP && tokens[index + 1].GetToken() == Token::DATABASE)
+                errorResult = CheckDropDatabaseStatement(tokens, index);
+            else if (tokens[index].GetToken() == Token::CREATE && tokens[index + 1].GetToken() == Token::TABLE)
+                errorResult = CheckCreateTableStatement(tokens, index);
+            else if (tokens[index].GetToken() == Token::DROP && tokens[index + 1].GetToken() == Token::TABLE)
+                errorResult = CheckDropTableStatement(tokens, index);
+        }
 
         if (errorResult != std::nullopt)
             return errorResult;
