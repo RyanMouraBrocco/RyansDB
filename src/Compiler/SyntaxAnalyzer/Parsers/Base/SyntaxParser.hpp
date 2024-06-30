@@ -2,7 +2,7 @@
 
 #include <optional>
 #include <memory>
-#include "../../../Error/error.hpp"
+#include "../../../../Error/error.hpp"
 #include "../../../SymbolTable/SymbolTable.hpp"
 
 class SyntaxParser
@@ -10,11 +10,6 @@ class SyntaxParser
 protected:
     SyntaxParser(){};
     ~SyntaxParser(){};
-
-public:
-    SyntaxParser(SyntaxParser &other) = delete;
-    SyntaxParser(SyntaxParser &&other) = delete;
-    void operator=(const SyntaxParser &) = delete;
 
     std::optional<Error> Consume(std::shared_ptr<SymbolTable> symbolTable, const std::vector<TokenDefinition> &tokens, const Token &&expextedToken, int &index) const
     {
@@ -31,5 +26,9 @@ public:
         return std::nullopt;
     }
 
+public:
+    SyntaxParser(SyntaxParser &other) = delete;
+    SyntaxParser(SyntaxParser &&other) = delete;
+    void operator=(const SyntaxParser &) = delete;
     virtual std::optional<Error> ParserIntoParserTree(std::shared_ptr<SymbolTable> symbolTable, const std::vector<TokenDefinition> &tokens, int &index) const = 0;
 };

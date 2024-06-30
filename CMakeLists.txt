@@ -24,4 +24,14 @@ add_executable(RyansDBServer
                 ./src/Compiler/SymbolTable/ParserTree/Builder/ParserTreeBuilder.cpp
                 ./src/Compiler/SymbolTable/SymbolTable.cpp
                 ./src/Compiler/LexycalAnalyzer/LexycalAnalyzer.cpp
-                ./src/Compiler/SyntaxAnalyzer/SyntaxAnalyzer.cpp)
+                ./src/Compiler/SyntaxAnalyzer/SyntaxAnalyzer.cpp
+                ./src/Compiler/SyntaxAnalyzer/Parsers/AlterTableParser/AlterTableParser.cpp
+                ./src/Compiler/SyntaxAnalyzer/Parsers/CreateDatabaseParser/CreateDatabaseParser.cpp
+                ./src/Compiler/SyntaxAnalyzer/Parsers/CreateTableParser/CreateTableParser.cpp
+                ./src/Compiler/SyntaxAnalyzer/Parsers/DeleteParser/DeleteParser.cpp
+                ./src/Compiler/SyntaxAnalyzer/Parsers/DropDatabaseParser/DropDatabaseParser.cpp
+                ./src/Compiler/SyntaxAnalyzer/Parsers/DropTableParser/DropTableParser.cpp
+                ./src/Compiler/SyntaxAnalyzer/Parsers/InsertParser/InsertParser.cpp
+                ./src/Compiler/SyntaxAnalyzer/Parsers/LogicalOperationParser/LogicalOperationParser.cpp
+                ./src/Compiler/SyntaxAnalyzer/Parsers/SelectParser/SelectParser.cpp
+                ./src/Compiler/SyntaxAnalyzer/Parsers/UpdateParser/UpdateParser.cpp)

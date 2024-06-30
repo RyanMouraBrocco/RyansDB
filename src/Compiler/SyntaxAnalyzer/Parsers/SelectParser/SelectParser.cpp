@@ -27,7 +27,7 @@ std::optional<Error> SelectParser::ParserIntoParserTree(std::shared_ptr<SymbolTa
         if (errorResult.has_value())
             return errorResult;
 
-        errorResult = CheckLogicalExpression(symbolTable, tokens, index);
+        errorResult = p_logicalExpressionParser->ParserIntoParserTree(symbolTable, tokens, index);
         if (errorResult.has_value())
             return errorResult;
     }
@@ -124,7 +124,7 @@ std::optional<Error> SelectParser::CheckJoin(std::shared_ptr<SymbolTable> symbol
         if (errorResult.has_value())
             return errorResult;
 
-        errorResult = LogicalOperationParser::GetInstance()->ParserIntoParserTree(symbolTable, tokens, index);
+        errorResult = p_logicalExpressionParser->ParserIntoParserTree(symbolTable, tokens, index);
         if (errorResult.has_value())
             return errorResult;
 
