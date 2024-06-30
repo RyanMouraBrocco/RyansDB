@@ -51,7 +51,7 @@ std::optional<Error> UpdateParser::CheckUpdateSet(std::shared_ptr<SymbolTable> s
     {
         mustRepeat = false;
 
-        errorResult = p_logicalExpressionParser->CheckIdentifierAttribute(symbolTable, tokens, index);
+        errorResult = p_utilsParser->CheckIdentifierAttribute(symbolTable, tokens, index);
         if (errorResult.has_value())
             return errorResult;
 
@@ -59,7 +59,7 @@ std::optional<Error> UpdateParser::CheckUpdateSet(std::shared_ptr<SymbolTable> s
         if (errorResult.has_value())
             return errorResult;
 
-        errorResult = p_logicalExpressionParser->CheckFactorExpression(symbolTable, tokens, index);
+        errorResult = p_utilsParser->CheckFactorExpression(symbolTable, tokens, index);
         if (errorResult.has_value())
             return errorResult;
 

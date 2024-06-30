@@ -2,9 +2,9 @@
 
 #include <memory>
 #include <mutex>
-#include "../Base/SyntaxParser.hpp"
+#include "../Base/CommandParser.hpp"
 
-class CreateDatabaseParser : public SyntaxParser
+class CreateDatabaseParser : public CommandParser
 {
 private:
     static std::shared_ptr<CreateDatabaseParser> p_singleton;

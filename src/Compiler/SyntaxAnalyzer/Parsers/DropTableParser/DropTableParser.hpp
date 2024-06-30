@@ -2,9 +2,9 @@
 
 #include <memory>
 #include <mutex>
-#include "../Base/SyntaxParser.hpp"
+#include "../Base/CommandParser.hpp"
 
-class DropTableParser : public SyntaxParser
+class DropTableParser : public CommandParser
 {
 private:
     static std::shared_ptr<DropTableParser> p_singleton;

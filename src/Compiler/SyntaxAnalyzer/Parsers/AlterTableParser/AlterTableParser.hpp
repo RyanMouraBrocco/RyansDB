@@ -2,13 +2,16 @@
 
 #include <memory>
 #include <mutex>
-#include "../Base/SyntaxParser.hpp"
+#include "../Base/CommandParser.hpp"
+#include "../Utils/UtilsParser.hpp"
 
-class AlterTableParser : public SyntaxParser
+class AlterTableParser : public CommandParser
 {
 private:
     static std::shared_ptr<AlterTableParser> p_singleton;
     static std::mutex m_mutex;
+
+    std::shared_ptr<UtilsParser> p_utilsParser = UtilsParser::GetInstance();
 
     std::optional<Error> CheckAlterCommand(std::shared_ptr<SymbolTable> symbolTable, const std::vector<TokenDefinition> &tokens, int &index) const;
     std::optional<Error> ConsumeAddForeignKey(std::shared_ptr<SymbolTable> symbolTable, const std::vector<TokenDefinition> &tokens, int &index) const;

@@ -2,10 +2,10 @@
 
 #include <memory>
 #include <mutex>
-#include "../Base/SyntaxParser.hpp"
+#include "../Base/CommandParser.hpp"
 #include "../LogicalOperationParser/LogicalOperationParser.hpp"
 
-class InsertParser : public SyntaxParser
+class InsertParser : public CommandParser
 {
 private:
     static std::shared_ptr<InsertParser> p_singleton;

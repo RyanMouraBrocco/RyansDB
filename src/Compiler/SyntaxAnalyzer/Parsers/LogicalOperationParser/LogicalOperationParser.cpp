@@ -82,7 +82,7 @@ std::optional<Error> LogicalOperationParser::CheckTokenExpression(std::shared_pt
                 return errorResult;
         }
 
-        errorResult = CheckFactorExpression(symbolTable, tokens, index);
+        errorResult = p_utilsParser->CheckFactorExpression(symbolTable, tokens, index);
         if (errorResult.has_value())
             return errorResult;
     }
@@ -116,7 +116,7 @@ std::optional<Error> LogicalOperationParser::CheckComparisonExpression(std::shar
     symbolTable->AddNode(NonTerminalToken::COMPARISON_EXPRESSION);
 
     std::optional<Error> errorResult = std::nullopt;
-    errorResult = CheckFactorExpression(symbolTable, tokens, index);
+    errorResult = p_utilsParser->CheckFactorExpression(symbolTable, tokens, index);
     if (errorResult.has_value())
         return errorResult;
 
@@ -126,7 +126,7 @@ std::optional<Error> LogicalOperationParser::CheckComparisonExpression(std::shar
         if (errorResult.has_value())
             return errorResult;
 
-        errorResult = CheckFactorExpression(symbolTable, tokens, index);
+        errorResult = p_utilsParser->CheckFactorExpression(symbolTable, tokens, index);
         if (errorResult.has_value())
             return errorResult;
     }
@@ -147,48 +147,6 @@ std::optional<Error> LogicalOperationParser::CheckCompareAction(std::shared_ptr<
 
     symbolTable->TierUp();
     return errorResult;
-}
-
-std::optional<Error> LogicalOperationParser::CheckFactorExpression(std::shared_ptr<SymbolTable> symbolTable, const std::vector<TokenDefinition> &tokens, int &index) const
-{
-    symbolTable->AddNode(NonTerminalToken::FACTOR_EXPRESSION);
-    std::optional<Error> errorResult = std::nullopt;
-
-    if (tokens[index].GetToken() == Token::IDENTIFIER)
-        errorResult = CheckIdentifierAttribute(symbolTable, tokens, index);
-    else if (tokens[index].GetToken() == Token::NULL_VALUE)
-        errorResult = Consume(symbolTable, tokens, Token::NULL_VALUE, index);
-    else if (SymbolTable::IsFactorToken(tokens[index].GetToken()))
-        errorResult = Consume(symbolTable, tokens, tokens[index].GetToken(), index);
-    else
-        errorResult = Error(ErrorType::InvalidToken, "It as expected a valid factor but receive a " + tokens[index].GetUpperCaseLexeme());
-
-    symbolTable->TierUp();
-    return errorResult;
-}
-
-std::optional<Error> LogicalOperationParser::CheckIdentifierAttribute(std::shared_ptr<SymbolTable> symbolTable, const std::vector<TokenDefinition> &tokens, int &index) const
-{
-    symbolTable->AddNode(NonTerminalToken::IDENTIFIER_ATTRIBUTE);
-    std::optional<Error> errorResult = std::nullopt;
-    errorResult = Consume(symbolTable, tokens, Token::IDENTIFIER, index);
-    if (errorResult.has_value())
-        return errorResult;
-
-    if (tokens[index].GetToken() == Token::DOT)
-    {
-        errorResult = Consume(symbolTable, tokens, Token::DOT, index);
-        if (errorResult.has_value())
-            return errorResult;
-
-        errorResult = Consume(symbolTable, tokens, Token::IDENTIFIER, index);
-        if (errorResult.has_value())
-            return errorResult;
-    }
-
-    symbolTable->TierUp();
-
-    return std::nullopt;
 }
 
 std::shared_ptr<LogicalOperationParser> LogicalOperationParser::p_singleton = nullptr;

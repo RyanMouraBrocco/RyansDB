@@ -55,7 +55,7 @@ std::optional<Error> AlterTableParser::CheckAlterCommand(std::shared_ptr<SymbolT
             if (errorResult.has_value())
                 return errorResult;
 
-            errorResult = CheckColumnDefinition(symbolTable, tokens, index);
+            errorResult = p_utilsParser->CheckColumnDefinition(symbolTable, tokens, index);
             if (errorResult.has_value())
                 return errorResult;
         }
