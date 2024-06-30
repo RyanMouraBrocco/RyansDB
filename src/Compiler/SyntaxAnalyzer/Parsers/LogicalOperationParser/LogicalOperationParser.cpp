@@ -159,7 +159,7 @@ std::shared_ptr<LogicalOperationParser> LogicalOperationParser::GetInstance()
         m_mutex.lock();
         if (p_singleton == nullptr)
         {
-            p_singleton = std::shared_ptr<LogicalOperationParser>();
+            p_singleton = std::make_shared<LogicalOperationParser>();
         }
         m_mutex.unlock();
     }

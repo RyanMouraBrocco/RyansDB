@@ -126,7 +126,7 @@ std::shared_ptr<InsertParser> InsertParser::GetInstance()
         m_mutex.lock();
         if (p_singleton == nullptr)
         {
-            p_singleton = std::shared_ptr<InsertParser>();
+            p_singleton = std::make_shared<InsertParser>();
         }
         m_mutex.unlock();
     }

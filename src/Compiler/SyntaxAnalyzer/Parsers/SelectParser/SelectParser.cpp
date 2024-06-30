@@ -166,7 +166,7 @@ std::shared_ptr<SelectParser> SelectParser::GetInstance()
         m_mutex.lock();
         if (p_singleton == nullptr)
         {
-            p_singleton = std::shared_ptr<SelectParser>();
+            p_singleton = std::make_shared<SelectParser>();
         }
         m_mutex.unlock();
     }

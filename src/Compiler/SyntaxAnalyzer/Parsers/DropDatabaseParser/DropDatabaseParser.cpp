@@ -37,7 +37,7 @@ std::shared_ptr<DropDatabaseParser> DropDatabaseParser::GetInstance()
         m_mutex.lock();
         if (p_singleton == nullptr)
         {
-            p_singleton = std::shared_ptr<DropDatabaseParser>();
+            p_singleton = std::make_shared<DropDatabaseParser>();
         }
         m_mutex.unlock();
     }

@@ -83,7 +83,7 @@ std::shared_ptr<CreateTableParser> CreateTableParser::GetInstance()
         m_mutex.lock();
         if (p_singleton == nullptr)
         {
-            p_singleton = std::shared_ptr<CreateTableParser>();
+            p_singleton = std::make_shared<CreateTableParser>();
         }
         m_mutex.unlock();
     }

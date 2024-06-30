@@ -41,7 +41,7 @@ std::shared_ptr<DeleteParser> DeleteParser::GetInstance()
         m_mutex.lock();
         if (p_singleton == nullptr)
         {
-            p_singleton = std::shared_ptr<DeleteParser>();
+            p_singleton = std::make_shared<DeleteParser>();
         }
         m_mutex.unlock();
     }

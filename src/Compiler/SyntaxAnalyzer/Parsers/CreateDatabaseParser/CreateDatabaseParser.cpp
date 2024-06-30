@@ -37,7 +37,7 @@ std::shared_ptr<CreateDatabaseParser> CreateDatabaseParser::GetInstance()
         m_mutex.lock();
         if (p_singleton == nullptr)
         {
-            p_singleton = std::shared_ptr<CreateDatabaseParser>();
+            p_singleton = std::make_shared<CreateDatabaseParser>();
         }
         m_mutex.unlock();
     }

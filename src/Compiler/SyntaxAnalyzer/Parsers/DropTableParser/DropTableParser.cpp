@@ -37,7 +37,7 @@ std::shared_ptr<DropTableParser> DropTableParser::GetInstance()
         m_mutex.lock();
         if (p_singleton == nullptr)
         {
-            p_singleton = std::shared_ptr<DropTableParser>();
+            p_singleton = std::make_shared<DropTableParser>();
         }
         m_mutex.unlock();
     }

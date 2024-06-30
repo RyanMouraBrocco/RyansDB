@@ -196,7 +196,7 @@ std::shared_ptr<UtilsParser> UtilsParser::GetInstance()
         m_mutex.lock();
         if (p_singleton == nullptr)
         {
-            p_singleton = std::shared_ptr<UtilsParser>();
+            p_singleton = std::make_shared<UtilsParser>();
         }
         m_mutex.unlock();
     }
