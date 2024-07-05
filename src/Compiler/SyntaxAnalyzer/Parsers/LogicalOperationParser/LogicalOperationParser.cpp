@@ -71,16 +71,9 @@ std::optional<Error> LogicalOperationParser::CheckTokenExpression(std::shared_pt
     std::optional<Error> errorResult = std::nullopt;
     if (tokens[index].GetToken() == Token::NOT)
     {
-        errorResult = Consume(symbolTable, tokens, Token::NOT, index);
+        errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, Token::NOT, index);
         if (errorResult.has_value())
             return errorResult;
-
-        if (tokens[index].GetToken() == Token::NULL_VALUE)
-        {
-            errorResult = Consume(symbolTable, tokens, Token::NULL_VALUE, index);
-            if (errorResult.has_value())
-                return errorResult;
-        }
 
         errorResult = p_utilsParser->CheckFactorExpression(symbolTable, tokens, index);
         if (errorResult.has_value())
@@ -141,7 +134,7 @@ std::optional<Error> LogicalOperationParser::CheckCompareAction(std::shared_ptr<
     std::optional<Error> errorResult = std::nullopt;
 
     if (SymbolTable::IsComparisionToken(tokens[index].GetToken()))
-        errorResult = Consume(symbolTable, tokens, tokens[index].GetToken(), index);
+        errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, tokens[index].GetToken(), index);
     else
         errorResult = Error(ErrorType::InvalidToken, "It as expected a valid comparison token but receive a " + tokens[index].GetUpperCaseLexeme());
 

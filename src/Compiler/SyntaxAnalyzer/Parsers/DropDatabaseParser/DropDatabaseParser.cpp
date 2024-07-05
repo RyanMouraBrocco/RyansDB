@@ -14,7 +14,7 @@ std::optional<Error> DropDatabaseParser::ParserIntoParserTree(std::shared_ptr<Sy
     if (errorResult.has_value())
         return errorResult;
 
-    errorResult = Consume(symbolTable, tokens, Token::IDENTIFIER, index);
+    errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, Token::IDENTIFIER, index);
     if (errorResult.has_value())
         return errorResult;
 

@@ -14,7 +14,7 @@ std::optional<Error> InsertParser::ParserIntoParserTree(std::shared_ptr<SymbolTa
     if (errorResult.has_value())
         return errorResult;
 
-    errorResult = Consume(symbolTable, tokens, Token::IDENTIFIER, index);
+    errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, Token::IDENTIFIER, index);
     if (errorResult.has_value())
         return errorResult;
 
@@ -81,7 +81,7 @@ std::optional<Error> InsertParser::CheckInsertValue(std::shared_ptr<SymbolTable>
     case Token::INTEGER_NUMBER:
     case Token::DECIMAL_NUMBER:
     case Token::NULL_VALUE:
-        return Consume(symbolTable, tokens, tokens[index].GetToken(), index);
+        return AddInAbstractSyntaxTree(symbolTable, tokens, tokens[index].GetToken(), index);
     default:
         return Error(ErrorType::InvalidToken, "It was expected a valid insertable value");
     }
@@ -97,7 +97,7 @@ std::optional<Error> InsertParser::CheckInsertIdentifiers(std::shared_ptr<Symbol
     {
         mustRepeat = false;
 
-        errorResult = Consume(symbolTable, tokens, Token::IDENTIFIER, index);
+        errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, Token::IDENTIFIER, index);
         if (errorResult.has_value())
             return errorResult;
 
