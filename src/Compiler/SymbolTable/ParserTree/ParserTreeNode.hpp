@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include <optional>
+#include <variant>
 #include "../TokenDefinition/TokenDefinition.hpp"
 
 enum class ParserType
@@ -21,6 +22,8 @@ private:
 public:
     ParserToken(TokenDefinition tokenDefinition);
     ParserToken(NonTerminalToken nonTerminalToken);
+
+    std::variant<TokenDefinition, NonTerminalToken> GetValue() const;
 };
 
 class ParserTreeNode
@@ -35,4 +38,6 @@ public:
     ParserTreeNode(ParserToken token);
 
     void AddChild(const std::shared_ptr<ParserTreeNode> child);
+    std::vector<std::shared_ptr<ParserTreeNode>> GetChildren() const;
+    ParserToken GetToken() const;
 };
