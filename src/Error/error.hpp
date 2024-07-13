@@ -8,6 +8,7 @@ enum class ErrorType
     // END Protocol Error
 
     Unexpected = 500,
+
     // START Compiler Error
     InvalidReservedStatement = 600,
     InvalidIdentifierStatement = 601,
@@ -16,7 +17,10 @@ enum class ErrorType
     InvalidCharacter = 604,
     InvalidNumberStatement = 605,
     InvalidToken = 606,
+    InvalidBooleanExpression = 607,
     // END Compiler Error
+
+    
 
 };
 
