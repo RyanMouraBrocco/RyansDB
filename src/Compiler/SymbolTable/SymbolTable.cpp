@@ -32,7 +32,7 @@ void SymbolTable::TierUp()
 
 std::shared_ptr<ParserTreeNode> SymbolTable::BuildTree()
 {
-    m_parserTreeBuilder.Build();
+    return m_parserTreeBuilder.Build();
 }
 
 bool SymbolTable::IsSpecialCharacterToken(const char &value)

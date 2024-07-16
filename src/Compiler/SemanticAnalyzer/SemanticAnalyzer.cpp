@@ -78,7 +78,11 @@ std::optional<Error> SemanticAnalyzer::CheckLogicalNode(std::shared_ptr<ParserTr
         }
         else if (nonTerminalToken == NonTerminalToken::COMPARISON_EXPRESSION)
         {
-            
+            auto errorResult = ValidateComparisionExpression(currentNode.node);
+            if (errorResult.has_value())
+                return errorResult;
+
+            stack.pop();
         }
         else
         {
@@ -91,6 +95,8 @@ std::optional<Error> SemanticAnalyzer::CheckLogicalNode(std::shared_ptr<ParserTr
                 stack.pop();
         }
     }
+
+    return std::nullopt;
 }
 
 bool SemanticAnalyzer::IsNotBooleanExpression(const NonTerminalToken &token, const std::vector<std::shared_ptr<ParserTreeNode>> &children, const int &childrenCount) const
@@ -134,4 +140,45 @@ std::optional<Error> SemanticAnalyzer::ValidateBooleanFactorExpression(const std
         return Error(ErrorType::InvalidBooleanExpression, "Invalid bool expression");
 
     return std::nullopt;
+}
+
+std::optional<Error> SemanticAnalyzer::ValidateComparisionExpression(const std::shared_ptr<ParserTreeNode> &comparisionExpression) const
+{
+    auto children = comparisionExpression->GetChildren();
+    if (children.size() != 3)
+        return Error(ErrorType::Unexpected, "A coparision expression should have had 3 children");
+
+    auto leftFactorExpression = children[0];
+    auto rightFactorEpxression = children[2];
+
+    return CompareLeftAndRightFactorExpressionOfAComparisionExpression(leftFactorExpression, rightFactorEpxression);
+}
+
+std::optional<Error> SemanticAnalyzer::CompareLeftAndRightFactorExpressionOfAComparisionExpression(const std::shared_ptr<ParserTreeNode> &lefFactorExpression, const std::shared_ptr<ParserTreeNode> &rightFactorExpression) const
+{
+    auto leftToken = lefFactorExpression->GetToken().GetValue();
+    if (std::holds_alternative<NonTerminalToken>(leftToken))
+        return std::nullopt;
+
+    auto rightToken = lefFactorExpression->GetToken().GetValue();
+    if (std::holds_alternative<NonTerminalToken>(leftToken))
+        return std::nullopt;
+
+    return IsCompatibleTokens(std::get<TokenDefinition>(leftToken), std::get<TokenDefinition>(rightToken));
+}
+
+std::optional<Error> SemanticAnalyzer::IsCompatibleTokens(const TokenDefinition &leftToken, const TokenDefinition &rightToken) const
+{
+    if (leftToken.GetToken() == rightToken.GetToken())
+        return std::nullopt;
+
+    if (IsNumericToken(leftToken) && IsNumericToken(rightToken))
+        return std::nullopt;
+
+    return Error(ErrorType::InvalidComperisionExpression, "Invalid comparision expression");
+}
+
+bool SemanticAnalyzer::IsNumericToken(const TokenDefinition &tokenDefinition) const
+{
+    return tokenDefinition.GetToken() == Token::INTEGER_NUMBER || tokenDefinition.GetToken() == Token::DECIMAL_NUMBER;
 }

@@ -35,4 +35,5 @@ add_executable(RyansDBServer
                 ./src/Compiler/SyntaxAnalyzer/Parsers/LogicalOperationParser/LogicalOperationParser.cpp
                 ./src/Compiler/SyntaxAnalyzer/Parsers/SelectParser/SelectParser.cpp
                 ./src/Compiler/SyntaxAnalyzer/Parsers/UpdateParser/UpdateParser.cpp
-                ./src/Compiler/SyntaxAnalyzer/Parsers/Utils/UtilsParser.cpp)
+                ./src/Compiler/SyntaxAnalyzer/Parsers/Utils/UtilsParser.cpp
+                ./src/Compiler/SemanticAnalyzer/SemanticAnalyzer.cpp)

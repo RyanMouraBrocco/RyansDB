@@ -18,6 +18,7 @@ enum class ErrorType
     InvalidNumberStatement = 605,
     InvalidToken = 606,
     InvalidBooleanExpression = 607,
+    InvalidComperisionExpression = 607,
     // END Compiler Error
 
     

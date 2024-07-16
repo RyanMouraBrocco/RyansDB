@@ -26,6 +26,10 @@ private:
     bool IsNotBooleanExpression(const NonTerminalToken &token, const std::vector<std::shared_ptr<ParserTreeNode>> &children, const int &childrenCount) const;
     bool IsBooleanExpression(const NonTerminalToken &token, const std::vector<std::shared_ptr<ParserTreeNode>> &children, const int &childrenCount) const;
     std::optional<Error> ValidateBooleanFactorExpression(const std::shared_ptr<ParserTreeNode> &factorExpressionNode) const;
+    std::optional<Error> ValidateComparisionExpression(const std::shared_ptr<ParserTreeNode> &comparisionExpression) const;
+    std::optional<Error> CompareLeftAndRightFactorExpressionOfAComparisionExpression(const std::shared_ptr<ParserTreeNode> &lefFactorExpression, const std::shared_ptr<ParserTreeNode> &rightFactorExpression) const;
+    std::optional<Error> IsCompatibleTokens(const TokenDefinition &leftToken, const TokenDefinition &rightToken) const;
+    bool IsNumericToken(const TokenDefinition &tokenDefinition) const;
 
 public:
     SemanticAnalyzer(std::shared_ptr<SymbolTable> symbolTable);
