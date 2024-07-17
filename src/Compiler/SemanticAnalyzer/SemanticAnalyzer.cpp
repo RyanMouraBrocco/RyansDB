@@ -86,10 +86,10 @@ std::optional<Error> SemanticAnalyzer::CheckLogicalNode(std::shared_ptr<ParserTr
         }
         else
         {
-            if (currentNode.lastNodeIndex <= childrenCount)
+            if (*currentNode.lastNodeIndex < childrenCount)
             {
-                stack.push(Wrapper(children[currentNode.lastNodeIndex], 0));
-                currentNode.lastNodeIndex++;
+                stack.push(Wrapper(children[*currentNode.lastNodeIndex], 0));
+                (*currentNode.lastNodeIndex)++;
             }
             else
                 stack.pop();
@@ -156,11 +156,11 @@ std::optional<Error> SemanticAnalyzer::ValidateComparisionExpression(const std::
 
 std::optional<Error> SemanticAnalyzer::CompareLeftAndRightFactorExpressionOfAComparisionExpression(const std::shared_ptr<ParserTreeNode> &lefFactorExpression, const std::shared_ptr<ParserTreeNode> &rightFactorExpression) const
 {
-    auto leftToken = lefFactorExpression->GetToken().GetValue();
+    auto leftToken = lefFactorExpression->GetChildren()[0]->GetToken().GetValue();
     if (std::holds_alternative<NonTerminalToken>(leftToken))
         return std::nullopt;
 
-    auto rightToken = lefFactorExpression->GetToken().GetValue();
+    auto rightToken = rightFactorExpression->GetChildren()[0]->GetToken().GetValue();
     if (std::holds_alternative<NonTerminalToken>(leftToken))
         return std::nullopt;
 

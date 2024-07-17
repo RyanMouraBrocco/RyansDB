@@ -68,6 +68,7 @@
         "variant": "cpp",
         "bitset": "cpp",
         "regex": "cpp",
-        "stack": "cpp"
+        "stack": "cpp",
+        "queue": "cpp"
     }
 }

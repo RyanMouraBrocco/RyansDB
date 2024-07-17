@@ -9,10 +9,12 @@
 struct Wrapper
 {
     std::shared_ptr<ParserTreeNode> node;
-    int lastNodeIndex;
+    std::shared_ptr<int> lastNodeIndex;
 
-    Wrapper(std::shared_ptr<ParserTreeNode> node, int lastNodexIndex) : node(node), lastNodeIndex(lastNodeIndex)
+    Wrapper(std::shared_ptr<ParserTreeNode> node, int lastNodexIndex)
     {
+        this->node = node;
+        this->lastNodeIndex = std::make_shared<int>(lastNodexIndex);
     }
 };
 
