@@ -35,3 +35,8 @@ void ParserTreeBuider::TierUp()
 {
     m_nonTerminalLevel.pop();
 }
+
+std::shared_ptr<ParserTreeNode> ParserTreeBuider::Build()
+{
+    return p_root;
+}

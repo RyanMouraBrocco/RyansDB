@@ -8,9 +8,9 @@ std::optional<Error> UtilsParser::CheckFactorExpression(std::shared_ptr<SymbolTa
     if (tokens[index].GetToken() == Token::IDENTIFIER)
         errorResult = CheckIdentifierAttribute(symbolTable, tokens, index);
     else if (tokens[index].GetToken() == Token::NULL_VALUE)
-        errorResult = Consume(symbolTable, tokens, Token::NULL_VALUE, index);
+        errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, Token::NULL_VALUE, index);
     else if (SymbolTable::IsFactorToken(tokens[index].GetToken()))
-        errorResult = Consume(symbolTable, tokens, tokens[index].GetToken(), index);
+        errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, tokens[index].GetToken(), index);
     else
         errorResult = Error(ErrorType::InvalidToken, "It as expected a valid factor but receive a " + tokens[index].GetUpperCaseLexeme());
 
@@ -22,7 +22,7 @@ std::optional<Error> UtilsParser::CheckIdentifierAttribute(std::shared_ptr<Symbo
 {
     symbolTable->AddNode(NonTerminalToken::IDENTIFIER_ATTRIBUTE);
     std::optional<Error> errorResult = std::nullopt;
-    errorResult = Consume(symbolTable, tokens, Token::IDENTIFIER, index);
+    errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, Token::IDENTIFIER, index);
     if (errorResult.has_value())
         return errorResult;
 
@@ -32,7 +32,7 @@ std::optional<Error> UtilsParser::CheckIdentifierAttribute(std::shared_ptr<Symbo
         if (errorResult.has_value())
             return errorResult;
 
-        errorResult = Consume(symbolTable, tokens, Token::IDENTIFIER, index);
+        errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, Token::IDENTIFIER, index);
         if (errorResult.has_value())
             return errorResult;
     }
@@ -52,7 +52,7 @@ std::optional<Error> UtilsParser::CheckColumnDefinition(std::shared_ptr<SymbolTa
     if (IsColumnConstraint(tokens, index))
         CheckColumnContraints(symbolTable, tokens, index);
 
-    CheckTextType(symbolTable, tokens, index);
+    CheckColumnType(symbolTable, tokens, index);
 
     if (IsColumnConstraint(tokens, index))
         CheckColumnContraints(symbolTable, tokens, index);
@@ -71,7 +71,7 @@ std::optional<Error> UtilsParser::CheckColumnType(std::shared_ptr<SymbolTable> s
     Token currentToken = tokens[index].GetToken();
     if (currentToken == Token::INTEGER_NUMBER || currentToken == Token::DECIMAL_NUMBER)
     {
-        errorResult = Consume(symbolTable, tokens, tokens[index].GetToken(), index);
+        errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, tokens[index].GetToken(), index);
         if (errorResult.has_value())
             return errorResult;
     }
@@ -85,7 +85,7 @@ std::optional<Error> UtilsParser::CheckColumnType(std::shared_ptr<SymbolTable> s
         if (errorResult.has_value())
             return errorResult;
 
-        errorResult = Consume(symbolTable, tokens, Token::INTEGER_NUMBER, index);
+        errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, Token::INTEGER_NUMBER, index);
         if (errorResult.has_value())
             return errorResult;
 
@@ -111,7 +111,7 @@ std::optional<Error> UtilsParser::CheckTextType(std::shared_ptr<SymbolTable> sym
     case Token::VARCHAR:
     case Token::CHAR:
     case Token::NCHAR:
-        return Consume(symbolTable, tokens, tokens[index].GetToken(), index);
+        return AddInAbstractSyntaxTree(symbolTable, tokens, tokens[index].GetToken(), index);
     default:
         return Error(ErrorType::InvalidToken, "It was expected a valid insertable value");
     }
@@ -154,27 +154,27 @@ std::optional<Error> UtilsParser::CheckColumnContraint(std::shared_ptr<SymbolTab
 
     if (tokens[index].GetToken() == Token::PRIMARY)
     {
-        errorResult = Consume(symbolTable, tokens, Token::PRIMARY, index);
+        errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, Token::PRIMARY, index);
         if (errorResult.has_value())
             return errorResult;
 
-        errorResult = Consume(symbolTable, tokens, Token::KEY, index);
+        errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, Token::KEY, index);
         if (errorResult.has_value())
             return errorResult;
     }
     else if (tokens[index].GetToken() == Token::NOT)
     {
-        errorResult = Consume(symbolTable, tokens, Token::NOT, index);
+        errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, Token::NOT, index);
         if (errorResult.has_value())
             return errorResult;
 
-        errorResult = Consume(symbolTable, tokens, Token::NULL_VALUE, index);
+        errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, Token::NULL_VALUE, index);
         if (errorResult.has_value())
             return errorResult;
     }
     else if (tokens[index].GetToken() == Token::UNIQUE || tokens[index].GetToken() == Token::NULL_VALUE)
     {
-        errorResult = Consume(symbolTable, tokens, tokens[index].GetToken(), index);
+        errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, tokens[index].GetToken(), index);
         if (errorResult.has_value())
             return errorResult;
     }

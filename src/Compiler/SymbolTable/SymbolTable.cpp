@@ -30,6 +30,11 @@ void SymbolTable::TierUp()
     m_parserTreeBuilder.TierUp();
 }
 
+std::shared_ptr<ParserTreeNode> SymbolTable::BuildTree()
+{
+    return m_parserTreeBuilder.Build();
+}
+
 bool SymbolTable::IsSpecialCharacterToken(const char &value)
 {
     return SymbolTable::m_specialCharacterTokens.find(value) != SymbolTable::m_specialCharacterTokens.end();

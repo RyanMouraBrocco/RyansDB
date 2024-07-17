@@ -14,7 +14,7 @@ std::optional<Error> AlterTableParser::ParserIntoParserTree(std::shared_ptr<Symb
     if (errorResult.has_value())
         return errorResult;
 
-    errorResult = Consume(symbolTable, tokens, Token::IDENTIFIER, index);
+    errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, Token::IDENTIFIER, index);
     if (errorResult.has_value())
         return errorResult;
 
@@ -39,7 +39,7 @@ std::optional<Error> AlterTableParser::CheckAlterCommand(std::shared_ptr<SymbolT
 
     if (tokens[index].GetToken() == Token::ADD)
     {
-        errorResult = Consume(symbolTable, tokens, Token::ADD, index);
+        errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, Token::ADD, index);
         if (errorResult.has_value())
             return errorResult;
 
@@ -62,15 +62,15 @@ std::optional<Error> AlterTableParser::CheckAlterCommand(std::shared_ptr<SymbolT
     }
     else if (tokens[index].GetToken() == Token::DROP)
     {
-        errorResult = Consume(symbolTable, tokens, Token::DROP, index);
+        errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, Token::DROP, index);
         if (errorResult.has_value())
             return errorResult;
 
-        errorResult = Consume(symbolTable, tokens, Token::COLUMN, index);
+        errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, Token::COLUMN, index);
         if (errorResult.has_value())
             return errorResult;
 
-        errorResult = Consume(symbolTable, tokens, Token::IDENTIFIER, index);
+        errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, Token::IDENTIFIER, index);
         if (errorResult.has_value())
             return errorResult;
     }
@@ -85,23 +85,23 @@ std::optional<Error> AlterTableParser::CheckAlterCommand(std::shared_ptr<SymbolT
 std::optional<Error> AlterTableParser::ConsumeAddForeignKey(std::shared_ptr<SymbolTable> symbolTable, const std::vector<TokenDefinition> &tokens, int &index) const
 {
     std::optional<Error> errorResult = std::nullopt;
-    errorResult = Consume(symbolTable, tokens, Token::FOREIGN, index);
+    errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, Token::FOREIGN, index);
     if (errorResult.has_value())
         return errorResult;
 
-    errorResult = Consume(symbolTable, tokens, Token::KEY, index);
+    errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, Token::KEY, index);
     if (errorResult.has_value())
         return errorResult;
 
-    errorResult = Consume(symbolTable, tokens, Token::IDENTIFIER, index);
+    errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, Token::IDENTIFIER, index);
     if (errorResult.has_value())
         return errorResult;
 
-    errorResult = Consume(symbolTable, tokens, Token::REFERENCES, index);
+    errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, Token::REFERENCES, index);
     if (errorResult.has_value())
         return errorResult;
 
-    errorResult = Consume(symbolTable, tokens, Token::IDENTIFIER, index);
+    errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, Token::IDENTIFIER, index);
     if (errorResult.has_value())
         return errorResult;
 
@@ -109,7 +109,7 @@ std::optional<Error> AlterTableParser::ConsumeAddForeignKey(std::shared_ptr<Symb
     if (errorResult.has_value())
         return errorResult;
 
-    errorResult = Consume(symbolTable, tokens, Token::IDENTIFIER, index);
+    errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, Token::IDENTIFIER, index);
     if (errorResult.has_value())
         return errorResult;
 

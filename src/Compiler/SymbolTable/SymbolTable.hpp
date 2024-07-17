@@ -25,9 +25,11 @@ public:
     SymbolTable();
     void AddToken(const std::string value, const Token key);
     std::shared_ptr<std::vector<TokenDefinition>> GetSortTokens() const;
+
     void AddNode(TokenDefinition token);
     void AddNode(NonTerminalToken nonTerminalToken);
     void TierUp();
+    std::shared_ptr<ParserTreeNode> BuildTree();
 
     static bool IsSpecialCharacterToken(const char &value);
     static std::variant<Token, Error> GetSpecialCharacterToken(const char &value);

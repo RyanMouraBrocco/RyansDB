@@ -14,7 +14,7 @@ std::optional<Error> CreateTableParser::ParserIntoParserTree(std::shared_ptr<Sym
     if (errorResult.has_value())
         return errorResult;
 
-    errorResult = Consume(symbolTable, tokens, Token::IDENTIFIER, index);
+    errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, Token::IDENTIFIER, index);
     if (errorResult.has_value())
         return errorResult;
 
@@ -50,7 +50,7 @@ std::optional<Error> CreateTableParser::CheckColumnsDefinitions(std::shared_ptr<
     {
         mustRepeat = false;
 
-        errorResult = Consume(symbolTable, tokens, Token::IDENTIFIER, index);
+        errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, Token::IDENTIFIER, index);
         if (errorResult.has_value())
             return errorResult;
 

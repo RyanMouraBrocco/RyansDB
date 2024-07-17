@@ -52,13 +52,13 @@ std::optional<Error> SelectParser::CheckSelectItems(std::shared_ptr<SymbolTable>
         mustRepeat = false;
         if (tokens[index].GetToken() == Token::ASTERISK)
         {
-            errorResult = Consume(symbolTable, tokens, Token::ASTERISK, index);
+            errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, Token::ASTERISK, index);
             if (errorResult.has_value())
                 return errorResult;
         }
         else
         {
-            errorResult = Consume(symbolTable, tokens, Token::IDENTIFIER, index);
+            errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, Token::IDENTIFIER, index);
             if (errorResult.has_value())
                 return errorResult;
         }
@@ -108,7 +108,7 @@ std::optional<Error> SelectParser::CheckJoin(std::shared_ptr<SymbolTable> symbol
         symbolTable->AddNode(NonTerminalToken::JOIN);
         depthNonTerminalToken++;
 
-        errorResult = Consume(symbolTable, tokens, Token::INNER, index);
+        errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, Token::INNER, index);
         if (errorResult.has_value())
             return errorResult;
 
@@ -140,13 +140,13 @@ std::optional<Error> SelectParser::CheckTableName(std::shared_ptr<SymbolTable> s
 {
     symbolTable->AddNode(NonTerminalToken::TABLE_NAME);
 
-    std::optional<Error> errorResult = Consume(symbolTable, tokens, Token::IDENTIFIER, index);
+    std::optional<Error> errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, Token::IDENTIFIER, index);
     if (errorResult.has_value())
         return errorResult;
 
     if (tokens[index].GetToken() == Token::IDENTIFIER)
     {
-        errorResult = Consume(symbolTable, tokens, Token::IDENTIFIER, index);
+        errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, Token::IDENTIFIER, index);
         if (errorResult.has_value())
             return errorResult;
     }

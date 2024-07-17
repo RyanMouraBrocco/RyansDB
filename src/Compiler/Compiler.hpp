@@ -2,6 +2,7 @@
 
 #include "./LexycalAnalyzer/LexycalAnalyzer.hpp"
 #include "./SyntaxAnalyzer/SyntaxAnalyzer.hpp"
+#include "./SemanticAnalyzer/SemanticAnalyzer.hpp"
 #include <memory>
 
 class Compiler
@@ -11,5 +12,5 @@ private:
 
 public:
     Compiler();
-    std::optional<Error> Build(std::string query);
+    std::variant<std::shared_ptr<ParserTreeNode>, Error> Build(std::string query);
 };
