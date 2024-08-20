@@ -45,6 +45,8 @@ private:
     std::shared_ptr<BTreeInnerNode> p_innerRoot;
     std::shared_ptr<BTreeLeafNode> p_leafRoot;
 
+    std::optional<Error> InsertLeaf(BTreeKey key, int value);
+
 public:
     BTree(); // receive here the factory to know how to generate BTreeLeafNode
     std::optional<Error> Insert(BTreeKey key, int value);
@@ -55,11 +57,13 @@ class BTreeInnerNode
 {
 private:
     bool m_hasLeafChildren;
-    std::vector<std::shared_ptr<BTreeKey>> p_keys;
+    std::vector<BTreeKey> p_keys;
     std::vector<std::shared_ptr<BTreeInnerNode>> p_innerChildren;
-    std::vector<std::shared_ptr<BTreeLeafNode>> p_leftChildren;
+    std::vector<std::shared_ptr<BTreeLeafNode>> p_leafChildren;
 
 public:
+    BTreeInnerNode();
+    BTreeInnerNode(BTreeKey key, std::shared_ptr<BTreeLeafNode> leftNode, std::shared_ptr<BTreeLeafNode> rightNode);
     bool GetHasLeafChildren();
     int BinarySearchIndexForNextNode(BTreeKey key);
     std::shared_ptr<BTreeInnerNode> GetInnerNodeByIndex(int index);
@@ -69,10 +73,15 @@ public:
 class BTreeLeafNode
 {
 private:
-    std::vector<std::shared_ptr<BTreeKey>> p_keys;
+    std::vector<BTreeKey> p_keys;
     // here we could receive the factory to see what it will be saved on leaf page
     std::optional<int> BinarySearchIndexData(BTreeKey key);
 
 public:
+    BTreeLeafNode();
+    BTreeLeafNode(std::vector<BTreeKey> initKeys);
+    int GetKeySize();
     std::optional<int> FindOne(BTreeKey key);
+    std::optional<Error> InsertOne(BTreeKey key, int value);
+    std::shared_ptr<BTreeInnerNode> Split();
 };
