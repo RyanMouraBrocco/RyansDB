@@ -3,6 +3,8 @@
 BTree::BTree()
 {
     m_isLeaf = true;
+    p_innerRoot = nullptr;
+    p_leafRoot = std::make_shared<BTreeLeafNode>();
 }
 
 std::optional<Error> BTree::Insert(BTreeKey key, int value)
@@ -26,6 +28,8 @@ std::optional<Error> BTree::InsertLeaf(BTreeKey key, int value)
         p_innerRoot = innerNode;
         m_isLeaf = false;
     }
+
+    return std::nullopt;
 }
 
 std::optional<Error> BTree::InsertInnerNode(BTreeKey key, int value)
@@ -88,12 +92,29 @@ std::variant<int, Error> BTree::FindOne(BTreeKey key)
     return Error(ErrorType::Unexpected, "Unexpect behavior when get in btree");
 }
 
-BTreeInnerNode::BTreeInnerNode(BTreeKey key, std::shared_ptr<BTreeLeafNode> leftNode, std::shared_ptr<BTreeLeafNode> rightNode)
+BTreeInnerNode::BTreeInnerNode()
+{
+}
+
+BTreeInnerNode::BTreeInnerNode(std::vector<BTreeKey> keys, std::vector<std::shared_ptr<BTreeInnerNode>> innerNodes, std::vector<std::shared_ptr<BTreeLeafNode>> leafNodes) : p_keys(keys), p_innerChildren(innerNodes), p_leafChildren(leafNodes)
+{
+    m_hasLeafChildren = leafNodes.size() > 0;
+}
+
+BTreeInnerNode::BTreeInnerNode(BTreeKey key, BTreeLeafNode *leftNode, std::shared_ptr<BTreeLeafNode> rightNode)
 {
     p_keys.push_back(key);
-    p_leafChildren.push_back(leftNode);
+    p_leafChildren.push_back(std::shared_ptr<BTreeLeafNode>(leftNode));
     p_leafChildren.push_back(rightNode);
     m_hasLeafChildren = true;
+}
+
+BTreeInnerNode::BTreeInnerNode(BTreeKey key, BTreeInnerNode *leftNode, std::shared_ptr<BTreeInnerNode> rightNode)
+{
+    p_keys.push_back(key);
+    p_innerChildren.push_back(std::shared_ptr<BTreeInnerNode>(leftNode));
+    p_innerChildren.push_back(rightNode);
+    m_hasLeafChildren = false;
 }
 
 std::shared_ptr<BTreeInnerNode> BTreeInnerNode::Split()
@@ -121,7 +142,10 @@ std::shared_ptr<BTreeInnerNode> BTreeInnerNode::Split()
 
     std::shared_ptr<BTreeInnerNode> rightNode = std::make_shared<BTreeInnerNode>(rightArray, rightInnerNodes, rightLeafNodes);
     if (p_father == nullptr)
-        p_father = std::make_shared<BTreeInnerNode>(rightArray[0], this, rightNode);
+    {
+        BTreeKey middleKey = rightArray[0];
+        p_father = std::make_shared<BTreeInnerNode>(middleKey, this, rightNode);
+    }
 
     rightNode->p_father = p_father;
 
@@ -159,15 +183,32 @@ int BTreeInnerNode::BinarySearchIndexForNextNode(BTreeKey key)
     return lastItem + 1;
 }
 
-std::optional<int> BTreeLeafNode::FindOne(BTreeKey key)
+bool BTreeInnerNode::GetHasLeafChildren()
 {
-    auto indexOfItem = BinarySearchIndexData(key);
-    if (!indexOfItem.has_value())
-        return indexOfItem;
+    return m_hasLeafChildren;
+}
 
-    // use here to access database and fetch data
-    // for now, its just return the index
-    return indexOfItem.value();
+int BTreeInnerNode::GetKeySize()
+{
+    return p_keys.size();
+}
+
+std::shared_ptr<BTreeInnerNode> BTreeInnerNode::GetInnerNodeByIndex(int index)
+{
+    return p_innerChildren[index];
+}
+
+std::shared_ptr<BTreeLeafNode> BTreeInnerNode::GetLeafNodeByIndex(int index)
+{
+    return p_leafChildren[index];
+}
+
+BTreeLeafNode::BTreeLeafNode()
+{
+}
+
+BTreeLeafNode::BTreeLeafNode(std::vector<BTreeKey> keys) : p_keys(keys)
+{
 }
 
 std::optional<int> BTreeLeafNode::BinarySearchIndexData(BTreeKey key)
@@ -196,6 +237,17 @@ int BTreeLeafNode::GetKeySize()
     return p_keys.size();
 }
 
+std::optional<int> BTreeLeafNode::FindOne(BTreeKey key)
+{
+    auto indexOfItem = BinarySearchIndexData(key);
+    if (!indexOfItem.has_value())
+        return indexOfItem;
+
+    // use here to access database and fetch data
+    // for now, its just return the index
+    return indexOfItem.value();
+}
+
 std::optional<Error> BTreeLeafNode::InsertOne(BTreeKey key, int value)
 {
     p_keys.push_back(key);
@@ -214,10 +266,8 @@ std::optional<Error> BTreeLeafNode::InsertOne(BTreeKey key, int value)
     p_keys[nextPosition] = key;
 
     // insert value here;
-}
 
-BTreeLeafNode::BTreeLeafNode(std::vector<BTreeKey> keys) : p_keys(keys)
-{
+    return std::nullopt;
 }
 
 std::shared_ptr<BTreeInnerNode> BTreeLeafNode::Split()

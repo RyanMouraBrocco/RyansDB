@@ -7,6 +7,8 @@
 #include "Orchestrator/RequestOrchestrator.hpp"
 #include <thread>
 
+#include "StorageEngine/BTree/BTree.hpp"
+
 void EndPointsListener(Connection *connection)
 {
     auto orchestrator = RequestOrchestrator();
@@ -41,37 +43,42 @@ void EndPointsListener(Connection *connection)
 
 int main()
 {
-    Socket socket = Socket(5007);
-    socket.Listen();
-    if (socket.GetStatus() != SocketStatus::Opened)
-    {
-        return -1;
-    }
+    // Socket socket = Socket(5007);
+    // socket.Listen();
+    // if (socket.GetStatus() != SocketStatus::Opened)
+    // {
+    //     return -1;
+    // }
 
-    short connectionPool = 1;
+    // short connectionPool = 1;
 
-    Connection **connections = new Connection *[connectionPool];
-    std::thread **threads = new std::thread *[connectionPool];
+    // Connection **connections = new Connection *[connectionPool];
+    // std::thread **threads = new std::thread *[connectionPool];
 
-    for (short i = 0; i < connectionPool; i++)
-    {
-        connections[i] = new Connection(socket);
-        threads[i] = new std::thread(EndPointsListener, connections[i]);
-    }
+    // for (short i = 0; i < connectionPool; i++)
+    // {
+    //     connections[i] = new Connection(socket);
+    //     threads[i] = new std::thread(EndPointsListener, connections[i]);
+    // }
 
-    for (short i = 0; i < connectionPool; i++)
-    {
-        threads[i]->join();
-    }
+    // for (short i = 0; i < connectionPool; i++)
+    // {
+    //     threads[i]->join();
+    // }
 
-    for (short i = 0; i < connectionPool; i++)
-    {
-        delete connections[i];
-        delete threads[i];
-    }
+    // for (short i = 0; i < connectionPool; i++)
+    // {
+    //     delete connections[i];
+    //     delete threads[i];
+    // }
 
-    delete[] connections;
-    delete[] threads;
+    // delete[] connections;
+    // delete[] threads;
+
+    BTree btree;
+
+    auto value = BTreeKey(1);
+    btree.Insert(value, 10);
 
     return 0;
 }

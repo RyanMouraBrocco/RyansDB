@@ -1,42 +1,17 @@
 #pragma once
 
 #include "../../Error/error.hpp"
+#include "Key/BTreeKey.hpp"
 #include <memory>
 #include <optional>
 #include <variant>
 #include <vector>
 
-const int MAX_TREE_CHILDREN = 11;
+const int MAX_TREE_CHILDREN = 10;
 const int MIN_INNER_NODE_TREE_CHILDREN = MAX_TREE_CHILDREN % 2 == 0 ? MAX_TREE_CHILDREN / 2 : (MAX_TREE_CHILDREN + 1) / 2;
 
-class BTreeKey
-{
-private:
-    int m_value;
-
-public:
-    BTreeKey(int value);
-    inline bool operator>(const BTreeKey &key)
-    {
-        return m_value > key.m_value;
-    }
-    inline bool operator<(const BTreeKey &key)
-    {
-        return m_value < key.m_value;
-    }
-    inline bool operator==(const BTreeKey &key)
-    {
-        return m_value == key.m_value;
-    }
-    inline bool operator<=(const BTreeKey &key)
-    {
-        return m_value <= key.m_value;
-    }
-    inline bool operator>=(const BTreeKey &key)
-    {
-        return m_value >= key.m_value;
-    }
-};
+class BTreeInnerNode;
+class BTreeLeafNode;
 
 class BTree
 {
@@ -46,7 +21,7 @@ private:
     std::shared_ptr<BTreeLeafNode> p_leafRoot;
 
     std::optional<Error> InsertLeaf(BTreeKey key, int value);
-    std::optional<Error> BTree::InsertInnerNode(BTreeKey key, int value);
+    std::optional<Error> InsertInnerNode(BTreeKey key, int value);
 
 public:
     BTree(); // receive here the factory to know how to generate BTreeLeafNode
@@ -66,8 +41,8 @@ private:
 public:
     BTreeInnerNode();
     BTreeInnerNode(std::vector<BTreeKey> keys, std::vector<std::shared_ptr<BTreeInnerNode>> innerNodes, std::vector<std::shared_ptr<BTreeLeafNode>> leafNodes);
-    BTreeInnerNode(BTreeKey key, std::shared_ptr<BTreeLeafNode> leftNode, std::shared_ptr<BTreeLeafNode> rightNode);
-    BTreeInnerNode(BTreeKey key, std::shared_ptr<BTreeInnerNode> leftNode, std::shared_ptr<BTreeInnerNode> rightNode);
+    BTreeInnerNode(BTreeKey key, BTreeLeafNode* leftNode, std::shared_ptr<BTreeLeafNode> rightNode);
+    BTreeInnerNode(BTreeKey key, BTreeInnerNode *leftNode, std::shared_ptr<BTreeInnerNode> rightNode);
     bool GetHasLeafChildren();
     int GetKeySize();
     int BinarySearchIndexForNextNode(BTreeKey key);
