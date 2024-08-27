@@ -6,6 +6,7 @@
 #include <optional>
 #include <variant>
 #include <vector>
+#include <stack>
 
 const int MAX_TREE_CHILDREN = 10;
 const int MIN_INNER_NODE_TREE_CHILDREN = MAX_TREE_CHILDREN % 2 == 0 ? MAX_TREE_CHILDREN / 2 : (MAX_TREE_CHILDREN + 1) / 2;
@@ -41,7 +42,7 @@ private:
 public:
     BTreeInnerNode();
     BTreeInnerNode(std::vector<BTreeKey> keys, std::vector<std::shared_ptr<BTreeInnerNode>> innerNodes, std::vector<std::shared_ptr<BTreeLeafNode>> leafNodes);
-    BTreeInnerNode(BTreeKey key, BTreeLeafNode* leftNode, std::shared_ptr<BTreeLeafNode> rightNode);
+    BTreeInnerNode(BTreeKey key, BTreeLeafNode *leftNode, std::shared_ptr<BTreeLeafNode> rightNode);
     BTreeInnerNode(BTreeKey key, BTreeInnerNode *leftNode, std::shared_ptr<BTreeInnerNode> rightNode);
     bool GetHasLeafChildren();
     int GetKeySize();
@@ -49,6 +50,7 @@ public:
     std::shared_ptr<BTreeInnerNode> GetInnerNodeByIndex(int index);
     std::shared_ptr<BTreeLeafNode> GetLeafNodeByIndex(int index);
     std::shared_ptr<BTreeInnerNode> Split();
+    void InsertOne(BTreeKey key, BTreeLeafNode *leftNodePointer, std::shared_ptr<BTreeLeafNode> rightNode);
 };
 
 class BTreeLeafNode

@@ -46,7 +46,7 @@ std::optional<Error> BTree::InsertInnerNode(BTreeKey key, int value)
                 return insertResult;
 
             if (leafNode->GetKeySize() == MAX_TREE_CHILDREN)
-                p_leafRoot->Split();
+                leafNode->Split();
 
             auto previous = next;
             while (previous->GetKeySize() == MAX_TREE_CHILDREN)
@@ -203,6 +203,17 @@ std::shared_ptr<BTreeLeafNode> BTreeInnerNode::GetLeafNodeByIndex(int index)
     return p_leafChildren[index];
 }
 
+void BTreeInnerNode::InsertOne(BTreeKey key, BTreeLeafNode *leftNodePointer, std::shared_ptr<BTreeLeafNode> rightNode)
+{
+    auto leftNode = std::shared_ptr<BTreeLeafNode>(leftNodePointer);
+    p_keys.push_back(key);
+    p_leafChildren.push_back(leftNode);
+    p_leafChildren.push_back(rightNode);
+
+    // find position of the key here
+    // with the key position found, its possible to finde the p_leafChildren positions
+}
+
 BTreeLeafNode::BTreeLeafNode()
 {
 }
@@ -251,16 +262,17 @@ std::optional<int> BTreeLeafNode::FindOne(BTreeKey key)
 std::optional<Error> BTreeLeafNode::InsertOne(BTreeKey key, int value)
 {
     p_keys.push_back(key);
+
     int nextPosition = 0;
-    for (int i = p_keys.size() - 1; i > 0; i--)
+    for (int i = p_keys.size() - 2; i >= 0; i--)
     {
-        if (p_keys[i] >= key)
-        {
-            p_keys[i] = p_keys[i - 1];
-            nextPosition = i - 1;
-        }
+        if (p_keys[i] > key)
+            p_keys[i + 1] = p_keys[i];
         else
+        {
+            nextPosition = i + 1;
             break;
+        }
     }
 
     p_keys[nextPosition] = key;
@@ -273,16 +285,25 @@ std::optional<Error> BTreeLeafNode::InsertOne(BTreeKey key, int value)
 std::shared_ptr<BTreeInnerNode> BTreeLeafNode::Split()
 {
     int middleNumber = p_keys.size() / 2;
-    std::vector<BTreeKey> rightArray;
+    std::stack<BTreeKey> stackKeys;
     for (int i = p_keys.size() - 1; i >= middleNumber; i--)
     {
-        rightArray.push_back(p_keys[i]);
+        stackKeys.push(p_keys[i]);
         p_keys.pop_back();
+    }
+
+    std::vector<BTreeKey> rightArray;
+    while (stackKeys.size() > 0)
+    {
+        rightArray.push_back(stackKeys.top());
+        stackKeys.pop();
     }
 
     std::shared_ptr<BTreeLeafNode> rightNode = std::make_shared<BTreeLeafNode>(rightArray);
     if (p_father == nullptr)
         p_father = std::make_shared<BTreeInnerNode>(rightArray[0], this, rightNode);
+    else
+        p_father->InsertOne(rightArray[0], this, rightNode);
 
     rightNode->p_father = p_father;
 

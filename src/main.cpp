@@ -76,9 +76,36 @@ int main()
     // delete[] threads;
 
     BTree btree;
-
-    auto value = BTreeKey(1);
-    btree.Insert(value, 10);
+    btree.Insert(BTreeKey(1), 10);
+    btree.Insert(BTreeKey(2), 10);
+    btree.Insert(BTreeKey(3), 10);
+    btree.Insert(BTreeKey(4), 10);
+    btree.Insert(BTreeKey(5), 10);
+    btree.Insert(BTreeKey(6), 10);
+    btree.Insert(BTreeKey(7), 10);
+    btree.Insert(BTreeKey(8), 10);
+    btree.Insert(BTreeKey(9), 10);
+    btree.Insert(BTreeKey(10), 10);
+    btree.Insert(BTreeKey(11), 10);
+    btree.Insert(BTreeKey(12), 10);
+    btree.Insert(BTreeKey(13), 10);
+    btree.Insert(BTreeKey(14), 10);
+    btree.Insert(BTreeKey(15), 10);
+    btree.Insert(BTreeKey(16), 10);
+    btree.Insert(BTreeKey(17), 10);
+    btree.Insert(BTreeKey(18), 10);
+    btree.Insert(BTreeKey(19), 10);
+    btree.Insert(BTreeKey(20), 10);
+    btree.Insert(BTreeKey(21), 10);
+    btree.Insert(BTreeKey(22), 10);
+    btree.Insert(BTreeKey(23), 10);
+    btree.Insert(BTreeKey(24), 10);
+    btree.Insert(BTreeKey(25), 10);
+    btree.Insert(BTreeKey(26), 10);
+    btree.Insert(BTreeKey(27), 10);
+    btree.Insert(BTreeKey(28), 10);
+    btree.Insert(BTreeKey(29), 10);
+    btree.Insert(BTreeKey(30), 10);
 
     return 0;
 }
