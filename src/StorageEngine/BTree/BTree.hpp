@@ -51,6 +51,7 @@ public:
     BTreeLeafNode *GetLeafNodeByIndex(int index);
     BTreeInnerNode *Split();
     void InsertOne(BTreeKey key, BTreeLeafNode *rightNode);
+    void InsertOne(BTreeKey key, BTreeInnerNode *rightNode);
 };
 
 class BTreeLeafNode

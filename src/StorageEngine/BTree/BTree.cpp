@@ -51,7 +51,10 @@ std::optional<Error> BTree::InsertInnerNode(BTreeKey key, int value)
             auto previous = next;
             while (previous->GetKeySize() == MAX_TREE_CHILDREN)
             {
+                bool isRoot = previous == p_innerRoot;
                 previous = previous->Split();
+                if (isRoot)
+                    p_innerRoot = previous;
             }
 
             next = nullptr;
@@ -119,34 +122,60 @@ BTreeInnerNode::BTreeInnerNode(BTreeKey key, BTreeInnerNode *leftNode, BTreeInne
 
 BTreeInnerNode *BTreeInnerNode::Split()
 {
-    // refact here based on the split of leaf
     int middleNumber = p_keys.size() / 2;
-    std::vector<BTreeKey> rightArray;
-    std::vector<BTreeInnerNode *> rightInnerNodes;
-    std::vector<BTreeLeafNode *> rightLeafNodes;
+
+    std::stack<BTreeKey> stackKeys;
+    std::stack<BTreeLeafNode *> stackLeafNodes;
+    std::stack<BTreeInnerNode *> stackInnerNodes;
     for (int i = p_keys.size() - 1; i >= middleNumber; i--)
     {
-        rightArray.push_back(p_keys[i]);
+        stackKeys.push(p_keys[i]);
         p_keys.pop_back();
+    }
 
-        if (m_hasLeafChildren)
+    if (m_hasLeafChildren)
+    {
+        for (int i = p_leafChildren.size() - 1; i >= middleNumber; i--)
         {
-            rightLeafNodes.push_back(p_leafChildren[i]);
+            stackLeafNodes.push(p_leafChildren[i]);
             p_leafChildren.pop_back();
         }
-        else
+    }
+    else
+    {
+        for (int i = p_innerChildren.size() - 1; i >= middleNumber; i--)
         {
-            rightInnerNodes.push_back(p_innerChildren[i]);
+            stackInnerNodes.push(p_innerChildren[i]);
             p_innerChildren.pop_back();
         }
     }
 
+    std::vector<BTreeKey> rightArray;
+    std::vector<BTreeLeafNode *> rightLeafNodes;
+    std::vector<BTreeInnerNode *> rightInnerNodes;
+    while (stackKeys.size() > 0)
+    {
+        rightArray.push_back(stackKeys.top());
+        stackKeys.pop();
+    }
+
+    while (stackLeafNodes.size() > 0)
+    {
+        rightLeafNodes.push_back(stackLeafNodes.top());
+        stackLeafNodes.pop();
+    }
+
+    while (stackInnerNodes.size() > 0)
+    {
+        rightInnerNodes.push_back(stackInnerNodes.top());
+        stackInnerNodes.pop();
+    }
+
     BTreeInnerNode *rightNode = new BTreeInnerNode(rightArray, rightInnerNodes, rightLeafNodes);
     if (p_father == nullptr)
-    {
-        BTreeKey middleKey = rightArray[0];
-        p_father = new BTreeInnerNode(middleKey, this, rightNode);
-    }
+        p_father = new BTreeInnerNode(rightArray[0], this, rightNode);
+    else
+        p_father->InsertOne(rightArray[0], rightNode);
 
     rightNode->p_father = p_father;
 
@@ -163,22 +192,20 @@ int BTreeInnerNode::BinarySearchIndexForNextNode(BTreeKey key)
     {
         int middle = min + (max - min) / 2;
         BTreeKey middleKey = p_keys[middle];
-        if (middleKey > key)
+        if (middleKey >= key)
         {
-            if (middle < lastItem && p_keys[middle + 1] <= key)
-                return middle;
+            if (middle < lastItem && p_keys[middle + 1] < key)
+                return middle + 1;
 
             min = middle + 1;
         }
-        else if (middleKey < key)
+        else
         {
             if (middle > 0 && p_keys[middle - 1] >= key)
-                return middle;
+                return middle - 1;
 
             max = middle - 1;
         }
-        else
-            return middle;
     }
 
     return lastItem + 1;
@@ -230,6 +257,34 @@ void BTreeInnerNode::InsertOne(BTreeKey key, BTreeLeafNode *rightNode)
     }
 
     p_leafChildren[rightPosition] = rightNode;
+}
+
+void BTreeInnerNode::InsertOne(BTreeKey key, BTreeInnerNode *rightNode)
+{
+    p_keys.push_back(key);
+    p_innerChildren.push_back(rightNode);
+
+    int rightPosition = 1, keyPosition = 0;
+    for (int i = p_keys.size() - 2; i >= 0; i--)
+    {
+        if (p_keys[i] > key)
+            p_keys[i + 1] = p_keys[i];
+        else
+        {
+            keyPosition = i + 1;
+            rightPosition = i + 2;
+            break;
+        }
+    }
+
+    p_keys[keyPosition] = key;
+
+    for (int i = p_innerChildren.size() - 2; i >= rightPosition; i--)
+    {
+        p_innerChildren[i + 1] = p_innerChildren[i];
+    }
+
+    p_innerChildren[rightPosition] = rightNode;
 }
 
 BTreeLeafNode::BTreeLeafNode()
