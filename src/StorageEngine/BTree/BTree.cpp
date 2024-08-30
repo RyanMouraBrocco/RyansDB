@@ -102,6 +102,16 @@ BTreeInnerNode::BTreeInnerNode()
 BTreeInnerNode::BTreeInnerNode(std::vector<BTreeKey> keys, std::vector<BTreeInnerNode *> innerNodes, std::vector<BTreeLeafNode *> leafNodes) : p_keys(keys), p_innerChildren(innerNodes), p_leafChildren(leafNodes)
 {
     m_hasLeafChildren = leafNodes.size() > 0;
+
+    for (int i = 0; i < p_leafChildren.size(); i++)
+    {
+        p_leafChildren[i]->SetFather(this);
+    }
+
+    for (int i = 0; i < p_innerChildren.size(); i++)
+    {
+        p_innerChildren[i]->p_father = this;
+    }
 }
 
 BTreeInnerNode::BTreeInnerNode(BTreeKey key, BTreeLeafNode *leftNode, BTreeLeafNode *rightNode)
@@ -135,7 +145,7 @@ BTreeInnerNode *BTreeInnerNode::Split()
 
     if (m_hasLeafChildren)
     {
-        for (int i = p_leafChildren.size() - 1; i >= middleNumber; i--)
+        for (int i = p_leafChildren.size() - 1; i > middleNumber; i--)
         {
             stackLeafNodes.push(p_leafChildren[i]);
             p_leafChildren.pop_back();
@@ -143,7 +153,7 @@ BTreeInnerNode *BTreeInnerNode::Split()
     }
     else
     {
-        for (int i = p_innerChildren.size() - 1; i >= middleNumber; i--)
+        for (int i = p_innerChildren.size() - 1; i > middleNumber; i--)
         {
             stackInnerNodes.push(p_innerChildren[i]);
             p_innerChildren.pop_back();
@@ -153,6 +163,10 @@ BTreeInnerNode *BTreeInnerNode::Split()
     std::vector<BTreeKey> rightArray;
     std::vector<BTreeLeafNode *> rightLeafNodes;
     std::vector<BTreeInnerNode *> rightInnerNodes;
+
+    BTreeKey toUpValue = stackKeys.top();
+    stackKeys.pop();
+
     while (stackKeys.size() > 0)
     {
         rightArray.push_back(stackKeys.top());
@@ -173,9 +187,9 @@ BTreeInnerNode *BTreeInnerNode::Split()
 
     BTreeInnerNode *rightNode = new BTreeInnerNode(rightArray, rightInnerNodes, rightLeafNodes);
     if (p_father == nullptr)
-        p_father = new BTreeInnerNode(rightArray[0], this, rightNode);
+        p_father = new BTreeInnerNode(toUpValue, this, rightNode);
     else
-        p_father->InsertOne(rightArray[0], rightNode);
+        p_father->InsertOne(toUpValue, rightNode);
 
     rightNode->p_father = p_father;
 
@@ -381,4 +395,9 @@ BTreeInnerNode *BTreeLeafNode::Split()
     rightNode->p_father = p_father;
 
     return p_father;
+}
+
+void BTreeLeafNode::SetFather(BTreeInnerNode *father)
+{
+    p_father = father;
 }

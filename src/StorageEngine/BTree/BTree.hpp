@@ -8,8 +8,7 @@
 #include <vector>
 #include <stack>
 
-const int MAX_TREE_CHILDREN = 10;
-const int MIN_INNER_NODE_TREE_CHILDREN = MAX_TREE_CHILDREN % 2 == 0 ? MAX_TREE_CHILDREN / 2 : (MAX_TREE_CHILDREN + 1) / 2;
+const int MAX_TREE_CHILDREN = 11;
 
 class BTreeInnerNode;
 class BTreeLeafNode;
@@ -69,4 +68,5 @@ public:
     std::optional<int> FindOne(BTreeKey key);
     std::optional<Error> InsertOne(BTreeKey key, int value);
     BTreeInnerNode *Split();
+    void SetFather(BTreeInnerNode *father);
 };
