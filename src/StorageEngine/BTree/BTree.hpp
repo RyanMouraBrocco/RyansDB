@@ -8,7 +8,7 @@
 #include <vector>
 #include <stack>
 
-const int MAX_TREE_CHILDREN = 11;
+const int MAX_TREE_CHILDREN = 3;
 
 class BTreeInnerNode;
 class BTreeLeafNode;

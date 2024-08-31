@@ -86,13 +86,15 @@ std::variant<int, Error> BTree::FindOne(BTreeKey key)
                 auto leafValue = leafNode->FindOne(key);
                 if (leafValue.has_value())
                     return leafValue.value();
+
+                next = nullptr;
             }
             else
                 next = next->GetInnerNodeByIndex(keyIndex);
         }
     }
 
-    return Error(ErrorType::Unexpected, "Unexpect behavior when get in btree");
+    return Error(ErrorType::NotFoundItem, "Item not found");
 }
 
 BTreeInnerNode::BTreeInnerNode()
@@ -206,23 +208,23 @@ int BTreeInnerNode::BinarySearchIndexForNextNode(BTreeKey key)
     {
         int middle = min + (max - min) / 2;
         BTreeKey middleKey = p_keys[middle];
-        if (middleKey >= key)
+        if (key >= middleKey)
         {
-            if (middle < lastItem && p_keys[middle + 1] < key)
+            if (middle < lastItem && key < p_keys[middle + 1])
                 return middle + 1;
 
             min = middle + 1;
         }
         else
         {
-            if (middle > 0 && p_keys[middle - 1] >= key)
+            if (middle > 0 && key >= p_keys[middle - 1])
                 return middle - 1;
 
             max = middle - 1;
         }
     }
 
-    return lastItem + 1;
+    return key < p_keys[0] ? 0 : lastItem + 1;
 }
 
 bool BTreeInnerNode::GetHasLeafChildren()
@@ -319,9 +321,9 @@ std::optional<int> BTreeLeafNode::BinarySearchIndexData(BTreeKey key)
     {
         int middle = min + (max - min) / 2;
         BTreeKey middleKey = p_keys[middle];
-        if (middleKey > key)
+        if (key > middleKey)
             min = middle + 1;
-        else if (middleKey < key)
+        else if (key < middleKey)
             max = middle - 1;
         else
             return middle;

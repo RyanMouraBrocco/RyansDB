@@ -3,13 +3,13 @@
 
 enum class ErrorType
 {
-    // START Protocol Error
+    // BEGIN Protocol Error
     ProtocolFormat = 400,
     // END Protocol Error
 
     Unexpected = 500,
 
-    // START Compiler Error
+    // BEGIN Compiler Error
     InvalidReservedStatement = 600,
     InvalidIdentifierStatement = 601,
     InvalidVariableStatement = 602,
@@ -21,7 +21,9 @@ enum class ErrorType
     InvalidComperisionExpression = 607,
     // END Compiler Error
 
-    
+    // BEGIN BTREE
+    NotFoundItem = 900,
+    // END BTREE
 
 };
 
