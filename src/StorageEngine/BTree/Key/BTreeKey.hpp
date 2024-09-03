@@ -23,6 +23,11 @@ public:
         return m_value == key.m_value;
     }
 
+    inline bool operator!=(const BTreeKey &key)
+    {
+        return m_value != key.m_value;
+    }
+
     inline bool operator<=(const BTreeKey &key)
     {
         return m_value <= key.m_value;

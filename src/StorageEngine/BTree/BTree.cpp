@@ -97,6 +97,103 @@ std::variant<int, Error> BTree::FindOne(BTreeKey key)
     return Error(ErrorType::NotFoundItem, "Item not found");
 }
 
+std::optional<Error> BTree::Delete(BTreeKey key)
+{
+    if (p_leafRoot)
+        return DeleteLeaf(key);
+
+    return DeleteInnerNode(key);
+}
+
+std::optional<Error> BTree::DeleteLeaf(BTreeKey key)
+{
+    auto deleteResult = p_leafRoot->DeleteOne(key);
+    if (deleteResult.has_value())
+        return deleteResult;
+
+    return std::nullopt;
+}
+
+std::optional<Error> BTree::DeleteInnerNode(BTreeKey key)
+{
+    auto next = p_innerRoot;
+    while (next != nullptr)
+    {
+        int keyIndex = next->BinarySearchIndexForNextNode(key);
+        if (next->GetHasLeafChildren())
+        {
+            auto leafNode = next->GetLeafNodeByIndex(keyIndex);
+            auto deleteResult = leafNode->DeleteOne(key);
+            if (deleteResult.has_value())
+                return deleteResult;
+
+            auto fatherIndex = keyIndex > 0 ? keyIndex - 1 : 0;
+            if (leafNode->GetKeySize() == 0)
+            {
+            }
+            else if (next->GetKey(fatherIndex) != leafNode->GetKey(0))
+                next->UpdateKey(fatherIndex, leafNode->GetKey(0));
+
+            // if (leafNode->GetKeySize() == MAX_TREE_CHILDREN)
+            //     leafNode->Split();
+
+            // auto previous = next;
+            // while (previous->GetKeySize() == MAX_TREE_CHILDREN)
+            // {
+            //     bool isRoot = previous == p_innerRoot;
+            //     previous = previous->Split();
+            //     if (isRoot)
+            //         p_innerRoot = previous;
+            // }
+
+            next = nullptr;
+        }
+        else
+            next = next->GetInnerNodeByIndex(keyIndex);
+    }
+
+    return std::nullopt;
+}
+
+std::vector<BTreeKey> BTree::ListAll()
+{
+    std::vector<BTreeKey> keys;
+
+    if (m_isLeaf)
+    {
+        for (int i = 0; i < p_leafRoot->GetKeySize(); i++)
+        {
+            keys.push_back(p_leafRoot->GetKey(i));
+        }
+    }
+    else
+    {
+        auto next = p_innerRoot;
+        while (next != nullptr)
+        {
+            if (next->GetHasLeafChildren())
+            {
+                auto leaf = next->GetLeafNodeByIndex(0);
+                while (leaf != nullptr)
+                {
+                    for (int i = 0; i < leaf->GetKeySize(); i++)
+                    {
+                        keys.push_back(leaf->GetKey(i));
+                    }
+
+                    leaf = leaf->GetNextPage();
+                }
+
+                next = nullptr;
+            }
+            else
+                next = next->GetInnerNodeByIndex(0);
+        }
+    }
+
+    return keys;
+}
+
 BTreeInnerNode::BTreeInnerNode()
 {
 }
@@ -303,6 +400,16 @@ void BTreeInnerNode::InsertOne(BTreeKey key, BTreeInnerNode *rightNode)
     p_innerChildren[rightPosition] = rightNode;
 }
 
+BTreeKey BTreeInnerNode::GetKey(int index)
+{
+    return p_keys[index];
+}
+
+void BTreeInnerNode::UpdateKey(int index, BTreeKey key)
+{
+    p_keys[index] = key;
+}
+
 BTreeLeafNode::BTreeLeafNode()
 {
 }
@@ -394,7 +501,15 @@ BTreeInnerNode *BTreeLeafNode::Split()
     else
         p_father->InsertOne(rightArray[0], rightNode);
 
+    if (p_nextPage != nullptr)
+    {
+        rightNode->p_nextPage = p_nextPage;
+        p_nextPage->p_previousPage = rightNode;
+    }
+
+    p_nextPage = rightNode;
     rightNode->p_father = p_father;
+    rightNode->p_previousPage = this;
 
     return p_father;
 }
@@ -402,4 +517,27 @@ BTreeInnerNode *BTreeLeafNode::Split()
 void BTreeLeafNode::SetFather(BTreeInnerNode *father)
 {
     p_father = father;
+}
+
+std::optional<Error> BTreeLeafNode::DeleteOne(BTreeKey key)
+{
+    auto indexPositionResult = BinarySearchIndexData(key);
+    if (!indexPositionResult.has_value())
+        return Error(ErrorType::NotFoundItem, "Item not found");
+
+    auto index = indexPositionResult.value();
+
+    p_keys.erase(p_keys.begin() + index);
+
+    return std::nullopt;
+}
+
+BTreeKey BTreeLeafNode::GetKey(int index)
+{
+    return p_keys[index];
+}
+
+BTreeLeafNode *BTreeLeafNode::GetNextPage()
+{
+    return p_nextPage;
 }

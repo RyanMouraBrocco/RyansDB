@@ -22,11 +22,15 @@ private:
 
     std::optional<Error> InsertLeaf(BTreeKey key, int value);
     std::optional<Error> InsertInnerNode(BTreeKey key, int value);
+    std::optional<Error> DeleteLeaf(BTreeKey key);
+    std::optional<Error> DeleteInnerNode(BTreeKey key);
 
 public:
     BTree(); // receive here the factory to know how to generate BTreeLeafNode
     std::optional<Error> Insert(BTreeKey key, int value);
+    std::optional<Error> Delete(BTreeKey key);
     std::variant<int, Error> FindOne(BTreeKey key);
+    std::vector<BTreeKey> ListAll();
 };
 
 class BTreeInnerNode
@@ -51,12 +55,16 @@ public:
     BTreeInnerNode *Split();
     void InsertOne(BTreeKey key, BTreeLeafNode *rightNode);
     void InsertOne(BTreeKey key, BTreeInnerNode *rightNode);
+    BTreeKey GetKey(int index);
+    void UpdateKey(int index, BTreeKey key);
 };
 
 class BTreeLeafNode
 {
 private:
     BTreeInnerNode *p_father = nullptr;
+    BTreeLeafNode *p_nextPage = nullptr;
+    BTreeLeafNode *p_previousPage = nullptr;
     std::vector<BTreeKey> p_keys;
     // here we could receive the factory to see what it will be saved on leaf page
     std::optional<int> BinarySearchIndexData(BTreeKey key);
@@ -67,6 +75,9 @@ public:
     int GetKeySize();
     std::optional<int> FindOne(BTreeKey key);
     std::optional<Error> InsertOne(BTreeKey key, int value);
+    std::optional<Error> DeleteOne(BTreeKey key);
     BTreeInnerNode *Split();
     void SetFather(BTreeInnerNode *father);
+    BTreeKey GetKey(int index);
+    BTreeLeafNode *GetNextPage();
 };

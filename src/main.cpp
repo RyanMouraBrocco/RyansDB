@@ -8,6 +8,7 @@
 #include <thread>
 
 #include "StorageEngine/BTree/BTree.hpp"
+#include <chrono>
 
 void EndPointsListener(Connection *connection)
 {
@@ -76,29 +77,36 @@ int main()
     // delete[] threads;
 
     BTree btree;
-    btree.Insert(BTreeKey(1), 10);
-    btree.Insert(BTreeKey(16), 10);
-    btree.Insert(BTreeKey(24), 10);
-    btree.Insert(BTreeKey(4), 10);
-    btree.Insert(BTreeKey(41), 10);
-    btree.Insert(BTreeKey(17), 10);
-    btree.Insert(BTreeKey(5), 10);
-    btree.Insert(BTreeKey(8), 10);
-    btree.Insert(BTreeKey(23), 10);
-    btree.Insert(BTreeKey(9), 10);
-    btree.Insert(BTreeKey(11), 10);
-    btree.Insert(BTreeKey(234), 10);
-    btree.Insert(BTreeKey(6), 10);
-    btree.Insert(BTreeKey(3), 10);
-    btree.Insert(BTreeKey(13), 10);
-    btree.Insert(BTreeKey(38), 10);
-    btree.Insert(BTreeKey(15), 10);
-    btree.Insert(BTreeKey(10), 10);
-    btree.Insert(BTreeKey(77), 10);
-    btree.Insert(BTreeKey(15), 10);
-    btree.Insert(BTreeKey(28), 10);
+    // btree.Insert(BTreeKey(1), 10);
+    // btree.Insert(BTreeKey(16), 10);
+    // btree.Insert(BTreeKey(24), 10);
+    // btree.Insert(BTreeKey(4), 10);
+    // btree.Insert(BTreeKey(41), 10);
+    // btree.Insert(BTreeKey(17), 10);
+    // btree.Insert(BTreeKey(5), 10);
+    // btree.Insert(BTreeKey(8), 10);
+    // btree.Insert(BTreeKey(23), 10);
+    // btree.Insert(BTreeKey(9), 10);
+    // btree.Insert(BTreeKey(11), 10);
+    // btree.Insert(BTreeKey(234), 10);
+    // btree.Insert(BTreeKey(6), 10);
+    // btree.Insert(BTreeKey(3), 10);
+    // btree.Insert(BTreeKey(13), 10);
+    // btree.Insert(BTreeKey(38), 10);
+    // btree.Insert(BTreeKey(15), 10);
+    // btree.Insert(BTreeKey(10), 10);
+    // btree.Insert(BTreeKey(77), 10);
+    // btree.Insert(BTreeKey(15), 10);
+    // btree.Insert(BTreeKey(28), 10);
 
-    auto value = btree.FindOne(BTreeKey(22));
+    // auto value = btree.FindOne(BTreeKey(22));
+
+    btree.Insert(BTreeKey(1), 10);
+    btree.Insert(BTreeKey(2), 10);
+    btree.Insert(BTreeKey(3), 10);
+
+    btree.Delete(BTreeKey(2));
+    btree.Delete(BTreeKey(1));
 
     return 0;
 }
