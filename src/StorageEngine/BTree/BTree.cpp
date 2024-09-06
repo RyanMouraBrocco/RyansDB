@@ -128,10 +128,38 @@ std::optional<Error> BTree::DeleteInnerNode(BTreeKey key)
                 return deleteResult;
 
             auto fatherIndex = keyIndex > 0 ? keyIndex - 1 : 0;
-            if (leafNode->GetKeySize() == 0)
+            if (leafNode->GetKeySize() < MIN_TREE_CHILDREN)
             {
+                auto right = leafNode->GetNextPage();
+                auto left = leafNode->GetPreviousPage();
+
+                if (right != nullptr &&
+                    right->GetFather() == leafNode->GetFather() &&
+                    right->GetKeySize() > MIN_TREE_CHILDREN)
+                {
+                    // need borrow from right
+                }
+                else if (left != nullptr &&
+                         left->GetFather() == leafNode->GetFather() &&
+                         left->GetKeySize() > MIN_TREE_CHILDREN)
+                {
+                    // need borrow from left
+                }
+                else if (right != nullptr &&
+                         right->GetFather() == leafNode->GetFather() &&
+                         right->GetKeySize() <= MIN_TREE_CHILDREN)
+                {
+                    // need merge with right
+                }
+                else if (left != nullptr &&
+                         left->GetFather() == leafNode->GetFather() &&
+                         left->GetKeySize() <= MIN_TREE_CHILDREN)
+                {
+                    // need merge with left
+                }
             }
-            else if (next->GetKey(fatherIndex) != leafNode->GetKey(0))
+
+            if (next->GetKey(fatherIndex) != leafNode->GetKey(0))
                 next->UpdateKey(fatherIndex, leafNode->GetKey(0));
 
             // if (leafNode->GetKeySize() == MAX_TREE_CHILDREN)
@@ -540,4 +568,9 @@ BTreeKey BTreeLeafNode::GetKey(int index)
 BTreeLeafNode *BTreeLeafNode::GetNextPage()
 {
     return p_nextPage;
+}
+
+BTreeLeafNode *BTreeLeafNode::GetPreviousPage()
+{
+    return p_previousPage;
 }
