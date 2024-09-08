@@ -204,11 +204,11 @@ std::optional<Error> BTree::DeleteInnerNode(BTreeKey key)
                 }
                 else
                 {
-                    auto fatherOfFatherIndex = father->GetFather()->BinarySearchIndexForNextNode(key);
+                    auto fatherOfFatherIndex = std::get<int>(father->GetFather()->GetInnerNodeIndex(father));
                     BTreeInnerNode *nextInnerNode = nullptr;
                     BTreeInnerNode *previousInnerNode = nullptr;
 
-                    if (fatherOfFatherIndex < father->GetFather()->GetKeySize() + 2)
+                    if (fatherOfFatherIndex < father->GetFather()->GetKeySize() + 1)
                         nextInnerNode = father->GetFather()->GetInnerNodeByIndex(fatherOfFatherIndex + 1);
 
                     if (fatherOfFatherIndex > 0)
@@ -561,6 +561,28 @@ std::variant<int, Error> BTreeInnerNode::GetKeyIndex(BTreeKey key)
     return Error(ErrorType::NotFoundItem, "It was not possible to found this key");
 }
 
+std::variant<int, Error> BTreeInnerNode::GetLeafNodeIndex(BTreeLeafNode *leafNode)
+{
+    for (int i = 0; i < p_leafChildren.size(); i++)
+    {
+        if (p_leafChildren[i] == leafNode)
+            return i;
+    }
+
+    return Error(ErrorType::NotFoundItem, "It was not possible to found this key");
+}
+
+std::variant<int, Error> BTreeInnerNode::GetInnerNodeIndex(BTreeInnerNode *innerNode)
+{
+    for (int i = 0; i < p_innerChildren.size(); i++)
+    {
+        if (p_innerChildren[i] == innerNode)
+            return i;
+    }
+
+    return Error(ErrorType::NotFoundItem, "It was not possible to found this key");
+}
+
 void BTreeInnerNode::DeleteKeyByIndex(int index)
 {
     p_keys.erase(p_keys.begin() + index);
@@ -578,12 +600,12 @@ void BTreeInnerNode::DeleteInnerChildrenByIndex(int index)
 
 int BTreeInnerNode::GetInnerNodeSize()
 {
-    p_innerChildren.size();
+    return p_innerChildren.size();
 }
 
 int BTreeInnerNode::GetLeafNodeSize()
 {
-    p_leafChildren.size();
+    return p_leafChildren.size();
 }
 
 void BTreeInnerNode::MergeWithRightNode(int currentFatherPositon, BTreeInnerNode *rightNode)
@@ -792,14 +814,13 @@ std::optional<Error> BTreeLeafNode::BorrowFromPreviousPage()
 
 std::optional<Error> BTreeLeafNode::MergeWithNextPage()
 {
-    auto firstNextPageKey = p_nextPage->GetKey(0);
     p_keys.insert(p_keys.end(), p_nextPage->p_keys.begin(), p_nextPage->p_keys.end());
 
     p_nextPage = p_nextPage->p_nextPage;
     if (p_nextPage != nullptr)
         p_nextPage->p_previousPage = this;
 
-    auto fatherKeyIndexResult = p_father->GetKeyIndex(firstNextPageKey);
+    auto fatherKeyIndexResult = p_father->GetLeafNodeIndex(this);
     if (std::holds_alternative<Error>(fatherKeyIndexResult))
         return std::get<Error>(fatherKeyIndexResult);
 

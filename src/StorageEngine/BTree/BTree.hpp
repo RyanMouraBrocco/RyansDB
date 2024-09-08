@@ -60,6 +60,8 @@ public:
     void UpdateKey(int index, BTreeKey key);
     BTreeInnerNode *GetFather();
     std::variant<int, Error> GetKeyIndex(BTreeKey key);
+    std::variant<int, Error> GetLeafNodeIndex(BTreeLeafNode *leafNode);
+    std::variant<int, Error> GetInnerNodeIndex(BTreeInnerNode *innerNode);
     void DeleteKeyByIndex(int index);
     void DeleteLeafChildrenByIndex(int index);
     void DeleteInnerChildrenByIndex(int index);
