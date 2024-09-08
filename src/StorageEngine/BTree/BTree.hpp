@@ -58,6 +58,17 @@ public:
     void InsertOne(BTreeKey key, BTreeInnerNode *rightNode);
     BTreeKey GetKey(int index);
     void UpdateKey(int index, BTreeKey key);
+    BTreeInnerNode *GetFather();
+    std::variant<int, Error> GetKeyIndex(BTreeKey key);
+    void DeleteKeyByIndex(int index);
+    void DeleteLeafChildrenByIndex(int index);
+    void DeleteInnerChildrenByIndex(int index);
+    void SetFather(BTreeInnerNode *father);
+    void BorrowFromRightNode(int currentFatherPosition, BTreeInnerNode *rightNode);
+    void BorrowFromLeftNode(int currentFatherPosition, BTreeInnerNode *leftNode);
+    int GetInnerNodeSize();
+    int GetLeafNodeSize();
+    void MergeWithRightNode(int currentFatherPosition, BTreeInnerNode *rightNode);
 };
 
 class BTreeLeafNode
@@ -82,4 +93,8 @@ public:
     BTreeKey GetKey(int index);
     BTreeLeafNode *GetNextPage();
     BTreeLeafNode *GetPreviousPage();
+    BTreeInnerNode *GetFather();
+    std::optional<Error> BorrowFromNextPage();
+    std::optional<Error> BorrowFromPreviousPage();
+    std::optional<Error> MergeWithNextPage();
 };

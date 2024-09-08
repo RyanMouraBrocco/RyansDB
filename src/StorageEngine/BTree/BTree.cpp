@@ -137,42 +137,95 @@ std::optional<Error> BTree::DeleteInnerNode(BTreeKey key)
                     right->GetFather() == leafNode->GetFather() &&
                     right->GetKeySize() > MIN_TREE_CHILDREN)
                 {
-                    // need borrow from right
+                    auto borrowedResult = leafNode->BorrowFromNextPage();
+                    if (borrowedResult.has_value())
+                        return borrowedResult;
                 }
                 else if (left != nullptr &&
                          left->GetFather() == leafNode->GetFather() &&
                          left->GetKeySize() > MIN_TREE_CHILDREN)
                 {
-                    // need borrow from left
+                    auto borrowedResult = leafNode->BorrowFromPreviousPage();
+                    if (borrowedResult.has_value())
+                        return borrowedResult;
                 }
                 else if (right != nullptr &&
                          right->GetFather() == leafNode->GetFather() &&
                          right->GetKeySize() <= MIN_TREE_CHILDREN)
                 {
-                    // need merge with right
+                    auto mergedResult = leafNode->MergeWithNextPage();
+                    if (mergedResult.has_value())
+                        return mergedResult;
                 }
                 else if (left != nullptr &&
                          left->GetFather() == leafNode->GetFather() &&
                          left->GetKeySize() <= MIN_TREE_CHILDREN)
                 {
-                    // need merge with left
+                    auto mergedResult = left->MergeWithNextPage();
+                    if (mergedResult.has_value())
+                        return mergedResult;
                 }
             }
 
-            if (next->GetKey(fatherIndex) != leafNode->GetKey(0))
-                next->UpdateKey(fatherIndex, leafNode->GetKey(0));
+            auto father = next;
+            while (father != nullptr)
+            {
+                auto findKeyResult = father->GetKeyIndex(key);
+                if (std::holds_alternative<int>(findKeyResult))
+                {
+                    int keyIndex = std::get<int>(findKeyResult);
+                    auto innerNodePath = father;
+                    if (!innerNodePath->GetHasLeafChildren())
+                    {
+                        auto innerNodePath = father->GetInnerNodeByIndex(keyIndex + 1);
+                        while (!innerNodePath->GetHasLeafChildren())
+                            innerNodePath = innerNodePath->GetInnerNodeByIndex(0);
+                    }
 
-            // if (leafNode->GetKeySize() == MAX_TREE_CHILDREN)
-            //     leafNode->Split();
+                    father->UpdateKey(keyIndex, innerNodePath->GetLeafNodeByIndex(0)->GetKey(0));
+                }
 
-            // auto previous = next;
-            // while (previous->GetKeySize() == MAX_TREE_CHILDREN)
-            // {
-            //     bool isRoot = previous == p_innerRoot;
-            //     previous = previous->Split();
-            //     if (isRoot)
-            //         p_innerRoot = previous;
-            // }
+                if (father == p_innerRoot)
+                {
+                    if (father->GetKeySize() == 0)
+                    {
+                        if (father->GetHasLeafChildren())
+                        {
+                            p_leafRoot = father->GetLeafNodeByIndex(0);
+                            p_leafRoot->SetFather(nullptr);
+                            p_innerRoot = nullptr;
+                        }
+                        else
+                        {
+                            p_innerRoot = father->GetInnerNodeByIndex(0);
+                            p_innerRoot->SetFather(nullptr);
+                        }
+                    }
+                }
+                else
+                {
+                    auto fatherOfFatherIndex = father->GetFather()->BinarySearchIndexForNextNode(key);
+                    BTreeInnerNode *nextInnerNode = nullptr;
+                    BTreeInnerNode *previousInnerNode = nullptr;
+
+                    if (fatherOfFatherIndex < father->GetFather()->GetKeySize() + 2)
+                        nextInnerNode = father->GetFather()->GetInnerNodeByIndex(fatherOfFatherIndex + 1);
+
+                    if (fatherOfFatherIndex > 0)
+                        previousInnerNode = father->GetFather()->GetInnerNodeByIndex(fatherOfFatherIndex - 1);
+
+                    if (nextInnerNode != nullptr && nextInnerNode->GetKeySize() > MIN_TREE_CHILDREN)
+                        father->BorrowFromRightNode(fatherOfFatherIndex, nextInnerNode);
+                    else if (previousInnerNode != nullptr && previousInnerNode->GetKeySize() > MIN_TREE_CHILDREN)
+                        father->BorrowFromRightNode(fatherOfFatherIndex, previousInnerNode);
+                    else if (nextInnerNode != nullptr && nextInnerNode->GetKeySize() <= MIN_TREE_CHILDREN)
+                        father->MergeWithRightNode(fatherOfFatherIndex, nextInnerNode);
+                    else if (previousInnerNode != nullptr && previousInnerNode->GetKeySize() <= MIN_TREE_CHILDREN)
+                        previousInnerNode->MergeWithRightNode(fatherOfFatherIndex - 1, father);
+                }
+
+                father = father->GetFather();
+            }
 
             next = nullptr;
         }
@@ -367,6 +420,51 @@ BTreeInnerNode *BTreeInnerNode::GetInnerNodeByIndex(int index)
     return p_innerChildren[index];
 }
 
+void BTreeInnerNode::SetFather(BTreeInnerNode *father)
+{
+    p_father = father;
+}
+
+void BTreeInnerNode::BorrowFromRightNode(int currentFatherPosition, BTreeInnerNode *rightNode)
+{
+    p_keys.push_back(p_father->GetKey(currentFatherPosition));
+    p_father->UpdateKey(currentFatherPosition, rightNode->GetKey(0));
+    rightNode->DeleteKeyByIndex(0);
+
+    if (m_hasLeafChildren)
+    {
+        p_innerChildren.push_back(rightNode->p_innerChildren[0]);
+        rightNode->p_innerChildren[0]->SetFather(this);
+        rightNode->DeleteInnerChildrenByIndex(0);
+    }
+    else
+    {
+        p_leafChildren.push_back(rightNode->p_leafChildren[0]);
+        rightNode->p_leafChildren[0]->SetFather(this);
+        rightNode->DeleteLeafChildrenByIndex(0);
+    }
+}
+
+void BTreeInnerNode::BorrowFromLeftNode(int currentFatherPosition, BTreeInnerNode *leftNode)
+{
+    p_keys.insert(p_keys.begin(), p_father->GetKey(currentFatherPosition - 1));
+    p_father->UpdateKey(currentFatherPosition - 1, leftNode->GetKey(leftNode->GetKeySize() - 1));
+    leftNode->DeleteKeyByIndex(leftNode->GetKeySize() - 1);
+
+    if (m_hasLeafChildren)
+    {
+        p_innerChildren.insert(p_innerChildren.begin(), leftNode->p_innerChildren[leftNode->GetInnerNodeSize() - 1]);
+        p_innerChildren[0]->SetFather(this);
+        leftNode->DeleteInnerChildrenByIndex(leftNode->GetInnerNodeSize() - 1);
+    }
+    else
+    {
+        p_leafChildren.insert(p_leafChildren.begin(), leftNode->p_leafChildren[leftNode->GetLeafNodeSize() - 1]);
+        p_leafChildren[0]->SetFather(this);
+        leftNode->DeleteLeafChildrenByIndex(leftNode->GetLeafNodeSize() - 1);
+    }
+}
+
 BTreeLeafNode *BTreeInnerNode::GetLeafNodeByIndex(int index)
 {
     return p_leafChildren[index];
@@ -436,6 +534,84 @@ BTreeKey BTreeInnerNode::GetKey(int index)
 void BTreeInnerNode::UpdateKey(int index, BTreeKey key)
 {
     p_keys[index] = key;
+}
+
+BTreeInnerNode *BTreeInnerNode::GetFather()
+{
+    return p_father;
+}
+
+std::variant<int, Error> BTreeInnerNode::GetKeyIndex(BTreeKey key)
+{
+    int min = 0;
+    int max = p_keys.size() - 1;
+
+    while (min <= max)
+    {
+        int middle = min + (max - min) / 2;
+        BTreeKey middleKey = p_keys[middle];
+        if (key > middleKey)
+            min = middle + 1;
+        else if (key < middleKey)
+            max = middle - 1;
+        else
+            return middle;
+    }
+
+    return Error(ErrorType::NotFoundItem, "It was not possible to found this key");
+}
+
+void BTreeInnerNode::DeleteKeyByIndex(int index)
+{
+    p_keys.erase(p_keys.begin() + index);
+}
+
+void BTreeInnerNode::DeleteLeafChildrenByIndex(int index)
+{
+    p_leafChildren.erase(p_leafChildren.begin() + index);
+}
+
+void BTreeInnerNode::DeleteInnerChildrenByIndex(int index)
+{
+    p_innerChildren.erase(p_innerChildren.begin() + index);
+}
+
+int BTreeInnerNode::GetInnerNodeSize()
+{
+    p_innerChildren.size();
+}
+
+int BTreeInnerNode::GetLeafNodeSize()
+{
+    p_leafChildren.size();
+}
+
+void BTreeInnerNode::MergeWithRightNode(int currentFatherPositon, BTreeInnerNode *rightNode)
+{
+    p_keys.push_back(p_father->p_keys[currentFatherPositon]);
+    p_father->DeleteKeyByIndex(currentFatherPositon);
+    p_father->DeleteInnerChildrenByIndex(currentFatherPositon + 1);
+    for (int i = 0; i < rightNode->GetKeySize(); i++)
+        p_keys.push_back(rightNode->GetKey(i));
+
+    if (m_hasLeafChildren)
+    {
+        for (int i = 0; i < rightNode->GetLeafNodeSize(); i++)
+        {
+            auto leafNode = rightNode->GetLeafNodeByIndex(i);
+            leafNode->SetFather(this);
+            p_leafChildren.push_back(leafNode);
+        }
+    }
+    else
+    {
+        for (int i = 0; i < rightNode->GetInnerNodeSize(); i++)
+        {
+            auto innerNode = rightNode->GetInnerNodeByIndex(i);
+            innerNode->SetFather(this);
+            p_innerChildren.push_back(innerNode);
+        }
+    }
 }
 
 BTreeLeafNode::BTreeLeafNode()
@@ -573,4 +749,64 @@ BTreeLeafNode *BTreeLeafNode::GetNextPage()
 BTreeLeafNode *BTreeLeafNode::GetPreviousPage()
 {
     return p_previousPage;
+}
+
+BTreeInnerNode *BTreeLeafNode::GetFather()
+{
+    return p_father;
+}
+
+std::optional<Error> BTreeLeafNode::BorrowFromNextPage()
+{
+    BTreeKey borrowedKey = p_nextPage->GetKey(0);
+    p_keys.push_back(borrowedKey);
+    p_nextPage->p_keys.erase(p_nextPage->p_keys.begin());
+
+    auto fatherKeyIndexResult = p_father->GetKeyIndex(borrowedKey);
+    if (std::holds_alternative<Error>(fatherKeyIndexResult))
+        return std::get<Error>(fatherKeyIndexResult);
+
+    auto fatherKeyIndex = std::get<int>(fatherKeyIndexResult);
+
+    p_father->UpdateKey(fatherKeyIndex, p_nextPage->GetKey(0));
+
+    return std::nullopt;
+}
+
+std::optional<Error> BTreeLeafNode::BorrowFromPreviousPage()
+{
+    BTreeKey borrowedKey = p_previousPage->GetKey(p_previousPage->GetKeySize() - 1);
+    p_keys.insert(p_keys.begin(), borrowedKey);
+    p_previousPage->p_keys.erase(p_previousPage->p_keys.end() - 1);
+
+    auto fatherKeyIndexResult = p_father->GetKeyIndex(borrowedKey);
+    if (std::holds_alternative<Error>(fatherKeyIndexResult))
+        return std::get<Error>(fatherKeyIndexResult);
+
+    auto fatherKeyIndex = std::get<int>(fatherKeyIndexResult);
+
+    p_father->UpdateKey(fatherKeyIndex, p_keys[0]);
+
+    return std::nullopt;
+}
+
+std::optional<Error> BTreeLeafNode::MergeWithNextPage()
+{
+    auto firstNextPageKey = p_nextPage->GetKey(0);
+    p_keys.insert(p_keys.end(), p_nextPage->p_keys.begin(), p_nextPage->p_keys.end());
+
+    p_nextPage = p_nextPage->p_nextPage;
+    if (p_nextPage != nullptr)
+        p_nextPage->p_previousPage = this;
+
+    auto fatherKeyIndexResult = p_father->GetKeyIndex(firstNextPageKey);
+    if (std::holds_alternative<Error>(fatherKeyIndexResult))
+        return std::get<Error>(fatherKeyIndexResult);
+
+    auto fatherKeyIndex = std::get<int>(fatherKeyIndexResult);
+
+    p_father->DeleteKeyByIndex(fatherKeyIndex);
+    p_father->DeleteLeafChildrenByIndex(fatherKeyIndex + 1);
+
+    return std::nullopt;
 }
