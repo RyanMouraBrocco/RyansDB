@@ -111,34 +111,61 @@ int main()
     // btree.Delete(BTreeKey(3));
 
     // delete test 2
-    btree.Insert(BTreeKey(1), 10);
-    btree.Insert(BTreeKey(16), 10);
-    btree.Insert(BTreeKey(24), 10);
-    btree.Insert(BTreeKey(4), 10);
-    btree.Insert(BTreeKey(41), 10);
-    btree.Insert(BTreeKey(17), 10);
-    btree.Insert(BTreeKey(5), 10);
-    btree.Insert(BTreeKey(8), 10);
-    btree.Insert(BTreeKey(23), 10);
-    btree.Insert(BTreeKey(9), 10);
-    btree.Insert(BTreeKey(11), 10);
-    btree.Insert(BTreeKey(234), 10);
-    btree.Insert(BTreeKey(6), 10);
-    btree.Insert(BTreeKey(3), 10);
-    btree.Insert(BTreeKey(13), 10);
-    btree.Insert(BTreeKey(38), 10);
-    btree.Insert(BTreeKey(15), 10);
-    btree.Insert(BTreeKey(10), 10);
-    btree.Insert(BTreeKey(77), 10);
-    btree.Insert(BTreeKey(15), 10);
-    btree.Insert(BTreeKey(28), 10);
+    // btree.Insert(BTreeKey(1), 10);
+    // btree.Insert(BTreeKey(16), 10);
+    // btree.Insert(BTreeKey(24), 10);
+    // btree.Insert(BTreeKey(4), 10);
+    // btree.Insert(BTreeKey(41), 10);
+    // btree.Insert(BTreeKey(17), 10);
+    // btree.Insert(BTreeKey(5), 10);
+    // btree.Insert(BTreeKey(8), 10);
+    // btree.Insert(BTreeKey(23), 10);
+    // btree.Insert(BTreeKey(9), 10);
+    // btree.Insert(BTreeKey(11), 10);
+    // btree.Insert(BTreeKey(234), 10);
+    // btree.Insert(BTreeKey(6), 10);
+    // btree.Insert(BTreeKey(3), 10);
+    // btree.Insert(BTreeKey(13), 10);
+    // btree.Insert(BTreeKey(38), 10);
+    // btree.Insert(BTreeKey(15), 10);
+    // btree.Insert(BTreeKey(10), 10);
+    // btree.Insert(BTreeKey(77), 10);
+    // btree.Insert(BTreeKey(15), 10);
+    // btree.Insert(BTreeKey(28), 10);
 
-    btree.Delete(BTreeKey(11));
-    btree.Delete(BTreeKey(9));
+    // btree.Delete(BTreeKey(11));
+    // btree.Delete(BTreeKey(9));
+    // btree.Delete(BTreeKey(10));
 
+    // auto all = btree.ListAll();
 
-    auto all = btree.ListAll();
+    // delete test 3
+    // for (int i = 0; i < 1'000'000; i++)
+    // {
+    //     btree.Insert(BTreeKey(i), 10);
+    // }
 
+    // for (int i = 0; i < 1'000'000; i++)
+    // {
+    //     btree.Delete(BTreeKey(i));
+    // }
+
+    // delete test 4
+    for (int i = 0; i < 100; i++)
+    {
+        btree.Insert(BTreeKey(i), 10);
+    }
+
+    for (int i = 99; i >= 0; i--)
+    {
+        std::cout << i << std::endl;
+        if (i == 71)
+        {
+            int a = 2;
+            a = 3;
+        }
+        btree.Delete(BTreeKey(i));
+    }
 
     return 0;
 }

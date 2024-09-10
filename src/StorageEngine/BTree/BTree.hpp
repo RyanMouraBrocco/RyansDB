@@ -8,8 +8,8 @@
 #include <vector>
 #include <stack>
 
-const int MAX_TREE_CHILDREN = 3; // HERE MUST BE AN ODD NUMBER
-const int MIN_TREE_CHILDREN = (MAX_TREE_CHILDREN + 1) / 2;
+const int MAX_TREE_CHILDREN = 7; // HERE MUST BE AN ODD NUMBER
+const int MIN_TREE_CHILDREN = MAX_TREE_CHILDREN / 2;
 
 class BTreeInnerNode;
 class BTreeLeafNode;
