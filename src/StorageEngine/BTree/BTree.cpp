@@ -209,7 +209,7 @@ std::optional<Error> BTree::DeleteInnerNode(BTreeKey key)
                         BTreeInnerNode *nextInnerNode = nullptr;
                         BTreeInnerNode *previousInnerNode = nullptr;
 
-                        if (fatherOfFatherIndex < father->GetFather()->GetKeySize() + 1)
+                        if (fatherOfFatherIndex + 1 < father->GetFather()->GetKeySize())
                             nextInnerNode = father->GetFather()->GetInnerNodeByIndex(fatherOfFatherIndex + 1);
 
                         if (fatherOfFatherIndex > 0)
@@ -801,17 +801,16 @@ std::optional<Error> BTreeLeafNode::BorrowFromNextPage()
 
 std::optional<Error> BTreeLeafNode::BorrowFromPreviousPage()
 {
-    BTreeKey borrowedKey = p_previousPage->GetKey(p_previousPage->GetKeySize() - 1);
-    p_keys.insert(p_keys.begin(), borrowedKey);
+    p_keys.insert(p_keys.begin(), p_previousPage->GetKey(p_previousPage->GetKeySize() - 1));
     p_previousPage->p_keys.erase(p_previousPage->p_keys.end() - 1);
 
-    auto fatherKeyIndexResult = p_father->GetKeyIndex(borrowedKey);
+    auto fatherKeyIndexResult = p_father->GetLeafNodeIndex(this);
     if (std::holds_alternative<Error>(fatherKeyIndexResult))
         return std::get<Error>(fatherKeyIndexResult);
 
     auto fatherKeyIndex = std::get<int>(fatherKeyIndexResult);
 
-    p_father->UpdateKey(fatherKeyIndex, p_keys[0]);
+    p_father->UpdateKey(fatherKeyIndex - 1, p_keys[0]);
 
     return std::nullopt;
 }

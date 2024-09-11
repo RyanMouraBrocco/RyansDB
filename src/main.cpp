@@ -151,21 +151,83 @@ int main()
     // }
 
     // delete test 4
+    // for (int i = 0; i < 1'000'000; i++)
+    // {
+    //     btree.Insert(BTreeKey(i), 10);
+    // }
+
+    // for (int i = 999'999; i >= 0; i--)
+    // {
+    //     btree.Delete(BTreeKey(i));
+    // }
+
+    // delete test 5
+    // for (int i = 0; i < 1'000'000; i++)
+    // {
+    //     btree.Insert(BTreeKey(i), 10);
+    // }
+
+    // for (int i = 0; i < 1'000'000; i++)
+    // {
+    //     btree.Delete(BTreeKey(i));
+    // }
+
+    // delete test 6
+    // for (int i = 0; i < 1'000'000; i++)
+    // {
+    //     btree.Insert(BTreeKey(i), 10);
+    // }
+
+    // for (int i = 999'999; i >= 500'000; i--)
+    // {
+    //     btree.Delete(BTreeKey(i));
+    // }
+
+    // for (int i = 0; i < 500'000; i++)
+    // {
+    //     btree.Delete(BTreeKey(i));
+    // }
+
+    // delete test 7
+    // for (int i = 0; i < 10'000'000; i++)
+    // {
+    //     btree.Insert(BTreeKey(i), 10);
+    // }
+
+    // for (int i = 0; i < 10'000'000; i++)
+    // {
+    //     btree.Delete(BTreeKey(i));
+    // }
+
+    // for (int i = 9'999'999; i >= 5'000'000; i--)
+    // {
+    //     btree.Delete(BTreeKey(i));
+    // }
+
+    // for (int i = 0; i < 5'000'000; i++)
+    // {
+    //     btree.Delete(BTreeKey(i));
+    // }
+
+    // delete test 8
     for (int i = 0; i < 100; i++)
     {
         btree.Insert(BTreeKey(i), 10);
     }
 
-    for (int i = 99; i >= 0; i--)
+    for (int i = 0; i < 50; i++)
     {
-        std::cout << i << std::endl;
-        if (i == 71)
-        {
-            int a = 2;
-            a = 3;
-        }
         btree.Delete(BTreeKey(i));
     }
+
+    auto all = btree.ListAll();
+
+    for (int i = 99; i >= 50; i--)
+    {
+        btree.Delete(BTreeKey(i));
+    }
+
+    all = btree.ListAll();
 
     return 0;
 }
