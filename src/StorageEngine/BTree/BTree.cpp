@@ -194,6 +194,7 @@ std::optional<Error> BTree::DeleteInnerNode(BTreeKey key)
                             {
                                 p_leafRoot = father->GetLeafNodeByIndex(0);
                                 p_leafRoot->SetFather(nullptr);
+                                m_isLeaf = true;
                                 p_innerRoot = nullptr;
                             }
                             else
@@ -209,7 +210,7 @@ std::optional<Error> BTree::DeleteInnerNode(BTreeKey key)
                         BTreeInnerNode *nextInnerNode = nullptr;
                         BTreeInnerNode *previousInnerNode = nullptr;
 
-                        if (fatherOfFatherIndex + 1 < father->GetFather()->GetKeySize())
+                        if (fatherOfFatherIndex + 1 < father->GetFather()->GetInnerNodeSize())
                             nextInnerNode = father->GetFather()->GetInnerNodeByIndex(fatherOfFatherIndex + 1);
 
                         if (fatherOfFatherIndex > 0)

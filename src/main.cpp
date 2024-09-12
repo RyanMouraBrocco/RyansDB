@@ -210,24 +210,61 @@ int main()
     // }
 
     // delete test 8
-    for (int i = 0; i < 100; i++)
+    // for (int i = 0; i < 100; i++)
+    // {
+    //     btree.Insert(BTreeKey(i), 10);
+    // }
+
+    // for (int i = 0; i < 50; i++)
+    // {
+    //     auto response = btree.Delete(BTreeKey(i));
+    //     if (response.has_value())
+    //         std::cout << "NOT FOUND " << i << std::endl;
+    // }
+
+    // auto all = btree.ListAll();
+
+    // for (int i = 99; i >= 50; i--)
+    // {
+    //     btree.Delete(BTreeKey(i));
+    // }
+
+    // all = btree.ListAll();
+
+    // delete test 9
+    for (int i = 0; i < 1'000'000; i++)
     {
         btree.Insert(BTreeKey(i), 10);
     }
 
-    for (int i = 0; i < 50; i++)
+    for (int i = 0; i < 500'000; i++)
+    {
+        auto response = btree.Delete(BTreeKey(i));
+        if (response.has_value())
+            std::cout << "NOT FOUND " << i << std::endl;
+    }
+
+    for (int i = 999'999; i >= 0; i--)
     {
         btree.Delete(BTreeKey(i));
     }
 
-    auto all = btree.ListAll();
+    for (int i = 0; i < 1'000'000; i++)
+    {
+        btree.Insert(BTreeKey(i), 10);
+    }
 
-    for (int i = 99; i >= 50; i--)
+    for (int i = 0; i < 500'000; i++)
+    {
+        auto response = btree.Delete(BTreeKey(i));
+        if (response.has_value())
+            std::cout << "NOT FOUND " << i << std::endl;
+    }
+
+    for (int i = 999'999; i >= 0; i--)
     {
         btree.Delete(BTreeKey(i));
     }
-
-    all = btree.ListAll();
 
     return 0;
 }
