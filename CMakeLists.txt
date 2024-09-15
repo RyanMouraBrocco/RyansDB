@@ -37,5 +37,7 @@ add_executable(RyansDBServer
                 ./src/Compiler/SyntaxAnalyzer/Parsers/UpdateParser/UpdateParser.cpp
                 ./src/Compiler/SyntaxAnalyzer/Parsers/Utils/UtilsParser.cpp
                 ./src/Compiler/SemanticAnalyzer/SemanticAnalyzer.cpp
-                ./src/StorageEngine/BTree/Key/BTreeKey.cpp
-                ./src/StorageEngine/BTree/BTree.cpp)
+                ./src/StorageEngine/BPlusTree/Key/BPlusTreeKey.cpp
+                ./src/StorageEngine/BPlusTree/BPlusTree.cpp
+                ./src/StorageEngine/BPlusTree/InnerNode/BPlusTreeInnerNode.cpp
+                ./src/StorageEngine/BPlusTree/LeafNode/BPlusTreeLeafNode.cpp)

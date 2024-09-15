@@ -1,39 +1,39 @@
 #pragma once
 
-class BTreeKey
+class BPlusTreeKey
 {
 private:
     int m_value;
 
 public:
-    BTreeKey(int value);
+    BPlusTreeKey(int value);
 
-    inline bool operator>(const BTreeKey &key)
+    inline bool operator>(const BPlusTreeKey &key)
     {
         return m_value > key.m_value;
     }
 
-    inline bool operator<(const BTreeKey &key)
+    inline bool operator<(const BPlusTreeKey &key)
     {
         return m_value < key.m_value;
     }
 
-    inline bool operator==(const BTreeKey &key)
+    inline bool operator==(const BPlusTreeKey &key)
     {
         return m_value == key.m_value;
     }
 
-    inline bool operator!=(const BTreeKey &key)
+    inline bool operator!=(const BPlusTreeKey &key)
     {
         return m_value != key.m_value;
     }
 
-    inline bool operator<=(const BTreeKey &key)
+    inline bool operator<=(const BPlusTreeKey &key)
     {
         return m_value <= key.m_value;
     }
 
-    inline bool operator>=(const BTreeKey &key)
+    inline bool operator>=(const BPlusTreeKey &key)
     {
         return m_value >= key.m_value;
     }
