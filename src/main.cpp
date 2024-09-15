@@ -76,8 +76,8 @@ int main()
     // delete[] connections;
     // delete[] threads;
 
-    BPlusTree btree;
-    // btree.Insert(BPlusTreeKey(1), 10);
+    // BPlusTree<int> btree;
+    // btree.Insert(BPlusTreeKey<int>(1), 10);
     // btree.Insert(BPlusTreeKey(16), 10);
     // btree.Insert(BPlusTreeKey(24), 10);
     // btree.Insert(BPlusTreeKey(4), 10);
@@ -232,39 +232,64 @@ int main()
     // all = btree.ListAll();
 
     // delete test 9
-    for (int i = 0; i < 1'000'000; i++)
-    {
-        btree.Insert(BPlusTreeKey(i), 10);
-    }
+    // for (int i = 0; i < 1'000'000; i++)
+    // {
+    //     btree.Insert(BPlusTreeKey<int>(i), 10);
+    // }
 
-    for (int i = 0; i < 500'000; i++)
-    {
-        auto response = btree.Delete(BPlusTreeKey(i));
-        if (response.has_value())
-            std::cout << "NOT FOUND " << i << std::endl;
-    }
+    // for (int i = 0; i < 500'000; i++)
+    // {
+    //     auto response = btree.Delete(BPlusTreeKey<int>(i));
+    //     if (response.has_value())
+    //         std::cout << "NOT FOUND " << i << std::endl;
+    // }
 
-    for (int i = 999'999; i >= 0; i--)
-    {
-        btree.Delete(BPlusTreeKey(i));
-    }
+    // for (int i = 999'999; i >= 0; i--)
+    // {
+    //     btree.Delete(BPlusTreeKey<int>(i));
+    // }
 
-    for (int i = 0; i < 1'000'000; i++)
-    {
-        btree.Insert(BPlusTreeKey(i), 10);
-    }
+    // for (int i = 0; i < 1'000'000; i++)
+    // {
+    //     btree.Insert(BPlusTreeKey<int>(i), 10);
+    // }
 
-    for (int i = 0; i < 500'000; i++)
-    {
-        auto response = btree.Delete(BPlusTreeKey(i));
-        if (response.has_value())
-            std::cout << "NOT FOUND " << i << std::endl;
-    }
+    // for (int i = 0; i < 500'000; i++)
+    // {
+    //     auto response = btree.Delete(BPlusTreeKey<int>(i));
+    //     if (response.has_value())
+    //         std::cout << "NOT FOUND " << i << std::endl;
+    // }
 
-    for (int i = 999'999; i >= 0; i--)
-    {
-        btree.Delete(BPlusTreeKey(i));
-    }
+    // for (int i = 999'999; i >= 0; i--)
+    // {
+    //     btree.Delete(BPlusTreeKey<int>(i));
+    // }
+
+    // memory test
+    // for (int i = 0; i < 100'000'000; i++)
+    // {
+    //     btree.Insert(BPlusTreeKey(i), 10);
+    // }
+
+    // for (int i = 0; i < 100'000'000; i++)
+    // {
+    //     auto response = btree.Delete(BPlusTreeKey(i));
+    //     if (response.has_value())
+    //         std::cout << "NOT FOUND " << i << std::endl;
+    // }
+
+    // for (int i = 0; i < 100'000'000; i++)
+    // {
+    //     btree.Insert(BPlusTreeKey(i), 10);
+    // }
+
+    // for (int i = 0; i < 100'000'000; i++)
+    // {
+    //     auto response = btree.Delete(BPlusTreeKey(i));
+    //     if (response.has_value())
+    //         std::cout << "NOT FOUND " << i << std::endl;
+    // }
 
     return 0;
 }
