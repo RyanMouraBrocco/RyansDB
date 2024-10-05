@@ -15,14 +15,22 @@ std::optional<Error> ExecuteEngine::Execute(std::shared_ptr<ParserTreeNode> quer
     auto command = std::get<NonTerminalToken>(token);
     switch (command)
     {
-    case NonTerminalToken::CREATE_TABLE:
-        return CreateTableExecution();
-        break;
+    case NonTerminalToken::CREATE_DATABASE:
+        return CreateDatabaseExecution(queryTree);
     default:
-        break;
+        return Error(ErrorType::Unexpected, "A invalid non terminal token was sent");
     }
 }
 
-std::optional<Error> ExecuteEngine::CreateTableExecution()
+std::optional<Error> ExecuteEngine::CreateDatabaseExecution(std::shared_ptr<ParserTreeNode> queryTree)
 {
+    auto identifierTokenValue = queryTree->GetChildren()[2]->GetToken().GetValue();
+    if (std::holds_alternative<NonTerminalToken>(identifierTokenValue))
+        return Error();
+
+    auto identifier = std::get<TokenDefinition>(identifierTokenValue);
+    if (identifier.GetToken() != Token::IDENTIFIER)
+        return Error();
+
+    m_dataAccess.CreateDatabaseFile(identifier.GetUpperCaseLexeme());
 }
