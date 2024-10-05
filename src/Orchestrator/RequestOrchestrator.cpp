@@ -10,6 +10,9 @@ void RequestOrchestrator::Consume(std::string requestMessage)
     {
         auto protocol = std::get<RequestProtocol>(requestProtocolResult);
         auto compiler = Compiler();
-        compiler.Build(protocol.GetMessage());
+        auto analysParserTreeResult = compiler.Build(protocol.GetMessage());
+        auto analysPartserTree = std::get<std::shared_ptr<ParserTreeNode>>(analysParserTreeResult);
+        auto executer = ExecuteEngine();
+        auto result = executer.Execute(analysPartserTree);
     }
 }

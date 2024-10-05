@@ -2,15 +2,28 @@
 
 #include "vector"
 
-class PageFreeSpacePageHeader
+struct PageFreeSpacePageHeader
 {
-private:
-    int m_nextPageOffSet;
-    int m_previousPageOffSet;
+    int nextPageOffSet;
+    int previousPageOffSet;
+
+    PageFreeSpacePageHeader()
+    {
+        nextPageOffSet = -1;
+        previousPageOffSet = -1;
+    }
 };
 
-class PageFreeSpacePage
+struct PageFreeSpacePage
 {
-private:
-    std::vector<unsigned char> m_freePages;
+    PageFreeSpacePageHeader header;
+    unsigned char freePages[100];
+
+    PageFreeSpacePage()
+    {
+        for (char i = 0; i < 100; i++)
+        {
+            freePages[i] = 0;
+        }
+    }
 };

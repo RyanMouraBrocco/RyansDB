@@ -2,19 +2,20 @@
 
 #include "bitset"
 
-class BlockFreeSpacePageHeader
+struct BlockFreeSpacePageHeader
 {
-private:
-    int m_nextPageOffSet;
-    int m_previousPageOffSet;
+    int nextPageOffSet;
+    int previousPageOffSet;
+
+    BlockFreeSpacePageHeader()
+    {
+        nextPageOffSet = -1;
+        previousPageOffSet = -1;
+    }
 };
 
-class BlockFreeSpacePage
+struct BlockFreeSpacePage
 {
-private:
-    BlockFreeSpacePageHeader m_header;
-    std::bitset<32> m_freeMappingBlocks;
-
-public:
-    BlockFreeSpacePage(BlockFreeSpacePageHeader header, std::bitset<32> freeMappingBlocks);
+    BlockFreeSpacePageHeader header;
+    std::bitset<32> freeMappingBlocks;
 };

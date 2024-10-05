@@ -1,9 +1,11 @@
 #pragma once
 
-#include "../../Error/error.hpp"
+#include "../Error/error.hpp"
 #include "./Repositories/DatabaseRepository/DatabaseRepository.hpp"
+#include "./Contracts/Database/DatabaseDefinition.hpp"
 #include "optional"
 #include "string"
+#include <cstdlib>
 
 class DataAccess
 {

@@ -24,13 +24,13 @@ std::optional<Error> ExecuteEngine::Execute(std::shared_ptr<ParserTreeNode> quer
 
 std::optional<Error> ExecuteEngine::CreateDatabaseExecution(std::shared_ptr<ParserTreeNode> queryTree)
 {
-    auto identifierTokenValue = queryTree->GetChildren()[2]->GetToken().GetValue();
+    auto identifierTokenValue = queryTree->GetChildren()[0]->GetToken().GetValue();
     if (std::holds_alternative<NonTerminalToken>(identifierTokenValue))
-        return Error();
+        return Error(ErrorType::Unexpected, "A invalid non terminal token was sent");
 
     auto identifier = std::get<TokenDefinition>(identifierTokenValue);
     if (identifier.GetToken() != Token::IDENTIFIER)
-        return Error();
+        return Error(ErrorType::Unexpected, "A invalid non terminal token was sent");
 
-    m_dataAccess.CreateDatabaseFile(identifier.GetUpperCaseLexeme());
+    return m_dataAccess.CreateDatabaseFile(identifier.GetUpperCaseLexeme());
 }

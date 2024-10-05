@@ -2,15 +2,20 @@
 
 #include "vector"
 
-class TableMappingPageHeader
+struct TableMappingPageHeader
 {
-private:
-    int m_nextPageOffSet;
-    int m_previousPageOffSet;
+    int nextPageOffSet;
+    int previousPageOffSet;
+
+    TableMappingPageHeader()
+    {
+        nextPageOffSet = -1;
+        previousPageOffSet = -1;
+    }
 };
 
-class TableMappingPage
+struct TableMappingPage
 {
-private:
-    std::vector<int> m_tableMapping;
+    TableMappingPageHeader header;
+    int tableMapping[100];
 };

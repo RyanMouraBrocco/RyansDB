@@ -3,7 +3,14 @@
 std::optional<Error> DataAccess::CreateDatabaseFile(std::string name)
 {
     if (m_databaseRepository.Exists(name))
-        return Error(ErrorType::, "Database already exists");
+        return Error(ErrorType::Unexpected, "Database already exists");
 
-    return m_databaseRepository.CreateNewDatabaseFile(name);
+    DatabaseDefinition databaseDefinition = {
+        DatabaseHeader(atoi(name.c_str()), name, sizeof(DatabaseDefinition)),
+        BlockFreeSpacePage(),
+        PageFreeSpacePage(),
+        TableMappingPage(),
+    };
+
+    return m_databaseRepository.CreateDatabaseFile(databaseDefinition);
 }
