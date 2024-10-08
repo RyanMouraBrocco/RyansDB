@@ -18,4 +18,5 @@ public:
     DatabaseRepository();
     bool Exists(std::string name);
     std::optional<Error> CreateDatabaseFile(DatabaseDefinition databaseDef);
+    std::optional<Error> DropDatabaseFile(std::string name);
 };

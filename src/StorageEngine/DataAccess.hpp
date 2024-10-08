@@ -13,6 +13,6 @@ private:
     DatabaseRepository m_databaseRepository;
 
 public:
-    std::optional<Error>
-    CreateDatabaseFile(std::string name);
+    std::optional<Error> CreateDatabaseFile(std::string name);
+    std::optional<Error> DropDatabaseFile(std::string name);
 };
