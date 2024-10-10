@@ -69,7 +69,7 @@ std::optional<Error> UtilsParser::CheckColumnType(std::shared_ptr<SymbolTable> s
     symbolTable->AddNode(NonTerminalToken::COLUMN_TYPE);
 
     Token currentToken = tokens[index].GetToken();
-    if (currentToken == Token::INTEGER_NUMBER || currentToken == Token::DECIMAL_NUMBER)
+    if (currentToken == Token::INT || currentToken == Token::DECIMAL)
     {
         errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, tokens[index].GetToken(), index);
         if (errorResult.has_value())

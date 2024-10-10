@@ -37,6 +37,7 @@ enum class Token
     VALUES,
     DECLARE,
     INT,
+    DECIMAL,
     NVARCHAR,
     VARCHAR,
     BIT,

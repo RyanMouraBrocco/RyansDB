@@ -79,6 +79,7 @@ std::shared_ptr<std::vector<TokenDefinition>> SymbolTable::m_reservedStatements 
         TokenDefinition(Token::VALUES, "values", "VALUES"),
         TokenDefinition(Token::DECLARE, "declare", "DECLARE"),
         TokenDefinition(Token::INT, "int", "INT"),
+        TokenDefinition(Token::DECIMAL, "decimal", "DECIMAL"),
         TokenDefinition(Token::NVARCHAR, "nvarchar", "NVARCHAR"),
         TokenDefinition(Token::VARCHAR, "varchar", "VARCHAR"),
         TokenDefinition(Token::BIT, "bit", "BIT"),
