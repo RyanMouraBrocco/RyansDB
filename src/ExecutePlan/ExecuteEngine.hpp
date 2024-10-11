@@ -12,7 +12,8 @@ struct TableColumnDefinition
     std::string columnName;
     TokenDefinition type;
     int typeLength;
-    std::vector<TokenDefinition> constraints;
+    bool notNull = false;
+    bool primaryKey = false;
 
     TableColumnDefinition(std::string columnName, TokenDefinition type, int typeLength = -1) : columnName(columnName), type(type), typeLength(typeLength)
     {
@@ -29,7 +30,7 @@ private:
     std::optional<Error> CreateTableExecution(std::string databaseName, std::shared_ptr<ParserTreeNode> queryTree);
     std::variant<std::vector<TableColumnDefinition>, Error> ExtractColumns(std::shared_ptr<ParserTreeNode> queryTree);
     std::variant<std::tuple<TokenDefinition, int>, Error> ExtractColumnType(std::shared_ptr<ParserTreeNode> columnTypeTree);
-    std::variant<std::vector<TokenDefinition>, Error> ExtractColumnConstraints(std::shared_ptr<ParserTreeNode> columnConstrainsTree);
+    std::variant<std::tuple<bool, bool>, Error> ExtractColumnConstraints(std::shared_ptr<ParserTreeNode> columnConstrainsTree);
 
 public:
     ExecuteEngine();

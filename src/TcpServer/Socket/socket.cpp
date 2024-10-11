@@ -84,3 +84,9 @@ void Socket::UpsertError(Error error)
     else
         *p_error = error;
 }
+
+void Socket::Close()
+{
+    close(m_socketListener);
+    m_status = SocketStatus::Closed;
+}

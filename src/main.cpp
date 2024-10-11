@@ -56,10 +56,17 @@ int main()
     Connection **connections = new Connection *[connectionPool];
     std::thread **threads = new std::thread *[connectionPool];
 
-    for (short i = 0; i < connectionPool; i++)
+    try
     {
-        connections[i] = new Connection(socket);
-        threads[i] = new std::thread(EndPointsListener, connections[i]);
+        for (short i = 0; i < connectionPool; i++)
+        {
+            connections[i] = new Connection(socket);
+            threads[i] = new std::thread(EndPointsListener, connections[i]);
+        }
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << e.what() << std::endl;
     }
 
     for (short i = 0; i < connectionPool; i++)
@@ -75,6 +82,8 @@ int main()
 
     delete[] connections;
     delete[] threads;
+
+    socket.Close();
 
     return 0;
 }

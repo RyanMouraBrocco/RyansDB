@@ -38,4 +38,5 @@ public:
     void Listen();
     int GetListener() const;
     SocketStatus GetStatus() const;
+    void Close();
 };

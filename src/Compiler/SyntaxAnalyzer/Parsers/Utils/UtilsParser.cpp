@@ -50,12 +50,22 @@ std::optional<Error> UtilsParser::CheckColumnDefinition(std::shared_ptr<SymbolTa
     symbolTable->AddNode(NonTerminalToken::COLUMN_DEFINITION);
 
     if (IsColumnConstraint(tokens, index))
-        CheckColumnContraints(symbolTable, tokens, index);
+    {
+        errorResult = CheckColumnContraints(symbolTable, tokens, index);
+        if (errorResult.has_value())
+            return errorResult;
+    }
 
-    CheckColumnType(symbolTable, tokens, index);
+    errorResult = CheckColumnType(symbolTable, tokens, index);
+    if (errorResult.has_value())
+        return errorResult;
 
     if (IsColumnConstraint(tokens, index))
-        CheckColumnContraints(symbolTable, tokens, index);
+    {
+        errorResult = CheckColumnContraints(symbolTable, tokens, index);
+        if (errorResult.has_value())
+            return errorResult;
+    }
 
     symbolTable->TierUp();
 
@@ -111,14 +121,16 @@ std::optional<Error> UtilsParser::CheckTextType(std::shared_ptr<SymbolTable> sym
     case Token::VARCHAR:
     case Token::CHAR:
     case Token::NCHAR:
-        return AddInAbstractSyntaxTree(symbolTable, tokens, tokens[index].GetToken(), index);
+        errorResult = AddInAbstractSyntaxTree(symbolTable, tokens, tokens[index].GetToken(), index);
+        break;
     default:
-        return Error(ErrorType::InvalidToken, "It was expected a valid insertable value");
+        errorResult = Error(ErrorType::InvalidToken, "It was expected a valid insertable value");
+        break;
     }
 
     symbolTable->TierUp();
 
-    return std::nullopt;
+    return errorResult;
 }
 
 std::optional<Error> UtilsParser::CheckColumnContraints(std::shared_ptr<SymbolTable> symbolTable, const std::vector<TokenDefinition> &tokens, int &index) const

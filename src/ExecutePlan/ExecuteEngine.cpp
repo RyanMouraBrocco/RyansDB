@@ -79,11 +79,10 @@ std::optional<Error> ExecuteEngine::CreateTableExecution(std::string databaseNam
 std::variant<std::vector<TableColumnDefinition>, Error> ExecuteEngine::ExtractColumns(std::shared_ptr<ParserTreeNode> columnDefinitions)
 {
     std::vector<TableColumnDefinition> tableColumns;
-    auto columnDefinitionHelper = columnDefinitions;
-    bool hasMoreDefinition = true;
-    while (hasMoreDefinition)
+    auto columnDefinitionsItems = columnDefinitions->GetChildren();
+    for (int i = 0; i < columnDefinitionsItems.size(); i += 2)
     {
-        auto columnNameDefinition = columnDefinitionHelper->GetChildren()[0]->GetToken().GetValue();
+        auto columnNameDefinition = columnDefinitionsItems[i]->GetToken().GetValue();
         if (!std::holds_alternative<TokenDefinition>(columnNameDefinition))
             return Error(ErrorType::Unexpected, "");
 
@@ -91,7 +90,7 @@ std::variant<std::vector<TableColumnDefinition>, Error> ExecuteEngine::ExtractCo
         if (columnName.GetToken() != Token::IDENTIFIER)
             return Error(ErrorType::Unexpected, "");
 
-        auto columnDefinitionTree = columnDefinitionHelper->GetChildren()[1];
+        auto columnDefinitionTree = columnDefinitionsItems[i + 1];
         auto columnDefintionToken = columnDefinitionTree->GetToken().GetValue();
         if (!std::holds_alternative<NonTerminalToken>(columnDefintionToken) && std::get<NonTerminalToken>(columnDefintionToken) != NonTerminalToken::COLUMN_DEFINITION)
             return Error(ErrorType::Unexpected, "");
@@ -104,7 +103,7 @@ std::variant<std::vector<TableColumnDefinition>, Error> ExecuteEngine::ExtractCo
         if (!std::holds_alternative<NonTerminalToken>(leftColumnDefinitionToken))
             return Error(ErrorType::Unexpected, "");
 
-        std::vector<TokenDefinition> contraints;
+        std::tuple<bool, bool> contraints;
         std::tuple<TokenDefinition, int> *columnNameAndType = nullptr;
         if (std::get<NonTerminalToken>(leftColumnDefinitionToken) == NonTerminalToken::COLUMN_TYPE)
         {
@@ -125,7 +124,7 @@ std::variant<std::vector<TableColumnDefinition>, Error> ExecuteEngine::ExtractCo
                 if (std::holds_alternative<Error>(constraintsResult))
                     return std::get<Error>(constraintsResult);
 
-                auto contraints = std::get<std::vector<TokenDefinition>>(constraintsResult);
+                contraints = std::get<std::tuple<bool, bool>>(constraintsResult);
             }
         }
         else
@@ -134,7 +133,7 @@ std::variant<std::vector<TableColumnDefinition>, Error> ExecuteEngine::ExtractCo
             if (std::holds_alternative<Error>(constraintsResult))
                 return std::get<Error>(constraintsResult);
 
-            auto contraints = std::get<std::vector<TokenDefinition>>(constraintsResult);
+            contraints = std::get<std::tuple<bool, bool>>(constraintsResult);
 
             auto columnTypeTree = columnDefinitionTree->GetChildren()[1];
             auto columnTypeToken = columnTypeTree->GetToken().GetValue();
@@ -149,19 +148,9 @@ std::variant<std::vector<TableColumnDefinition>, Error> ExecuteEngine::ExtractCo
         }
 
         auto tableColumnDefinition = TableColumnDefinition(columnName.GetUpperCaseLexeme(), std::get<0>(*columnNameAndType), std::get<1>(*columnNameAndType));
-        tableColumnDefinition.constraints = contraints;
+        tableColumnDefinition.notNull = std::get<0>(contraints);
+        tableColumnDefinition.primaryKey = std::get<1>(contraints);
         tableColumns.push_back(tableColumnDefinition);
-
-        if (columnDefinitionHelper->GetChildren().size() > 2)
-        {
-            auto morecolumnDefinition = columnDefinitionHelper->GetChildren()[2];
-            if (!std::holds_alternative<NonTerminalToken>(morecolumnDefinition->GetToken().GetValue()) || std::get<NonTerminalToken>(morecolumnDefinition->GetToken().GetValue()) != NonTerminalToken::COLUMNS_DEFINITIONS)
-                return Error(ErrorType::Unexpected, "");
-
-            columnDefinitionHelper = morecolumnDefinition;
-        }
-        else
-            hasMoreDefinition = false;
     }
 
     return tableColumns;
@@ -177,39 +166,59 @@ std::variant<std::tuple<TokenDefinition, int>, Error> ExecuteEngine::ExtractColu
             return Error(ErrorType::Unexpected, "");
 
         auto textTokenType = std::get<TokenDefinition>(typeTree->GetChildren()[0]->GetToken().GetValue());
-        auto textTokenLength = stoi(std::get<TokenDefinition>(typeTree->GetChildren()[1]->GetToken().GetValue()).GetUpperCaseLexeme());
+        auto textTokenLength = stoi(std::get<TokenDefinition>(columnTypeTree->GetChildren()[1]->GetToken().GetValue()).GetUpperCaseLexeme());
 
         return std::tuple<TokenDefinition, int>(textTokenType, textTokenLength);
     }
     else
     {
-        return std::tuple<TokenDefinition, int>(std::get<TokenDefinition>(typeTree->GetToken().GetValue()), 0);
+        return std::tuple<TokenDefinition, int>(std::get<TokenDefinition>(typeTree->GetToken().GetValue()), -1);
     }
 }
 
-std::variant<std::vector<TokenDefinition>, Error> ExecuteEngine::ExtractColumnConstraints(std::shared_ptr<ParserTreeNode> columnConstrainsTree)
+std::variant<std::tuple<bool, bool>, Error> ExecuteEngine::ExtractColumnConstraints(std::shared_ptr<ParserTreeNode> columnConstrainsTree)
 {
-    bool hasMoreContraints = true;
-    auto contraintsTree = columnConstrainsTree;
-    std::vector<TokenDefinition> contraints;
-    while (hasMoreContraints)
+    auto contraintsItems = columnConstrainsTree->GetChildren();
+    std::tuple<bool, bool> contraints = std::make_tuple(false, false);
+    for (int i = 0; i < contraintsItems.size(); i++)
     {
-        auto constraintResult = contraintsTree->GetChildren()[0]->GetToken().GetValue();
-        if (!std::holds_alternative<TokenDefinition>(constraintResult))
+        auto constraintResult = contraintsItems[i]->GetToken().GetValue();
+        if (!std::holds_alternative<NonTerminalToken>(constraintResult) && std::get<NonTerminalToken>(constraintResult) != NonTerminalToken::COLUMN_CONSTRAINT)
             return Error(ErrorType::Unexpected, "");
 
-        contraints.push_back(std::get<TokenDefinition>(constraintResult));
+        auto firstConstraintToken = contraintsItems[i]->GetChildren()[0]->GetToken().GetValue();
+        if (!std::holds_alternative<TokenDefinition>(firstConstraintToken))
+            return Error(ErrorType::Unexpected, "");
 
-        if (contraintsTree->GetChildren().size() > 1)
+        auto fisrtConstraintToken = std::get<TokenDefinition>(firstConstraintToken);
+
+        if (fisrtConstraintToken.GetToken() == Token::PRIMARY)
         {
-            auto moreContraintsTree = contraintsTree->GetChildren()[1];
-            if (!std::holds_alternative<NonTerminalToken>(moreContraintsTree->GetToken().GetValue()) || std::get<NonTerminalToken>(moreContraintsTree->GetToken().GetValue()) != NonTerminalToken::COLUMN_CONSTRAINTS)
+            if (contraintsItems[i]->GetChildren().size() != 2 ||
+                !std::holds_alternative<TokenDefinition>(contraintsItems[i]->GetChildren()[1]->GetToken().GetValue()) ||
+                std::get<TokenDefinition>(contraintsItems[i]->GetChildren()[1]->GetToken().GetValue()).GetToken() != Token::KEY)
                 return Error(ErrorType::Unexpected, "");
 
-            contraintsTree = moreContraintsTree;
+            std::get<1>(contraints) = true;
+        }
+        else if (fisrtConstraintToken.GetToken() == Token::NOT)
+        {
+            if (contraintsItems[i]->GetChildren().size() != 2 ||
+                !std::holds_alternative<TokenDefinition>(contraintsItems[i]->GetChildren()[1]->GetToken().GetValue()) ||
+                std::get<TokenDefinition>(contraintsItems[i]->GetChildren()[1]->GetToken().GetValue()).GetToken() != Token::NULL_VALUE)
+                return Error(ErrorType::Unexpected, "");
+
+            std::get<0>(contraints) = true;
+        }
+        else if (fisrtConstraintToken.GetToken() == Token::NULL_VALUE)
+        {
+            if (contraintsItems[i]->GetChildren().size() != 1)
+                return Error(ErrorType::Unexpected, "");
+
+            std::get<0>(contraints) = false;
         }
         else
-            hasMoreContraints = false;
+            return Error(ErrorType::Unexpected, "");
     }
 
     return contraints;
