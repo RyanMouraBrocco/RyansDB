@@ -2,25 +2,24 @@
 
 #include "vector"
 
-class DataPageHeader
+struct DataPageHeader
 {
-private:
     int m_pageId;
     int m_pageLength;
     int m_tableId;
 };
 
-class DataPageOffSet
+struct DataPageOffSet
 {
-private:
     std::vector<int> m_positions;
 };
 
-class DataPage
+struct DataPage
 {
-private:
     DataPageHeader m_header;
     DataPageOffSet m_offSet;
 
-    DataPage(DataPageHeader header, DataPageOffSet offSet);
+    DataPage()
+    {
+    }
 };

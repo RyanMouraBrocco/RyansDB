@@ -20,10 +20,15 @@ std::optional<Error> DatabaseRepository::CreateDatabaseFile(DatabaseDefinition d
     return std::nullopt;
 }
 
-bool DatabaseRepository::Exists(std::string name)
+bool DatabaseRepository::ExistsDatabase(std::string name)
 {
     std::ifstream fileReader(m_databasePath + "/" + name + m_databaseExtension);
     return fileReader.good();
+}
+
+bool DatabaseRepository::ExistsTableInDatabase(std::string databaseName, std::string tableName)
+{
+    return false;
 }
 
 std::optional<Error> DatabaseRepository::DropDatabaseFile(std::string name)
@@ -37,4 +42,9 @@ std::optional<Error> DatabaseRepository::DropDatabaseFile(std::string name)
     {
         return Error(ErrorType::Unexpected, "Error to remove database file");
     }
+}
+
+std::optional<Error> DatabaseRepository::CreateTableInDatabaseFile(std::string databaseName, std::shared_ptr<DataPage> dataPageBlock)
+{
+    return Error(ErrorType::Unexpected, "");
 }

@@ -38,5 +38,8 @@ add_executable(RyansDBServer
                 ./src/Compiler/SyntaxAnalyzer/Parsers/Utils/UtilsParser.cpp
                 ./src/Compiler/SemanticAnalyzer/SemanticAnalyzer.cpp
                 ./src/ExecutePlan/ExecuteEngine.cpp
+                ./src/ExecutePlan/Processors/DatabaseProcessor/DatabaseProcessor.cpp
+                ./src/ExecutePlan/Processors/TableProcessor/TableProcessor.cpp
+                ./src/ExecutePlan/Processors/TableProcessor/CreateTableProcessor/CreateTableProcessor.cpp
                 ./src/StorageEngine/DataAccess.cpp
                 ./src/StorageEngine/Repositories/DatabaseRepository/DatabaseRepository.cpp)

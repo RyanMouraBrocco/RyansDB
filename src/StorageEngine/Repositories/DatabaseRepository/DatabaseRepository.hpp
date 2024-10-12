@@ -1,8 +1,11 @@
 #pragma once
 
 #include "../../../Error/error.hpp"
+#include "../../../Compiler/SymbolTable/SymbolTable.hpp"
 #include "../../Contracts/Database/DatabaseDefinition.hpp"
+#include "../../Contracts/Pages/DataPage.hpp"
 #include "optional"
+#include "memory"
 #include <iostream>
 #include <fstream>
 #include <filesystem>
@@ -16,7 +19,9 @@ private:
 
 public:
     DatabaseRepository();
-    bool Exists(std::string name);
+    bool ExistsDatabase(std::string name);
+    bool ExistsTableInDatabase(std::string databaseName, std::string tableName);
     std::optional<Error> CreateDatabaseFile(DatabaseDefinition databaseDef);
     std::optional<Error> DropDatabaseFile(std::string name);
+    std::optional<Error> CreateTableInDatabaseFile(std::string databaseName, std::shared_ptr<DataPage> dataPageBlock);
 };

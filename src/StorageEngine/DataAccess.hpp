@@ -7,6 +7,19 @@
 #include "string"
 #include <cstdlib>
 
+struct TableColumnDefinition
+{
+    std::string columnName;
+    TokenDefinition type;
+    int typeLength;
+    bool notNull = false;
+    bool primaryKey = false;
+
+    TableColumnDefinition(std::string columnName, TokenDefinition type, int typeLength = -1) : columnName(columnName), type(type), typeLength(typeLength)
+    {
+    }
+};
+
 class DataAccess
 {
 private:
@@ -15,4 +28,5 @@ private:
 public:
     std::optional<Error> CreateDatabaseFile(std::string name);
     std::optional<Error> DropDatabaseFile(std::string name);
+    std::optional<Error> CreateTableInDatabaseFile(std::string databaseName, std::string tableName, std::vector<TableColumnDefinition> columnsDefinitions);
 };
