@@ -6,6 +6,22 @@ DatabaseRepository::DatabaseRepository()
         std::filesystem::create_directories(m_databasePath);
 }
 
+std::variant<DatabaseDefinition, Error> DatabaseRepository::GetDatabaseFile(std::string databaseName)
+{
+    DatabaseDefinition databaseDefinition;
+
+    std::ifstream file(m_databasePath + "/" + databaseName + m_databaseExtension, std::ios::binary);
+
+    if (!file.is_open())
+        return Error(ErrorType::Unexpected, "Error to fetch databasefile");
+
+    file.read(reinterpret_cast<char *>(&databaseDefinition), sizeof(databaseDefinition));
+
+    file.close();
+
+    return databaseDefinition;
+}
+
 std::optional<Error> DatabaseRepository::CreateDatabaseFile(DatabaseDefinition databaseDef)
 {
     std::ofstream fileWriter(m_databasePath + "/" + databaseDef.header.databaseName + m_databaseExtension, std::ios::binary);
@@ -46,5 +62,9 @@ std::optional<Error> DatabaseRepository::DropDatabaseFile(std::string name)
 
 std::optional<Error> DatabaseRepository::CreateTableInDatabaseFile(std::string databaseName, std::shared_ptr<DataPage> dataPageBlock)
 {
+    auto databaseDefinitionResult = GetDatabaseFile(databaseName);
+    if (std::holds_alternative<Error>(databaseDefinitionResult))
+        return std::get<Error>(databaseDefinitionResult);
+
     return Error(ErrorType::Unexpected, "");
 }

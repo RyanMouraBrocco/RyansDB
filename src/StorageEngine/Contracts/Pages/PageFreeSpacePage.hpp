@@ -2,6 +2,8 @@
 
 #include "vector"
 
+const int PAGE_FREE_SPACE_PAGE_LENGTH = 7996;
+
 struct PageFreeSpacePageHeader
 {
     int nextPageOffSet;
@@ -17,11 +19,11 @@ struct PageFreeSpacePageHeader
 struct PageFreeSpacePage
 {
     PageFreeSpacePageHeader header;
-    unsigned char freePages[100];
+    unsigned char freePages[PAGE_FREE_SPACE_PAGE_LENGTH];
 
     PageFreeSpacePage()
     {
-        for (char i = 0; i < 100; i++)
+        for (char i = 0; i < PAGE_FREE_SPACE_PAGE_LENGTH; i++)
         {
             freePages[i] = 0;
         }

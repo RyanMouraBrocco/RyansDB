@@ -2,9 +2,8 @@
 
 #include "string"
 #include "vector"
-#include "../Pages/BlockFreeSpacePage.hpp"
 #include "../Pages/PageFreeSpacePage.hpp"
-#include "../Pages/TableMappingPage.hpp"
+#include "../Pages/MappingPage.hpp"
 
 struct DatabaseHeader
 {
@@ -32,18 +31,16 @@ struct DatabaseHeader
 struct DatabaseDefinition
 {
     DatabaseHeader header;
-    BlockFreeSpacePage blockFreeSpace;
+    MappingPage tableMapping;
     PageFreeSpacePage pageFreeSpace;
-    TableMappingPage tableMapping;
 
     DatabaseDefinition()
     {
     }
 
     DatabaseDefinition(DatabaseHeader header,
-                       BlockFreeSpacePage blockFreeSpace,
-                       PageFreeSpacePage pageFreeSpace,
-                       TableMappingPage tableMapping) : header(header), blockFreeSpace(blockFreeSpace), pageFreeSpace(pageFreeSpace), tableMapping(tableMapping)
+                       MappingPage tableMapping,
+                       PageFreeSpacePage pageFreeSpace) : header(header), tableMapping(tableMapping), pageFreeSpace(pageFreeSpace)
     {
     }
 };

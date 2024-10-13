@@ -13,9 +13,8 @@ std::optional<Error> DataAccess::CreateDatabaseFile(std::string name)
 
     DatabaseDefinition databaseDefinition = {
         DatabaseHeader(databaseId, name, sizeof(DatabaseDefinition)),
-        BlockFreeSpacePage(),
+        MappingPage(),
         PageFreeSpacePage(),
-        TableMappingPage(),
     };
 
     return m_databaseRepository.CreateDatabaseFile(databaseDefinition);

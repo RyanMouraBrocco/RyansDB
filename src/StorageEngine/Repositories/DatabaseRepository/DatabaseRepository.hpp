@@ -17,6 +17,8 @@ private:
     const std::string m_databasePath = "./database";
     const std::string m_databaseExtension = ".rdd";
 
+    std::variant<DatabaseDefinition, Error> GetDatabaseFile(std::string databaseName);
+
 public:
     DatabaseRepository();
     bool ExistsDatabase(std::string name);
