@@ -19,13 +19,9 @@ struct PageFreeSpacePageHeader
 struct PageFreeSpacePage
 {
     PageFreeSpacePageHeader header;
-    unsigned char freePages[PAGE_FREE_SPACE_PAGE_LENGTH];
+    std::vector<unsigned char> freePages;
 
     PageFreeSpacePage()
     {
-        for (char i = 0; i < PAGE_FREE_SPACE_PAGE_LENGTH; i++)
-        {
-            freePages[i] = 0;
-        }
     }
 };

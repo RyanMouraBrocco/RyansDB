@@ -4,6 +4,7 @@
 #include "../../../Compiler/SymbolTable/SymbolTable.hpp"
 #include "../../Contracts/Database/DatabaseDefinition.hpp"
 #include "../../Contracts/Pages/DataPage.hpp"
+#include "../../Contracts/Pages/TableMappingPage.hpp"
 #include "optional"
 #include "memory"
 #include <iostream>
@@ -16,8 +17,9 @@ class DatabaseRepository
 private:
     const std::string m_databasePath = "./database";
     const std::string m_databaseExtension = ".rdd";
+    const int m_pageSize = 8'000;
 
-    std::variant<DatabaseDefinition, Error> GetDatabaseFile(std::string databaseName);
+    std::variant<DatabaseDefinition, Error> GetDatabaseDefinition(std::string databaseName);
 
 public:
     DatabaseRepository();
@@ -25,5 +27,5 @@ public:
     bool ExistsTableInDatabase(std::string databaseName, std::string tableName);
     std::optional<Error> CreateDatabaseFile(DatabaseDefinition databaseDef);
     std::optional<Error> DropDatabaseFile(std::string name);
-    std::optional<Error> CreateTableInDatabaseFile(std::string databaseName, std::shared_ptr<DataPage> dataPageBlock);
+    std::optional<Error> CreateTableInDatabaseFile(std::string databaseName, TableMappingPage tableMappingPage, std::shared_ptr<DataPage> dataPageBlock);
 };

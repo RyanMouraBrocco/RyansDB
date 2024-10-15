@@ -42,14 +42,17 @@ std::optional<Error> DataAccess::CreateTableInDatabaseFile(std::string databaseN
         tableId += tableName[i];
     }
 
+    TableMappingPage tablePage;
+    tablePage.header.tableId = tableId;
+    tablePage.header.startPageOffSet = 501; // how should i set this info ???
+
     std::shared_ptr<DataPage> dataPageBlock(new DataPage[8], std::default_delete<DataPage[]>());
     for (int i = 0; i < 8; i++)
     {
         dataPageBlock.get()[i].m_header.m_pageId = i + 1;
-        dataPageBlock.get()[i].m_header.m_pageLength = 0; // ???
+        dataPageBlock.get()[i].m_header.m_pageLength = sizeof(dataPageBlock);
         dataPageBlock.get()[i].m_header.m_tableId = tableId;
-        dataPageBlock.get()[i].m_offSet;
     }
 
-    return m_databaseRepository.CreateTableInDatabaseFile(databaseName, dataPageBlock);
+    return m_databaseRepository.CreateTableInDatabaseFile(databaseName, tablePage, dataPageBlock);
 }

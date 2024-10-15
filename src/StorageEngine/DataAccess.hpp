@@ -3,6 +3,8 @@
 #include "../Error/error.hpp"
 #include "./Repositories/DatabaseRepository/DatabaseRepository.hpp"
 #include "./Contracts/Database/DatabaseDefinition.hpp"
+#include "./Contracts/Pages/MappingPage.hpp"
+#include "./Contracts/Pages/TableMappingPage.hpp"
 #include "optional"
 #include "string"
 #include <cstdlib>

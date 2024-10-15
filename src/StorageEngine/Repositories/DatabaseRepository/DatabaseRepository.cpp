@@ -6,14 +6,14 @@ DatabaseRepository::DatabaseRepository()
         std::filesystem::create_directories(m_databasePath);
 }
 
-std::variant<DatabaseDefinition, Error> DatabaseRepository::GetDatabaseFile(std::string databaseName)
+std::variant<DatabaseDefinition, Error> DatabaseRepository::GetDatabaseDefinition(std::string databaseName)
 {
-    DatabaseDefinition databaseDefinition;
-
     std::ifstream file(m_databasePath + "/" + databaseName + m_databaseExtension, std::ios::binary);
 
     if (!file.is_open())
         return Error(ErrorType::Unexpected, "Error to fetch databasefile");
+
+    DatabaseDefinition databaseDefinition;
 
     file.read(reinterpret_cast<char *>(&databaseDefinition), sizeof(databaseDefinition));
 
@@ -29,7 +29,13 @@ std::optional<Error> DatabaseRepository::CreateDatabaseFile(DatabaseDefinition d
     if (!fileWriter.is_open())
         return Error(ErrorType::Unexpected, "Error to generate databasefile");
 
-    fileWriter.write(reinterpret_cast<char *>(&databaseDef), sizeof(databaseDef));
+    int totalPageLength = 2 * m_pageSize + sizeof(databaseDef.header);
+    fileWriter.write(reinterpret_cast<char *>(&databaseDef), sizeof(DatabaseDefinition));
+    if (databaseDef.header.fileLength < totalPageLength)
+    {
+        fileWriter.seekp(totalPageLength - 1, std::ios::beg);
+        fileWriter.write("\0", 1);
+    }
 
     fileWriter.close();
 
@@ -60,11 +66,25 @@ std::optional<Error> DatabaseRepository::DropDatabaseFile(std::string name)
     }
 }
 
-std::optional<Error> DatabaseRepository::CreateTableInDatabaseFile(std::string databaseName, std::shared_ptr<DataPage> dataPageBlock)
+std::optional<Error> DatabaseRepository::CreateTableInDatabaseFile(std::string databaseName, TableMappingPage tableMappingPage, std::shared_ptr<DataPage> dataPageBlock)
 {
-    auto databaseDefinitionResult = GetDatabaseFile(databaseName);
+    auto databaseDefinitionResult = GetDatabaseDefinition(databaseName);
     if (std::holds_alternative<Error>(databaseDefinitionResult))
         return std::get<Error>(databaseDefinitionResult);
 
-    return Error(ErrorType::Unexpected, "");
+    auto databaseDefinition = std::get<DatabaseDefinition>(databaseDefinitionResult);
+
+    std::ofstream file(m_databasePath + "/" + databaseName + m_databaseExtension, std::ios::binary);
+
+    if (!file.is_open())
+        return Error(ErrorType::Unexpected, "Error to fetch databasefile");
+
+    file.seekp(databaseDefinition.header.fileLength, std::ios::beg);
+
+    file.write(reinterpret_cast<char *>(&tableMappingPage), sizeof(tableMappingPage));
+    file.write(reinterpret_cast<char *>(dataPageBlock.get()), 8 * sizeof(DataPage));
+
+    file.close();
+
+    return std::nullopt;
 }

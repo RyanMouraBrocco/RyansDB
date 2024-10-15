@@ -19,6 +19,6 @@ struct MappingPageHeader
 struct MappingPage
 {
     MappingPageHeader header;
-    int tableIds[MAPPING_PAGE_TABLES_LENGTH];
-    int tableOffSets[MAPPING_PAGE_TABLES_LENGTH];
+    std::vector<int> tableIds;
+    std::vector<int> tableOffSets;
 };
