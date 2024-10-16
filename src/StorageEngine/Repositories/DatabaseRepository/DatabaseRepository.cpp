@@ -8,32 +8,73 @@ DatabaseRepository::DatabaseRepository()
 
 std::variant<DatabaseDefinition, Error> DatabaseRepository::GetDatabaseDefinition(std::string databaseName)
 {
-    std::ifstream file(m_databasePath + "/" + databaseName + m_databaseExtension, std::ios::binary);
+    // std::ifstream file(m_databasePath + "/" + databaseName + m_databaseExtension, std::ios::binary);
 
-    if (!file.is_open())
-        return Error(ErrorType::Unexpected, "Error to fetch databasefile");
+    // if (!file.is_open())
+    return Error(ErrorType::Unexpected, "Error to fetch databasefile");
 
-    DatabaseDefinition databaseDefinition;
+    // DatabaseDefinition databaseDefinition;
 
-    file.read(reinterpret_cast<char *>(&databaseDefinition), sizeof(databaseDefinition));
+    // file.read(reinterpret_cast<char *>(&databaseDefinition), sizeof(databaseDefinition));
 
-    file.close();
+    // file.close();
 
-    return databaseDefinition;
+    // return databaseDefinition;
 }
 
 std::optional<Error> DatabaseRepository::CreateDatabaseFile(DatabaseDefinition databaseDef)
 {
-    std::ofstream fileWriter(m_databasePath + "/" + databaseDef.header.databaseName + m_databaseExtension, std::ios::binary);
+    DatabaseHeader databaseHeader = databaseDef.GetHeader();
+    std::ofstream fileWriter(m_databasePath + "/" + databaseHeader.GetDatabaseNameRef() + m_databaseExtension, std::ios::binary);
 
     if (!fileWriter.is_open())
         return Error(ErrorType::Unexpected, "Error to generate databasefile");
 
-    int totalPageLength = 2 * m_pageSize + sizeof(databaseDef.header);
-    fileWriter.write(reinterpret_cast<char *>(&databaseDef), sizeof(DatabaseDefinition));
-    if (databaseDef.header.fileLength < totalPageLength)
+    fileWriter.write(reinterpret_cast<char *>(databaseHeader.GetIdRef()), sizeof(int));
+    fileWriter.write(databaseHeader.GetDatabaseNameRef(), 50 * sizeof(char));
+    fileWriter.write(reinterpret_cast<char *>(databaseHeader.GetFileLengthRef()), sizeof(int));
+
+    fileWriter.seekp(m_databaseHeaderSizeInBytes - 1, std::ios::beg);
+    fileWriter.write("\0", 1);
+
+    auto mappingPage = databaseDef.GetTableMappingPage();
+    fileWriter.write(reinterpret_cast<char *>(mappingPage.GetHeader().GetNextPageOffSetRef()), sizeof(int));
+    fileWriter.write(reinterpret_cast<char *>(mappingPage.GetHeader().GetPreviousPageOffSetRef()), sizeof(int));
+
+    for (int i = 0; i < mappingPage.GetTablesMapSize(); i++)
     {
-        fileWriter.seekp(totalPageLength - 1, std::ios::beg);
+        fileWriter.write(reinterpret_cast<char *>(mappingPage.GetTableIdRefByIndex(i)), sizeof(int));
+    }
+
+    if (!mappingPage.IsFull())
+    {
+        fileWriter.seekp(m_databaseHeaderSizeInBytes + ((MAPPING_PAGE_TABLES_LENGTH + 2) * sizeof(int)) - 1, std::ios::beg);
+        fileWriter.write("\0", 1);
+    }
+
+    for (int i = 0; i < mappingPage.GetTablesMapSize(); i++)
+    {
+        fileWriter.write(reinterpret_cast<char *>(mappingPage.GetTableOffSetRefByIndex(i)), sizeof(int));
+    }
+
+    if (!mappingPage.IsFull())
+    {
+        fileWriter.seekp(m_databaseHeaderSizeInBytes + m_pageSizeInBytes - 1, std::ios::beg);
+        fileWriter.write("\0", 1);
+    }
+
+    auto pageFreeSpace = databaseDef.GetPageFreeSapce();
+    fileWriter.write(reinterpret_cast<char *>(pageFreeSpace.GetHeader().GetNextPageOffSetRef()), sizeof(int));
+    fileWriter.write(reinterpret_cast<char *>(pageFreeSpace.GetHeader().GetPreviousPageOffsetRef()), sizeof(int));
+
+    for (int i = 0; i < pageFreeSpace.GetFreePageSize(); i++)
+    {
+        fileWriter.write(reinterpret_cast<char *>(pageFreeSpace.GetFreePageRef(i)), sizeof(unsigned char));
+    }
+
+    if (!pageFreeSpace.IsFull())
+    {
+        fileWriter.seekp(m_databaseHeaderSizeInBytes + (2 * m_pageSizeInBytes) - 1, std::ios::beg);
         fileWriter.write("\0", 1);
     }
 
@@ -76,15 +117,15 @@ std::optional<Error> DatabaseRepository::CreateTableInDatabaseFile(std::string d
 
     std::ofstream file(m_databasePath + "/" + databaseName + m_databaseExtension, std::ios::binary);
 
-    if (!file.is_open())
-        return Error(ErrorType::Unexpected, "Error to fetch databasefile");
+    // if (!file.is_open())
+    //     return Error(ErrorType::Unexpected, "Error to fetch databasefile");
 
-    file.seekp(databaseDefinition.header.fileLength, std::ios::beg);
+    // file.seekp(databaseDefinition.header.fileLength, std::ios::beg);
 
-    file.write(reinterpret_cast<char *>(&tableMappingPage), sizeof(tableMappingPage));
-    file.write(reinterpret_cast<char *>(dataPageBlock.get()), 8 * sizeof(DataPage));
+    // file.write(reinterpret_cast<char *>(&tableMappingPage), sizeof(tableMappingPage));
+    // file.write(reinterpret_cast<char *>(dataPageBlock.get()), 8 * sizeof(DataPage));
 
-    file.close();
+    // file.close();
 
     return std::nullopt;
 }

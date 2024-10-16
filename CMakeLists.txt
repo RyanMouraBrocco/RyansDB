@@ -42,4 +42,9 @@ add_executable(RyansDBServer
                 ./src/ExecutePlan/Processors/TableProcessor/TableProcessor.cpp
                 ./src/ExecutePlan/Processors/TableProcessor/CreateTableProcessor/CreateTableProcessor.cpp
                 ./src/StorageEngine/DataAccess.cpp
-                ./src/StorageEngine/Repositories/DatabaseRepository/DatabaseRepository.cpp)
+                ./src/StorageEngine/Repositories/DatabaseRepository/DatabaseRepository.cpp
+                ./src/StorageEngine/Contracts/Database/DatabaseDefinition.cpp
+                ./src/StorageEngine/Contracts/Pages/MappingPage/MappingPage.cpp
+                ./src/StorageEngine/Contracts/Pages/PageFreeSpacePage/PageFreeSpacePage.cpp
+                ./src/StorageEngine/Contracts/Pages/TableMappingPage/TableMappingPage.cpp)
+                

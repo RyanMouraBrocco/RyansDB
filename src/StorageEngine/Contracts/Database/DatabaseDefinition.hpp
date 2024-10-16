@@ -2,45 +2,39 @@
 
 #include "string"
 #include "vector"
-#include "../Pages/PageFreeSpacePage.hpp"
-#include "../Pages/MappingPage.hpp"
+#include "../Pages/PageFreeSpacePage/PageFreeSpacePage.hpp"
+#include "../Pages/MappingPage/MappingPage.hpp"
 
-struct DatabaseHeader
+class DatabaseHeader
 {
-    int id;
-    char databaseName[50];
-    int fileLength;
+private:
+    int m_id;
+    char m_databaseName[50];
+    int m_fileLength;
 
-    DatabaseHeader()
-    {
-    }
+public:
+    DatabaseHeader();
+    DatabaseHeader(int id, std::string databaseName, int fileLength);
 
-    DatabaseHeader(int id, std::string databaseName, int fileLength) : id(id), fileLength(fileLength)
-    {
-        auto length = databaseName.length();
-        if (length > 50)
-            length = 50;
-
-        for (char i = 0; i < length; i++)
-        {
-            this->databaseName[i] = databaseName[i];
-        }
-    }
+    int GetId();
+    int *GetIdRef();
+    char *GetDatabaseNameRef();
+    int GetFileLength();
+    int *GetFileLengthRef();
 };
 
-struct DatabaseDefinition
+class DatabaseDefinition
 {
-    DatabaseHeader header;
-    MappingPage tableMapping;
-    PageFreeSpacePage pageFreeSpace;
+private:
+    DatabaseHeader m_header;
+    MappingPage m_tableMapping;
+    PageFreeSpacePage m_pageFreeSpace;
 
-    DatabaseDefinition()
-    {
-    }
+public:
+    DatabaseDefinition(int id, std::string databaseName, int fileLength);
+    DatabaseDefinition(DatabaseHeader header, MappingPage tableMapping, PageFreeSpacePage pageFreeSpace);
 
-    DatabaseDefinition(DatabaseHeader header,
-                       MappingPage tableMapping,
-                       PageFreeSpacePage pageFreeSpace) : header(header), tableMapping(tableMapping), pageFreeSpace(pageFreeSpace)
-    {
-    }
+    DatabaseHeader GetHeader();
+    MappingPage GetTableMappingPage();
+    PageFreeSpacePage GetPageFreeSapce();
 };
