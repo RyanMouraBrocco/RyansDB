@@ -20,7 +20,7 @@ std::optional<Error> ExecuteEngine::Execute(std::shared_ptr<ParserTreeNode> quer
     case NonTerminalToken::DROP_DATABASE:
         return p_databaseProcessor->DropDatabaseExecution(queryTree);
     case NonTerminalToken::CREATE_TABLE:
-        return p_tableProcessor->CreateTableExecution("house", queryTree);
+        return p_tableProcessor->CreateTableExecution("HOUSE", queryTree);
     default:
         return Error(ErrorType::Unexpected, "A invalid non terminal token was sent");
     }

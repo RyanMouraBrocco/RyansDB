@@ -46,5 +46,6 @@ add_executable(RyansDBServer
                 ./src/StorageEngine/Contracts/Database/DatabaseDefinition.cpp
                 ./src/StorageEngine/Contracts/Pages/MappingPage/MappingPage.cpp
                 ./src/StorageEngine/Contracts/Pages/PageFreeSpacePage/PageFreeSpacePage.cpp
-                ./src/StorageEngine/Contracts/Pages/TableMappingPage/TableMappingPage.cpp)
+                ./src/StorageEngine/Contracts/Pages/TableMappingPage/TableMappingPage.cpp
+                ./src/StorageEngine/Contracts/Pages/DataPage/DataPage.cpp)
                 

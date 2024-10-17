@@ -3,7 +3,7 @@
 #include "../../../Error/error.hpp"
 #include "../../../Compiler/SymbolTable/SymbolTable.hpp"
 #include "../../Contracts/Database/DatabaseDefinition.hpp"
-#include "../../Contracts/Pages/DataPage.hpp"
+#include "../../Contracts/Pages/DataPage/DataPage.hpp"
 #include "../../Contracts/Pages/TableMappingPage/TableMappingPage.hpp"
 #include "optional"
 #include "memory"

@@ -54,3 +54,8 @@ bool PageFreeSpacePage::IsFull()
 {
     return m_freePages.size() == PAGE_FREE_SPACE_PAGE_LENGTH;
 }
+
+void PageFreeSpacePage::AddFreePageValue(unsigned char value)
+{
+    m_freePages.push_back(value);
+}

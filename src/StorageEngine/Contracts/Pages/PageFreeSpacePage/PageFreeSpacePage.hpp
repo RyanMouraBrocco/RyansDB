@@ -31,5 +31,6 @@ public:
     int GetFreePageSize();
     unsigned char GetFreePage(int index);
     unsigned char *GetFreePageRef(int index);
+    void AddFreePageValue(unsigned char value);
     bool IsFull();
 };

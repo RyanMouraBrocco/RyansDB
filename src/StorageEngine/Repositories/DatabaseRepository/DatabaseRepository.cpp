@@ -115,17 +115,43 @@ std::optional<Error> DatabaseRepository::CreateTableInDatabaseFile(std::string d
 
     auto databaseDefinition = std::get<DatabaseDefinition>(databaseDefinitionResult);
 
-    std::ofstream file(m_databasePath + "/" + databaseName + m_databaseExtension, std::ios::binary);
+    std::ofstream file(m_databasePath + "/" + databaseName + m_databaseExtension, std::ios::binary | std::ios::app);
 
-    // if (!file.is_open())
-    //     return Error(ErrorType::Unexpected, "Error to fetch databasefile");
+    if (!file.is_open())
+        return Error(ErrorType::Unexpected, "Error to fetch databasefile");
 
-    // file.seekp(databaseDefinition.header.fileLength, std::ios::beg);
+    auto lastPositionInTheFile = file.tellp();
+    auto tableMappingHeader = tableMappingPage.GetHeader();
+    file.write(reinterpret_cast<char *>(tableMappingHeader.GetTableIdRef()), sizeof(int));
+    file.write(reinterpret_cast<char *>(tableMappingHeader.GetStartPageOffSetRef()), sizeof(int));
+    file.write(reinterpret_cast<char *>(tableMappingHeader.GetNextPageOffSetRef()), sizeof(int));
+    file.write(reinterpret_cast<char *>(tableMappingHeader.GetPreviousPageOffSetRef()), sizeof(int));
 
-    // file.write(reinterpret_cast<char *>(&tableMappingPage), sizeof(tableMappingPage));
-    // file.write(reinterpret_cast<char *>(dataPageBlock.get()), 8 * sizeof(DataPage));
+    auto map = tableMappingPage.GetMap().to_ullong();
+    file.write(reinterpret_cast<char *>(&map), sizeof(int));
 
-    // file.close();
+    for (int i = 0; i < 8; i++)
+    {
+        auto dataPage = dataPageBlock.get()[i];
+        auto dataPageHeader = dataPage.GetHeader();
+        file.write(reinterpret_cast<char *>(dataPageHeader.GetPageIdRef()), sizeof(int));
+        file.write(reinterpret_cast<char *>(dataPageHeader.GetPageLengthRef()), sizeof(int));
+        file.write(reinterpret_cast<char *>(dataPageHeader.GetTableIdRef()), sizeof(int));
+        file.seekp(m_pageSizeInBytes - sizeof(DataPageHeader), std::ios::cur);
+    }
+
+    file.write('\0', 1);
+
+    auto mapping = databaseDefinition.GetTableMappingPage();
+    auto pageFreeSpace = databaseDefinition.GetPageFreeSapce();
+
+    mapping.AddTableOffSet(tableMappingHeader.GetTableId(), lastPositionInTheFile);
+    // write in file here
+
+    pageFreeSpace.AddFreePageValue(0);
+    // save in file here
+
+    file.close();
 
     return std::nullopt;
 }

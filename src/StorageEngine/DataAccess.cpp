@@ -28,8 +28,8 @@ std::optional<Error> DataAccess::CreateTableInDatabaseFile(std::string databaseN
     if (!m_databaseRepository.ExistsDatabase(databaseName))
         return Error(ErrorType::Unexpected, "Database does not exist");
 
-    if (!m_databaseRepository.ExistsTableInDatabase(databaseName, tableName))
-        return Error(ErrorType::Unexpected, "Table does not exist");
+    if (m_databaseRepository.ExistsTableInDatabase(databaseName, tableName))
+        return Error(ErrorType::Unexpected, "Table already exists");
 
     int tableId = 0;
     for (int i = 0; i < tableName.length(); i++)
@@ -37,13 +37,11 @@ std::optional<Error> DataAccess::CreateTableInDatabaseFile(std::string databaseN
         tableId += tableName[i];
     }
 
-    return Error(ErrorType::Unexpected, "");
-
     TableMappingPage tablePage;
     // tablePage.header.tableId = tableId;
     // tablePage.header.startPageOffSet = 501; // how should i set this info ???
 
-    // std::shared_ptr<DataPage> dataPageBlock(new DataPage[8], std::default_delete<DataPage[]>());
+    std::shared_ptr<DataPage> dataPageBlock(new DataPage[8], std::default_delete<DataPage[]>());
     // for (int i = 0; i < 8; i++)
     // {
     //     dataPageBlock.get()[i].m_header.m_pageId = i + 1;
@@ -51,5 +49,5 @@ std::optional<Error> DataAccess::CreateTableInDatabaseFile(std::string databaseN
     //     dataPageBlock.get()[i].m_header.m_tableId = tableId;
     // }
 
-    // return m_databaseRepository.CreateTableInDatabaseFile(databaseName, tablePage, dataPageBlock);
+    return m_databaseRepository.CreateTableInDatabaseFile(databaseName, tablePage, dataPageBlock);
 }
