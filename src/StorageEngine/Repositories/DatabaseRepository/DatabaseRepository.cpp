@@ -30,53 +30,16 @@ std::optional<Error> DatabaseRepository::CreateDatabaseFile(DatabaseDefinition d
     if (!fileWriter.is_open())
         return Error(ErrorType::Unexpected, "Error to generate databasefile");
 
-    fileWriter.write(reinterpret_cast<char *>(databaseHeader.GetIdRef()), sizeof(int));
-    fileWriter.write(databaseHeader.GetDatabaseNameRef(), 50 * sizeof(char));
-    fileWriter.write(reinterpret_cast<char *>(databaseHeader.GetFileLengthRef()), sizeof(int));
-
-    fileWriter.seekp(m_databaseHeaderSizeInBytes - 1, std::ios::beg);
-    fileWriter.write("\0", 1);
+    DatabaseHeaderFileWriter databaseHeaderWriter(fileWriter);
+    databaseHeaderWriter.SetAll(databaseHeader);
 
     auto mappingPage = databaseDef.GetTableMappingPage();
-    fileWriter.write(reinterpret_cast<char *>(mappingPage.GetHeader().GetNextPageOffSetRef()), sizeof(int));
-    fileWriter.write(reinterpret_cast<char *>(mappingPage.GetHeader().GetPreviousPageOffSetRef()), sizeof(int));
-
-    for (int i = 0; i < mappingPage.GetTablesMapSize(); i++)
-    {
-        fileWriter.write(reinterpret_cast<char *>(mappingPage.GetTableIdRefByIndex(i)), sizeof(int));
-    }
-
-    if (!mappingPage.IsFull())
-    {
-        fileWriter.seekp(m_databaseHeaderSizeInBytes + ((MAPPING_PAGE_TABLES_LENGTH + 2) * sizeof(int)) - 1, std::ios::beg);
-        fileWriter.write("\0", 1);
-    }
-
-    for (int i = 0; i < mappingPage.GetTablesMapSize(); i++)
-    {
-        fileWriter.write(reinterpret_cast<char *>(mappingPage.GetTableOffSetRefByIndex(i)), sizeof(int));
-    }
-
-    if (!mappingPage.IsFull())
-    {
-        fileWriter.seekp(m_databaseHeaderSizeInBytes + m_pageSizeInBytes - 1, std::ios::beg);
-        fileWriter.write("\0", 1);
-    }
+    MappingFileWriter mappingPageWriter(fileWriter);
+    mappingPageWriter.SetAll(mappingPage);
 
     auto pageFreeSpace = databaseDef.GetPageFreeSapce();
-    fileWriter.write(reinterpret_cast<char *>(pageFreeSpace.GetHeader().GetNextPageOffSetRef()), sizeof(int));
-    fileWriter.write(reinterpret_cast<char *>(pageFreeSpace.GetHeader().GetPreviousPageOffsetRef()), sizeof(int));
-
-    for (int i = 0; i < pageFreeSpace.GetFreePageSize(); i++)
-    {
-        fileWriter.write(reinterpret_cast<char *>(pageFreeSpace.GetFreePageRef(i)), sizeof(unsigned char));
-    }
-
-    if (!pageFreeSpace.IsFull())
-    {
-        fileWriter.seekp(m_databaseHeaderSizeInBytes + (2 * m_pageSizeInBytes) - 1, std::ios::beg);
-        fileWriter.write("\0", 1);
-    }
+    PageFreeSpaceFileWriter pageFreeSpaceFileWriter(fileWriter);
+    pageFreeSpaceFileWriter.SetAll(pageFreeSpace);
 
     fileWriter.close();
 
@@ -140,7 +103,7 @@ std::optional<Error> DatabaseRepository::CreateTableInDatabaseFile(std::string d
         file.seekp(m_pageSizeInBytes - sizeof(DataPageHeader), std::ios::cur);
     }
 
-    file.write('\0', 1);
+    file.write("\0", 1);
 
     auto mapping = databaseDefinition.GetTableMappingPage();
     auto pageFreeSpace = databaseDefinition.GetPageFreeSapce();

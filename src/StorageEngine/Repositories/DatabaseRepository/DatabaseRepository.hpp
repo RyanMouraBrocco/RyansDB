@@ -5,6 +5,9 @@
 #include "../../Contracts/Database/DatabaseDefinition.hpp"
 #include "../../Contracts/Pages/DataPage/DataPage.hpp"
 #include "../../Contracts/Pages/TableMappingPage/TableMappingPage.hpp"
+#include "../../FileWriters/Database/Header/DatabaseHeaderFileWriter.hpp"
+#include "../../FileWriters/Pages/MappingPage/MappingFileWriter.hpp"
+#include "../../FileWriters/Pages/PageFreeSpacePage/PageFreeSpaceFileWriter.hpp"
 #include "optional"
 #include "memory"
 #include <iostream>
