@@ -18,6 +18,11 @@ int *DataPageHeader::GetPageIdRef()
     return &m_pageId;
 }
 
+void DataPageHeader::SetPageId(int pageId)
+{
+    m_pageId = pageId;
+}
+
 int DataPageHeader::GetPageLength()
 {
     return m_pageLength;
@@ -28,6 +33,11 @@ int *DataPageHeader::GetPageLengthRef()
     return &m_pageLength;
 }
 
+void DataPageHeader::SetPageLength(int pageLength)
+{
+    m_pageLength = pageLength;
+}
+
 int DataPageHeader::GetTableId()
 {
     return m_tableId;
@@ -36,6 +46,11 @@ int DataPageHeader::GetTableId()
 int *DataPageHeader::GetTableIdRef()
 {
     return &m_tableId;
+}
+
+void DataPageHeader::SetTableId(int tableId)
+{
+    m_tableId = tableId;
 }
 
 DataPageOffSet::DataPageOffSet()
@@ -54,4 +69,9 @@ DataPage::DataPage(int pageId, int pageLength, int tableId)
 DataPageHeader DataPage::GetHeader()
 {
     return m_header;
+}
+
+DataPageHeader *DataPage::GetHeaderRef()
+{
+    return &m_header;
 }

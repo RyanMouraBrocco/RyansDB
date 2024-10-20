@@ -14,10 +14,13 @@ public:
     DataPageHeader(int pageId, int pageLength, int tableId);
     int GetPageId();
     int *GetPageIdRef();
+    void SetPageId(int pageId);
     int GetPageLength();
     int *GetPageLengthRef();
+    void SetPageLength(int pageLength);
     int GetTableId();
     int *GetTableIdRef();
+    void SetTableId(int tableId);
 };
 
 class DataPageOffSet
@@ -39,4 +42,5 @@ public:
     DataPage();
     DataPage(int pageId, int pageLength, int tableId);
     DataPageHeader GetHeader();
+    DataPageHeader *GetHeaderRef();
 };

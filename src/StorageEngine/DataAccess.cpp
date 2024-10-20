@@ -11,7 +11,7 @@ std::optional<Error> DataAccess::CreateDatabaseFile(std::string name)
         databaseId += name[i];
     }
 
-    DatabaseDefinition databaseDefinition(databaseId, name, sizeof(databaseDefinition));
+    DatabaseDefinition databaseDefinition(databaseId, name, 16'000 + 96);
     return m_databaseRepository.CreateDatabaseFile(databaseDefinition);
 }
 
@@ -37,17 +37,15 @@ std::optional<Error> DataAccess::CreateTableInDatabaseFile(std::string databaseN
         tableId += tableName[i];
     }
 
-    TableMappingPage tablePage;
-    // tablePage.header.tableId = tableId;
-    // tablePage.header.startPageOffSet = 501; // how should i set this info ???
+    TableMappingPage tablePage(tableId);
 
     std::shared_ptr<DataPage> dataPageBlock(new DataPage[8], std::default_delete<DataPage[]>());
-    // for (int i = 0; i < 8; i++)
-    // {
-    //     dataPageBlock.get()[i].m_header.m_pageId = i + 1;
-    //     dataPageBlock.get()[i].m_header.m_pageLength = sizeof(dataPageBlock);
-    //     dataPageBlock.get()[i].m_header.m_tableId = tableId;
-    // }
+    for (int i = 0; i < 8; i++)
+    {
+        dataPageBlock.get()[i].GetHeaderRef()->SetPageId(i + 1);
+        dataPageBlock.get()[i].GetHeaderRef()->SetPageLength(0);
+        dataPageBlock.get()[i].GetHeaderRef()->SetTableId(tableId);
+    }
 
     return m_databaseRepository.CreateTableInDatabaseFile(databaseName, tablePage, dataPageBlock);
 }

@@ -13,6 +13,7 @@ private:
 
 public:
     TableMappingPageHeader();
+    TableMappingPageHeader(int tableId);
     int GetTableId();
     int *GetTableIdRef();
     int GetStartPageOffSet();
@@ -31,6 +32,7 @@ private:
 
 public:
     TableMappingPage();
+    TableMappingPage(int tableId);
     TableMappingPageHeader GetHeader();
     void SetTableBlockMap(int blockPosition, bool belongs);
     std::bitset<7992> GetMap();
