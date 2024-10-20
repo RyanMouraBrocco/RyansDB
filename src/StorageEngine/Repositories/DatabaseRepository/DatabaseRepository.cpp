@@ -8,18 +8,18 @@ DatabaseRepository::DatabaseRepository()
 
 std::variant<DatabaseDefinition, Error> DatabaseRepository::GetDatabaseDefinition(std::string databaseName)
 {
-    // std::ifstream file(m_databasePath + "/" + databaseName + m_databaseExtension, std::ios::binary);
+    std::ifstream file(m_databasePath + "/" + databaseName + m_databaseExtension, std::ios::binary);
 
-    // if (!file.is_open())
-    return Error(ErrorType::Unexpected, "Error to fetch databasefile");
+    if (!file.is_open())
+        return Error(ErrorType::Unexpected, "Error to fetch databasefile");
 
-    // DatabaseDefinition databaseDefinition;
+    DatabaseFileReader databaseFileReader(file);
+    databaseFileReader.LoadAll();
+    DatabaseDefinition database = databaseFileReader.Extract();
 
-    // file.read(reinterpret_cast<char *>(&databaseDefinition), sizeof(databaseDefinition));
+    file.close();
 
-    // file.close();
-
-    // return databaseDefinition;
+    return database;
 }
 
 std::optional<Error> DatabaseRepository::CreateDatabaseFile(DatabaseDefinition databaseDef)
@@ -30,16 +30,8 @@ std::optional<Error> DatabaseRepository::CreateDatabaseFile(DatabaseDefinition d
     if (!fileWriter.is_open())
         return Error(ErrorType::Unexpected, "Error to generate databasefile");
 
-    DatabaseHeaderFileWriter databaseHeaderWriter(fileWriter);
-    databaseHeaderWriter.SetAll(databaseHeader);
-
-    auto mappingPage = databaseDef.GetTableMappingPage();
-    MappingFileWriter mappingPageWriter(fileWriter);
-    mappingPageWriter.SetAll(mappingPage);
-
-    auto pageFreeSpace = databaseDef.GetPageFreeSapce();
-    PageFreeSpaceFileWriter pageFreeSpaceFileWriter(fileWriter);
-    pageFreeSpaceFileWriter.SetAll(pageFreeSpace);
+    DatabaseFileWriter databaseWriter(fileWriter);
+    databaseWriter.SetAll(databaseDef);
 
     fileWriter.close();
 
