@@ -26,7 +26,7 @@ void DatabaseFileWriter::SetAll(DatabaseDefinition &databaseDefinition)
 {
     auto header = databaseDefinition.GetHeader();
     auto mappingPage = databaseDefinition.GetTableMappingPage();
-    auto pageFreeSpace = databaseDefinition.GetPageFreeSapce();
+    auto pageFreeSpace = databaseDefinition.GetPageFreeSpace();
 
     SetHeader(header);
     SetMapping(mappingPage);

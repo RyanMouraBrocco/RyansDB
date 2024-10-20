@@ -51,6 +51,10 @@ int *DatabaseHeader::GetFileLengthRef()
     return &m_fileLength;
 }
 
+DatabaseDefinition::DatabaseDefinition()
+{
+}
+
 DatabaseDefinition::DatabaseDefinition(int id, std::string databaseName, int fileLength)
 {
     m_header = DatabaseHeader(id, databaseName, fileLength);
@@ -65,12 +69,27 @@ DatabaseHeader DatabaseDefinition::GetHeader()
     return m_header;
 }
 
+void DatabaseDefinition::SetHeader(DatabaseHeader header)
+{
+    m_header = header;
+}
+
 MappingPage DatabaseDefinition::GetTableMappingPage()
 {
     return m_tableMapping;
 }
 
-PageFreeSpacePage DatabaseDefinition::GetPageFreeSapce()
+void DatabaseDefinition::SetTableMappingPage(MappingPage mappingPage)
+{
+    m_tableMapping = mappingPage;
+}
+
+PageFreeSpacePage DatabaseDefinition::GetPageFreeSpace()
 {
     return m_pageFreeSpace;
+}
+
+void DatabaseDefinition::SetPageFreeSpace(PageFreeSpacePage pageFreeSpace)
+{
+    m_pageFreeSpace = pageFreeSpace;
 }

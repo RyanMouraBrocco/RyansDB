@@ -26,18 +26,23 @@ void MappingFileWriter::SetAll(MappingPage &mappingPage)
     auto header = mappingPage.GetHeader();
     WriteHeader(header);
 
-    for (int i = 0; i < mappingPage.GetTablesMapSize(); i++)
+    short tableIdsLength = (short)mappingPage.GetTablesMapSize();
+    r_fileWriter.write(reinterpret_cast<char *>(&tableIdsLength), sizeof(short));
+
+    for (short i = 0; i < tableIdsLength; i++)
     {
         r_fileWriter.write(reinterpret_cast<char *>(mappingPage.GetTableIdRefByIndex(i)), sizeof(int));
     }
 
     if (!mappingPage.IsFull())
     {
-        r_fileWriter.seekp(m_currentPageOffSet + ((MAPPING_PAGE_TABLES_LENGTH + 2) * sizeof(int)) - 1, std::ios::beg);
+        r_fileWriter.seekp(m_currentPageOffSet + (MAPPING_PAGE_TABLES_LENGTH * sizeof(int)) - 1, std::ios::beg);
         r_fileWriter.write("\0", 1);
     }
 
-    for (int i = 0; i < mappingPage.GetTablesMapSize(); i++)
+    r_fileWriter.write(reinterpret_cast<char *>(&tableIdsLength), sizeof(short));
+
+    for (short i = 0; i < tableIdsLength; i++)
     {
         r_fileWriter.write(reinterpret_cast<char *>(mappingPage.GetTableOffSetRefByIndex(i)), sizeof(int));
     }

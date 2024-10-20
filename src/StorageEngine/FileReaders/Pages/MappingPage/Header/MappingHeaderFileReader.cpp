@@ -2,6 +2,7 @@
 
 MappingHeaderFileReader::MappingHeaderFileReader(std::ifstream &fileReader, int pageOffSet) : r_fileReader(fileReader), m_currentPageOffSet(pageOffSet)
 {
+    p_mappingPageHeader = std::make_shared<MappingPageHeader>();
 }
 
 void MappingHeaderFileReader::FetchNextPageOffSet()

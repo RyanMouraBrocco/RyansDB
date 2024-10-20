@@ -35,6 +35,11 @@ MappingPageHeader MappingPage::GetHeader()
     return m_header;
 }
 
+void MappingPage::SetHeader(MappingPageHeader header)
+{
+    m_header = header;
+}
+
 int MappingPage::GetTablesMapSize()
 {
     return m_tableIds.size();
@@ -50,9 +55,13 @@ int *MappingPage::GetTableOffSetRefByIndex(int index)
     return &m_tableOffSets[index];
 }
 
-void MappingPage::AddTableOffSet(int tableId, int offSet)
+void MappingPage::AddTableId(int tableId)
 {
     m_tableIds.push_back(tableId);
+}
+
+void MappingPage::AddTableOffSet(int offSet)
+{
     m_tableOffSets.push_back(offSet);
 }
 

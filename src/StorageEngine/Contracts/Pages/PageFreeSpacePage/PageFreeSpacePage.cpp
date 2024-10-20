@@ -35,6 +35,11 @@ PageFreeSpacePageHeader PageFreeSpacePage::GetHeader()
     return m_header;
 }
 
+void PageFreeSpacePage::SetHeader(PageFreeSpacePageHeader header)
+{
+    m_header = header;
+}
+
 int PageFreeSpacePage::GetFreePageSize()
 {
     return m_freePages.size();

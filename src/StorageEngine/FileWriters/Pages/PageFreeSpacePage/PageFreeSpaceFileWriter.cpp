@@ -27,7 +27,10 @@ void PageFreeSpaceFileWriter::SetAll(PageFreeSpacePage &pageFreeSpace)
     auto header = pageFreeSpace.GetHeader();
     WriteHeader(header);
 
-    for (int i = 0; i < pageFreeSpace.GetFreePageSize(); i++)
+    short freePageSize = (short)pageFreeSpace.GetFreePageSize();
+    r_fileWriter.write(reinterpret_cast<char *>(&freePageSize), sizeof(short));
+
+    for (short i = 0; i < freePageSize; i++)
     {
         r_fileWriter.write(reinterpret_cast<char *>(pageFreeSpace.GetFreePageRef(i)), sizeof(unsigned char));
     }

@@ -2,6 +2,7 @@
 
 DatabaseHeaderFileReader::DatabaseHeaderFileReader(std::ifstream &fileReader) : r_fileReader(fileReader)
 {
+    p_databaseHeader = std::make_shared<DatabaseHeader>();
 }
 
 void DatabaseHeaderFileReader::FetchId()
@@ -16,7 +17,7 @@ void DatabaseHeaderFileReader::FetchDatabaseName()
 
 void DatabaseHeaderFileReader::FetchFileLength()
 {
-    r_fileReader.read(reinterpret_cast<char *>(p_databaseHeader.get()->GetFileLength()), sizeof(int));
+    r_fileReader.read(reinterpret_cast<char *>(p_databaseHeader->GetFileLengthRef()), sizeof(int));
 }
 
 DatabaseHeaderFileReader *DatabaseHeaderFileReader::LoadId()

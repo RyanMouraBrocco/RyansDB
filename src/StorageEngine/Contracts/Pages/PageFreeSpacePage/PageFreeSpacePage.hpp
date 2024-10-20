@@ -2,7 +2,7 @@
 
 #include "vector"
 
-const int PAGE_FREE_SPACE_PAGE_LENGTH = 7996;
+const int PAGE_FREE_SPACE_PAGE_LENGTH = 7990;
 
 class PageFreeSpacePageHeader
 {
@@ -28,6 +28,7 @@ private:
 public:
     PageFreeSpacePage();
     PageFreeSpacePageHeader GetHeader();
+    void SetHeader(PageFreeSpacePageHeader header);
     int GetFreePageSize();
     unsigned char GetFreePage(int index);
     unsigned char *GetFreePageRef(int index);

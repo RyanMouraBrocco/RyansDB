@@ -31,10 +31,14 @@ private:
     PageFreeSpacePage m_pageFreeSpace;
 
 public:
+    DatabaseDefinition();
     DatabaseDefinition(int id, std::string databaseName, int fileLength);
     DatabaseDefinition(DatabaseHeader header, MappingPage tableMapping, PageFreeSpacePage pageFreeSpace);
 
     DatabaseHeader GetHeader();
+    void SetHeader(DatabaseHeader header);
     MappingPage GetTableMappingPage();
-    PageFreeSpacePage GetPageFreeSapce();
+    void SetTableMappingPage(MappingPage mappingPage);
+    PageFreeSpacePage GetPageFreeSpace();
+    void SetPageFreeSpace(PageFreeSpacePage pageFreeSpace);
 };

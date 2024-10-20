@@ -2,7 +2,7 @@
 
 #include "vector"
 
-const int MAPPING_PAGE_TABLES_LENGTH = 1999;
+const int MAPPING_PAGE_TABLES_LENGTH = 998;
 
 class MappingPageHeader
 {
@@ -28,9 +28,11 @@ private:
 public:
     MappingPage();
     MappingPageHeader GetHeader();
+    void SetHeader(MappingPageHeader header);
     int GetTablesMapSize();
     int *GetTableIdRefByIndex(int index);
     int *GetTableOffSetRefByIndex(int index);
-    void AddTableOffSet(int tableId, int offSet);
+    void AddTableId(int tableId);
+    void AddTableOffSet(int offSet);
     bool IsFull();
 };
