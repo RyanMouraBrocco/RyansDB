@@ -75,15 +75,9 @@ std::optional<Error> DatabaseRepository::CreateTableInDatabaseFile(std::string d
     if (!file.is_open())
         return Error(ErrorType::Unexpected, "Error to fetch databasefile");
 
-    // auto lastPositionInTheFile = file.tellp();
-    // auto tableMappingHeader = tableMappingPage.GetHeader();
-    // file.write(reinterpret_cast<char *>(tableMappingHeader.GetTableIdRef()), sizeof(int));
-    // file.write(reinterpret_cast<char *>(tableMappingHeader.GetStartPageOffSetRef()), sizeof(int));
-    // file.write(reinterpret_cast<char *>(tableMappingHeader.GetNextPageOffSetRef()), sizeof(int));
-    // file.write(reinterpret_cast<char *>(tableMappingHeader.GetPreviousPageOffSetRef()), sizeof(int));
-
-    // auto map = tableMappingPage.GetMap().to_ullong();
-    // file.write(reinterpret_cast<char *>(&map), sizeof(int));
+    int nextPositionInTheFile = (int)file.tellp() + 1;
+    TableMappingFileWriter tableMappinFireWriter(file, nextPositionInTheFile);
+    tableMappinFireWriter.SetAll(tableMappingPage);
 
     // for (int i = 0; i < 8; i++)
     // {

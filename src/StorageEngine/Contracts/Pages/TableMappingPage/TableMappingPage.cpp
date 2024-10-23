@@ -68,12 +68,40 @@ TableMappingPageHeader TableMappingPage::GetHeader()
     return m_header;
 }
 
-void TableMappingPage::SetTableBlockMap(int blockPosition, bool belongs)
+void TableMappingPage::SetTableBlockMap(unsigned int blockPosition, bool belongs)
 {
-    m_tableBlockMap.set(blockPosition, belongs);
+    int bitsPerInt = (sizeof(int) * 8);
+    unsigned int intPosition = blockPosition % bitsPerInt;
+    unsigned int intIndex = blockPosition / bitsPerInt;
+
+    if (intIndex >= m_tableBlockMap.size())
+    {
+        for (int i = m_tableBlockMap.size(); i < intIndex; i++)
+            m_tableBlockMap.push_back(0);
+    }
+
+    if (belongs)
+        m_tableBlockMap[intIndex] |= 1 << intPosition;
+    else
+        m_tableBlockMap[intIndex] &= ~(1 << intPosition);
 }
 
-std::bitset<7992> TableMappingPage::GetMap()
+int TableMappingPage::GetTableBlockMapSize()
 {
-    return m_tableBlockMap;
+    return m_tableBlockMap.size();
+}
+
+unsigned int TableMappingPage::GetTableBlockMapByIndex(int index)
+{
+    return m_tableBlockMap[index];
+}
+
+unsigned int *TableMappingPage::GetTableBlockMapRefByIndex(int index)
+{
+    return &m_tableBlockMap[index];
+}
+
+bool TableMappingPage::IsFull()
+{
+    return m_tableBlockMap.size() == TABLE_MAPPING_PAGE_LENGTH;
 }

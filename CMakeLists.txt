@@ -52,6 +52,7 @@ add_executable(RyansDBServer
                 ./src/StorageEngine/FileWriters/Database/DatabaseFileWriter.cpp
                 ./src/StorageEngine/FileWriters/Pages/MappingPage/MappingFileWriter.cpp
                 ./src/StorageEngine/FileWriters/Pages/PageFreeSpacePage/PageFreeSpaceFileWriter.cpp
+                ./src/StorageEngine/FileWriters/Pages/TableMappingPage/TableMappingFileWriter.cpp
                 ./src/StorageEngine/FileReaders/Database/DatabaseFileReader.cpp
                 ./src/StorageEngine/FileReaders/Database/Header/DatabaseHeaderFileReader.cpp
                 ./src/StorageEngine/FileReaders/Pages/MappingPage/MappingFileReader.cpp
