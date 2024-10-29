@@ -32,10 +32,17 @@ public:
     DataPageOffSet();
 };
 
+class DataPageData
+{
+private:
+public:
+};
+
 class DataPage
 {
 private:
     DataPageHeader m_header;
+    DataPageData m_data;
     DataPageOffSet m_offSet;
 
 public:

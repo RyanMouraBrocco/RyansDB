@@ -75,30 +75,42 @@ std::optional<Error> DatabaseRepository::CreateTableInDatabaseFile(std::string d
     if (!file.is_open())
         return Error(ErrorType::Unexpected, "Error to fetch databasefile");
 
-    int nextPositionInTheFile = (int)file.tellp() + 1;
-    TableMappingFileWriter tableMappinFireWriter(file, nextPositionInTheFile);
+    int tableMappingStartPosition = (int)file.tellp() + 1;
+
+    auto header = tableMappingPage.GetHeader();
+
+    for (int i = 0; i < 8; i++)
+        tableMappingPage.SetTableBlockMap(header.GetLastMappedPageIndex() + i, true);
+
+    header.SetLastMappedPageIndex(header.GetLastMappedPageIndex() + 8);
+    header.SetStartPageOffSet(tableMappingStartPosition + 8'000);
+
+    tableMappingPage.SetHeader(header);
+
+    TableMappingFileWriter tableMappinFireWriter(file, tableMappingStartPosition);
     tableMappinFireWriter.SetAll(tableMappingPage);
 
-    // for (int i = 0; i < 8; i++)
-    // {
-    //     auto dataPage = dataPageBlock.get()[i];
-    //     auto dataPageHeader = dataPage.GetHeader();
-    //     file.write(reinterpret_cast<char *>(dataPageHeader.GetPageIdRef()), sizeof(int));
-    //     file.write(reinterpret_cast<char *>(dataPageHeader.GetPageLengthRef()), sizeof(int));
-    //     file.write(reinterpret_cast<char *>(dataPageHeader.GetTableIdRef()), sizeof(int));
-    //     file.seekp(m_pageSizeInBytes - sizeof(DataPageHeader), std::ios::cur);
-    // }
+    for (int i = 0; i < 8; i++)
+    {
+        int nextPagePosition = (int)file.tellp();
+        auto dataPage = dataPageBlock.get()[i];
+        DataFileWriter dataFileWriter(file, nextPagePosition);
+        dataFileWriter.SetAll(dataPage);
+    }
 
-    // file.write("\0", 1);
+    auto mapping = databaseDefinition.GetTableMappingPage();
+    mapping.AddTableId(tableMappingPage.GetHeader().GetTableId());
+    mapping.AddTableOffSet(tableMappingStartPosition);
+    MappingFileWriter mappinFileWriter(file);
+    mappinFileWriter.SetAll(mapping);
 
-    // auto mapping = databaseDefinition.GetTableMappingPage();
-    // auto pageFreeSpace = databaseDefinition.GetPageFreeSapce();
+    auto pageFreeSpace = databaseDefinition.GetPageFreeSpace();
+    pageFreeSpace.AddFreePageValue(0); // tableMappingPage
+    for (int i = 0; i < 8; i++)
+        pageFreeSpace.AddFreePageValue(0);
 
-    // mapping.AddTableOffSet(tableMappingHeader.GetTableId(), lastPositionInTheFile);
-    // // write in file here
-
-    // pageFreeSpace.AddFreePageValue(0);
-    // save in file here
+    PageFreeSpaceFileWriter pageFreeSpaceFileWriter(file);
+    pageFreeSpaceFileWriter.SetAll(pageFreeSpace);
 
     file.close();
 

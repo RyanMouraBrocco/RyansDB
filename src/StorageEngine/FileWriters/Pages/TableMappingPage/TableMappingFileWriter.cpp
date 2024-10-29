@@ -14,6 +14,7 @@ void TableMappingFileWriter::WriteHeader(TableMappingPageHeader &header)
     r_fileWriter.write(reinterpret_cast<char *>(header.GetStartPageOffSetRef()), sizeof(int));
     r_fileWriter.write(reinterpret_cast<char *>(header.GetNextPageOffSetRef()), sizeof(int));
     r_fileWriter.write(reinterpret_cast<char *>(header.GetPreviousPageOffSetRef()), sizeof(int));
+    r_fileWriter.write(reinterpret_cast<char *>(header.GetLastMappedPageIndexRef()), sizeof(int));
 }
 
 void TableMappingFileWriter::SetHeader(TableMappingPageHeader &header)

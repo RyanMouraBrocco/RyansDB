@@ -7,6 +7,7 @@
 #include "../../Contracts/Pages/TableMappingPage/TableMappingPage.hpp"
 #include "../../FileWriters/Database/DatabaseFileWriter.hpp"
 #include "../../FileWriters/Pages/TableMappingPage/TableMappingFileWriter.hpp"
+#include "../../FileWriters/Pages/DataPage/DataFileWriter.hpp"
 #include "../../FileReaders/Database/DatabaseFileReader.hpp"
 #include "optional"
 #include "memory"

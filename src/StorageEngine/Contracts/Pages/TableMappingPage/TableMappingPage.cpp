@@ -5,6 +5,7 @@ TableMappingPageHeader::TableMappingPageHeader()
     m_startPageOffSet = -1;
     m_nextPageOffSet = -1;
     m_previousPageOffSet = -1;
+    m_lastMappedPageIndex = 0;
 }
 
 TableMappingPageHeader::TableMappingPageHeader(int tableId) : m_tableId(tableId)
@@ -12,6 +13,7 @@ TableMappingPageHeader::TableMappingPageHeader(int tableId) : m_tableId(tableId)
     m_startPageOffSet = -1;
     m_nextPageOffSet = -1;
     m_previousPageOffSet = -1;
+    m_lastMappedPageIndex = 0;
 }
 
 int TableMappingPageHeader::GetTableId()
@@ -24,6 +26,11 @@ int *TableMappingPageHeader::GetTableIdRef()
     return &m_tableId;
 }
 
+void TableMappingPageHeader::SetTableId(int tableId)
+{
+    m_tableId = tableId;
+}
+
 int TableMappingPageHeader::GetStartPageOffSet()
 {
     return m_startPageOffSet;
@@ -32,6 +39,11 @@ int TableMappingPageHeader::GetStartPageOffSet()
 int *TableMappingPageHeader::GetStartPageOffSetRef()
 {
     return &m_startPageOffSet;
+}
+
+void TableMappingPageHeader::SetStartPageOffSet(int startPageOffSet)
+{
+    m_startPageOffSet = startPageOffSet;
 }
 
 int TableMappingPageHeader::GetNextPageOffSet()
@@ -44,6 +56,11 @@ int *TableMappingPageHeader::GetNextPageOffSetRef()
     return &m_nextPageOffSet;
 }
 
+void TableMappingPageHeader::SetNextPageOffSet(int nextPageOffSet)
+{
+    m_nextPageOffSet = nextPageOffSet;
+}
+
 int TableMappingPageHeader::GetPreviousPageOffSet()
 {
     return m_previousPageOffSet;
@@ -52,6 +69,26 @@ int TableMappingPageHeader::GetPreviousPageOffSet()
 int *TableMappingPageHeader::GetPreviousPageOffSetRef()
 {
     return &m_previousPageOffSet;
+}
+
+void TableMappingPageHeader::SetPreviousPageOffSet(int previousPageOffSet)
+{
+    m_previousPageOffSet = previousPageOffSet;
+}
+
+int TableMappingPageHeader::GetLastMappedPageIndex()
+{
+    return m_lastMappedPageIndex;
+}
+
+int *TableMappingPageHeader::GetLastMappedPageIndexRef()
+{
+    return &m_lastMappedPageIndex;
+}
+
+void TableMappingPageHeader::SetLastMappedPageIndex(int lastMappedPageIndex)
+{
+    m_lastMappedPageIndex = lastMappedPageIndex;
 }
 
 TableMappingPage::TableMappingPage()
@@ -68,6 +105,11 @@ TableMappingPageHeader TableMappingPage::GetHeader()
     return m_header;
 }
 
+void TableMappingPage::SetHeader(TableMappingPageHeader header)
+{
+    m_header = header;
+}
+
 void TableMappingPage::SetTableBlockMap(unsigned int blockPosition, bool belongs)
 {
     int bitsPerInt = (sizeof(int) * 8);
@@ -76,7 +118,7 @@ void TableMappingPage::SetTableBlockMap(unsigned int blockPosition, bool belongs
 
     if (intIndex >= m_tableBlockMap.size())
     {
-        for (int i = m_tableBlockMap.size(); i < intIndex; i++)
+        for (int i = m_tableBlockMap.size(); i <= intIndex; i++)
             m_tableBlockMap.push_back(0);
     }
 
