@@ -1,6 +1,6 @@
 #include "DatabaseHeaderFileWriter.hpp"
 
-DatabaseHeaderFileWriter::DatabaseHeaderFileWriter(std::ofstream &fileWriter) : r_fileWriter(fileWriter)
+DatabaseHeaderFileWriter::DatabaseHeaderFileWriter(std::fstream &fileWriter) : r_fileWriter(fileWriter)
 {
 }
 

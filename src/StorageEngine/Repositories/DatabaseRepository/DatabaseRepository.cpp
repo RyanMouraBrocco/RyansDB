@@ -25,7 +25,7 @@ std::variant<DatabaseDefinition, Error> DatabaseRepository::GetDatabaseDefinitio
 std::optional<Error> DatabaseRepository::CreateDatabaseFile(DatabaseDefinition databaseDef)
 {
     DatabaseHeader databaseHeader = databaseDef.GetHeader();
-    std::ofstream fileWriter(m_databasePath + "/" + databaseHeader.GetDatabaseNameRef() + m_databaseExtension, std::ios::binary);
+    std::fstream fileWriter(m_databasePath + "/" + databaseHeader.GetDatabaseNameRef() + m_databaseExtension, std::ios::binary | std::ios::out);
 
     if (!fileWriter.is_open())
         return Error(ErrorType::Unexpected, "Error to generate databasefile");
@@ -70,11 +70,12 @@ std::optional<Error> DatabaseRepository::CreateTableInDatabaseFile(std::string d
 
     auto databaseDefinition = std::get<DatabaseDefinition>(databaseDefinitionResult);
 
-    std::ofstream file(m_databasePath + "/" + databaseName + m_databaseExtension, std::ios::binary | std::ios::app);
+    std::fstream file(m_databasePath + "/" + databaseName + m_databaseExtension, std::ios::binary | std::ios::in | std::ios::out);
 
     if (!file.is_open())
         return Error(ErrorType::Unexpected, "Error to fetch databasefile");
 
+    file.seekp(0, std::ios::end);
     int tableMappingStartPosition = (int)file.tellp() + 1;
 
     auto header = tableMappingPage.GetHeader();

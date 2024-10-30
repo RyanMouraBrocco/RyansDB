@@ -1,10 +1,10 @@
 #include "MappingFileWriter.hpp"
 
-MappingFileWriter::MappingFileWriter(std::ofstream &fileWriter) : r_fileWriter(fileWriter)
+MappingFileWriter::MappingFileWriter(std::fstream &fileWriter) : r_fileWriter(fileWriter)
 {
 }
 
-MappingFileWriter::MappingFileWriter(std::ofstream &fileWriter, int pageOffSet) : r_fileWriter(fileWriter), m_currentPageOffSet(pageOffSet)
+MappingFileWriter::MappingFileWriter(std::fstream &fileWriter, int pageOffSet) : r_fileWriter(fileWriter), m_currentPageOffSet(pageOffSet)
 {
 }
 

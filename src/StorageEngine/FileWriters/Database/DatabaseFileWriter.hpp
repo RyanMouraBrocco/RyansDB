@@ -13,10 +13,10 @@
 class DatabaseFileWriter
 {
 private:
-    std::ofstream &r_fileWriter;
+    std::fstream &r_fileWriter;
 
 public:
-    DatabaseFileWriter(std::ofstream &fileWriter);
+    DatabaseFileWriter(std::fstream &fileWriter);
     void SetHeader(DatabaseHeader &header);
     void SetMapping(MappingPage &mapping);
     void SetPageFreeSpace(PageFreeSpacePage &pageFreeSpace);

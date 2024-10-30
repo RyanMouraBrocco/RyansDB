@@ -9,14 +9,14 @@ class PageFreeSpaceFileWriter
 {
 private:
     const int m_firstPageOffSet = 96 + 8'000;
-    std::ofstream &r_fileWriter;
+    std::fstream &r_fileWriter;
     int m_currentPageOffSet = m_firstPageOffSet;
 
     void WriteHeader(PageFreeSpacePageHeader &header);
 
 public:
-    PageFreeSpaceFileWriter(std::ofstream &fileWriter);
-    PageFreeSpaceFileWriter(std::ofstream &fileWriter, int pageOffSet);
+    PageFreeSpaceFileWriter(std::fstream &fileWriter);
+    PageFreeSpaceFileWriter(std::fstream &fileWriter, int pageOffSet);
     void SetHeader(PageFreeSpacePageHeader &header);
     void SetAll(PageFreeSpacePage &pageFreeSpace);
 };

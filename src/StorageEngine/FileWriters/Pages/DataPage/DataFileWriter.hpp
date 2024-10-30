@@ -9,14 +9,14 @@ class DataFileWriter
 {
 private:
     const int m_firstPageOffSet = 96 + 24'000;
-    std::ofstream &r_fileWriter;
+    std::fstream &r_fileWriter;
     int m_currentPageOffSet = m_firstPageOffSet;
 
     void WriteHeader(DataPageHeader &header);
 
 public:
-    DataFileWriter(std::ofstream &fileWriter);
-    DataFileWriter(std::ofstream &fileWriter, int pageOffSet);
+    DataFileWriter(std::fstream &fileWriter);
+    DataFileWriter(std::fstream &fileWriter, int pageOffSet);
     void SetHeader(DataPageHeader &header);
     void SetAll(DataPage &dataPage);
 };

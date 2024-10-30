@@ -1,10 +1,10 @@
 #include "DataFileWriter.hpp"
 
-DataFileWriter::DataFileWriter(std::ofstream &fileWriter) : r_fileWriter(fileWriter)
+DataFileWriter::DataFileWriter(std::fstream &fileWriter) : r_fileWriter(fileWriter)
 {
 }
 
-DataFileWriter::DataFileWriter(std::ofstream &fileWriter, int pageOffSet) : r_fileWriter(fileWriter), m_currentPageOffSet(pageOffSet)
+DataFileWriter::DataFileWriter(std::fstream &fileWriter, int pageOffSet) : r_fileWriter(fileWriter), m_currentPageOffSet(pageOffSet)
 {
 }
 

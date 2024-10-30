@@ -8,10 +8,10 @@
 class DatabaseHeaderFileWriter
 {
 private:
-    std::ofstream &r_fileWriter;
+    std::fstream &r_fileWriter;
 
 public:
-    DatabaseHeaderFileWriter(std::ofstream &fileWriter);
+    DatabaseHeaderFileWriter(std::fstream &fileWriter);
     void SetId(int *id);
     void SetDatabaseName(char *name);
     void SetFileLength(int *fileLength);
