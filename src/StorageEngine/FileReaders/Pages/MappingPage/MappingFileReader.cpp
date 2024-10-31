@@ -37,7 +37,7 @@ MappingFileReader *MappingFileReader::LoadTableIds()
 
 MappingFileReader *MappingFileReader::LoadTableOffSets()
 {
-    r_fileReader.seekg(m_currentPageOffSet + sizeof(MappingPageHeader) + (MAPPING_PAGE_TABLES_LENGTH * sizeof(int)), std::ios::beg);
+    r_fileReader.seekg(m_currentPageOffSet + sizeof(MappingPageHeader) + sizeof(short) + (MAPPING_PAGE_TABLES_LENGTH * sizeof(int)), std::ios::beg);
 
     short tablesMappingLength = 0;
     r_fileReader.read(reinterpret_cast<char *>(&tablesMappingLength), sizeof(short));

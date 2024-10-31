@@ -38,9 +38,6 @@ void TableMappingFileWriter::SetAll(TableMappingPage &tableMappingPage)
     if (!tableMappingPage.IsFull())
     {
         r_fileWriter.seekp(m_currentPageOffSet + 8'000 - 1, std::ios::beg);
-        r_fileWriter.write("A", sizeof(char));
-        r_fileWriter.write("B", sizeof(char));
-        r_fileWriter.write("C", sizeof(char));
-        r_fileWriter.write("D", sizeof(char));
+        r_fileWriter.write("\0", 1);
     }
 }

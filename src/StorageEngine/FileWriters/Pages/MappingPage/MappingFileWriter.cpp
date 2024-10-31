@@ -36,7 +36,7 @@ void MappingFileWriter::SetAll(MappingPage &mappingPage)
 
     if (!mappingPage.IsFull())
     {
-        r_fileWriter.seekp(m_currentPageOffSet + (MAPPING_PAGE_TABLES_LENGTH * sizeof(int)) - 1, std::ios::beg);
+        r_fileWriter.seekp(m_currentPageOffSet + sizeof(MappingPageHeader) + sizeof(short) + (MAPPING_PAGE_TABLES_LENGTH * sizeof(int)) - 1, std::ios::beg);
         r_fileWriter.write("\0", 1);
     }
 
