@@ -100,7 +100,7 @@ std::optional<Error> DatabaseRepository::CreateTableInDatabaseFile(std::string d
     }
 
     AddTableInMapping(file, databaseDefinition, tableMappingPage.GetHeader().GetTableId(), tableMappingStartPosition);
-    AddPageFreeSpaceForANewTable();
+    // AddPageFreeSpaceForANewTable();
     auto pageFreeSpace = databaseDefinition.GetPageFreeSpace();
     pageFreeSpace.AddFreePageValue(0); // tableMappingPage
     for (int i = 0; i < 8; i++)
