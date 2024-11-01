@@ -1,11 +1,11 @@
 #include "MappingFileReader.hpp"
 
-MappingFileReader::MappingFileReader(std::ifstream &fileReader) : r_fileReader(fileReader)
+MappingFileReader::MappingFileReader(std::fstream &fileReader) : r_fileReader(fileReader)
 {
     p_mappingPage = std::make_shared<MappingPage>();
 }
 
-MappingFileReader::MappingFileReader(std::ifstream &fileReader, int pageOffSet) : r_fileReader(fileReader), m_currentPageOffSet(pageOffSet)
+MappingFileReader::MappingFileReader(std::fstream &fileReader, int pageOffSet) : r_fileReader(fileReader), m_currentPageOffSet(pageOffSet)
 {
     p_mappingPage = std::make_shared<MappingPage>();
 }

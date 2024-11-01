@@ -16,6 +16,11 @@ int *MappingPageHeader::GetNextPageOffSetRef()
     return &m_nextPageOffSet;
 }
 
+void MappingPageHeader::SetNextPageOffSet(int nextPageOffSet)
+{
+    m_nextPageOffSet = nextPageOffSet;
+}
+
 int MappingPageHeader::GetPreviousPageOffSet()
 {
     return m_previousPageOffSet;
@@ -24,6 +29,11 @@ int MappingPageHeader::GetPreviousPageOffSet()
 int *MappingPageHeader::GetPreviousPageOffSetRef()
 {
     return &m_previousPageOffSet;
+}
+
+void MappingPageHeader::SetPreviousPageOffSet(int previousPageOffSet)
+{
+    m_previousPageOffSet = previousPageOffSet;
 }
 
 MappingPage::MappingPage()

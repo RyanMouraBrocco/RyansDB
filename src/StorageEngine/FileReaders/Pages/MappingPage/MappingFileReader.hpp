@@ -11,13 +11,13 @@ class MappingFileReader
 {
 private:
     const int m_firstPageOffSet = 96;
-    std::ifstream &r_fileReader;
+    std::fstream &r_fileReader;
     std::shared_ptr<MappingPage> p_mappingPage;
     int m_currentPageOffSet = m_firstPageOffSet;
 
 public:
-    MappingFileReader(std::ifstream &fileReader);
-    MappingFileReader(std::ifstream &fileReader, int pageOffSet);
+    MappingFileReader(std::fstream &fileReader);
+    MappingFileReader(std::fstream &fileReader, int pageOffSet);
     MappingFileReader *LoadHeader();
     MappingFileReader *LoadTableIds();
     MappingFileReader *LoadTableOffSets();

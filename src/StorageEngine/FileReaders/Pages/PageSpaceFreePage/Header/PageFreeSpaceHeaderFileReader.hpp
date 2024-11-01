@@ -8,7 +8,7 @@
 class PageFreeSpaceHeaderFileReader
 {
 private:
-    std::ifstream &r_fileReader;
+    std::fstream &r_fileReader;
     std::shared_ptr<PageFreeSpacePageHeader> p_pageFreeSpacePageHeader;
     int m_currentPageOffSet;
 
@@ -16,7 +16,7 @@ private:
     void FetchPreviousPageOffSet();
 
 public:
-    PageFreeSpaceHeaderFileReader(std::ifstream &fileReader, int pageOffSet);
+    PageFreeSpaceHeaderFileReader(std::fstream &fileReader, int pageOffSet);
     PageFreeSpaceHeaderFileReader *LoadNextPageOffSet();
     PageFreeSpaceHeaderFileReader *LoadPreviousPageOffSet();
     PageFreeSpaceHeaderFileReader *LoadAll();

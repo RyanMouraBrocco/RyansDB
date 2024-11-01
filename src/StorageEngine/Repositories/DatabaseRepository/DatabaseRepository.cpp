@@ -8,7 +8,7 @@ DatabaseRepository::DatabaseRepository()
 
 std::variant<DatabaseDefinition, Error> DatabaseRepository::GetDatabaseDefinition(std::string databaseName)
 {
-    std::ifstream file(m_databasePath + "/" + databaseName + m_databaseExtension, std::ios::binary);
+    std::fstream file(m_databasePath + "/" + databaseName + m_databaseExtension, std::ios::binary | std::ios::in);
 
     if (!file.is_open())
         return Error(ErrorType::Unexpected, "Error to fetch databasefile");
@@ -99,12 +99,8 @@ std::optional<Error> DatabaseRepository::CreateTableInDatabaseFile(std::string d
         dataFileWriter.SetAll(dataPage);
     }
 
-    auto mapping = databaseDefinition.GetTableMappingPage();
-    mapping.AddTableId(tableMappingPage.GetHeader().GetTableId());
-    mapping.AddTableOffSet(tableMappingStartPosition);
-    MappingFileWriter mappinFileWriter(file);
-    mappinFileWriter.SetAll(mapping);
-
+    AddTableInMapping(file, databaseDefinition, tableMappingPage.GetHeader().GetTableId(), tableMappingStartPosition);
+    AddPageFreeSpaceForANewTable();
     auto pageFreeSpace = databaseDefinition.GetPageFreeSpace();
     pageFreeSpace.AddFreePageValue(0); // tableMappingPage
     for (int i = 0; i < 8; i++)
@@ -116,4 +112,54 @@ std::optional<Error> DatabaseRepository::CreateTableInDatabaseFile(std::string d
     file.close();
 
     return std::nullopt;
+}
+
+void DatabaseRepository::AddTableInMapping(std::fstream &file, DatabaseDefinition &databaseDefinition, int tableId, int tableOffSet)
+{
+    MappingPage mapping = databaseDefinition.GetTableMappingPage();
+    bool isRoot = true;
+    int mappingPageOffSet = 0;
+    int currentPageOffSet = 96;
+    while (mapping.IsFull())
+    {
+        isRoot = false;
+        int nextPageOffSet = mapping.GetHeader().GetNextPageOffSet();
+        if (nextPageOffSet <= -1)
+        {
+            MappingPage newMappingPage;
+
+            auto header = MappingPageHeader();
+            header.SetPreviousPageOffSet(currentPageOffSet);
+            newMappingPage.SetHeader(header);
+
+            file.seekp(0, std::ios::end);
+            int nextFreePageOffSet = (int)file.tellp() + 1;
+            MappingFileWriter mappinFileWriter(file, nextFreePageOffSet);
+            mappinFileWriter.SetAll(newMappingPage);
+
+            mapping = newMappingPage;
+            mappingPageOffSet = nextFreePageOffSet;
+        }
+        else
+        {
+            mappingPageOffSet = nextPageOffSet;
+            MappingFileReader mappingFileReader(file, nextPageOffSet);
+            mapping = mappingFileReader.LoadAll()->Extract();
+        }
+
+        currentPageOffSet = nextPageOffSet;
+    }
+
+    mapping.AddTableId(tableId);
+    mapping.AddTableOffSet(tableOffSet);
+    if (isRoot)
+    {
+        MappingFileWriter mappinFileWriter(file);
+        mappinFileWriter.SetAll(mapping);
+    }
+    else
+    {
+        MappingFileWriter mappinFileWriter(file, mappingPageOffSet);
+        mappinFileWriter.SetAll(mapping);
+    }
 }

@@ -1,6 +1,6 @@
 #include "PageFreeSpaceHeaderFileReader.hpp"
 
-PageFreeSpaceHeaderFileReader::PageFreeSpaceHeaderFileReader(std::ifstream &fileReader, int pageOffSet) : r_fileReader(fileReader), m_currentPageOffSet(pageOffSet)
+PageFreeSpaceHeaderFileReader::PageFreeSpaceHeaderFileReader(std::fstream &fileReader, int pageOffSet) : r_fileReader(fileReader), m_currentPageOffSet(pageOffSet)
 {
     p_pageFreeSpacePageHeader = std::make_shared<PageFreeSpacePageHeader>();
 }

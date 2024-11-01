@@ -1,6 +1,6 @@
 #include "MappingHeaderFileReader.hpp"
 
-MappingHeaderFileReader::MappingHeaderFileReader(std::ifstream &fileReader, int pageOffSet) : r_fileReader(fileReader), m_currentPageOffSet(pageOffSet)
+MappingHeaderFileReader::MappingHeaderFileReader(std::fstream &fileReader, int pageOffSet) : r_fileReader(fileReader), m_currentPageOffSet(pageOffSet)
 {
     p_mappingPageHeader = std::make_shared<MappingPageHeader>();
 }

@@ -9,7 +9,7 @@
 class DatabaseHeaderFileReader
 {
 private:
-    std::ifstream &r_fileReader;
+    std::fstream &r_fileReader;
     std::shared_ptr<DatabaseHeader> p_databaseHeader;
 
     void FetchId();
@@ -17,7 +17,7 @@ private:
     void FetchFileLength();
 
 public:
-    DatabaseHeaderFileReader(std::ifstream &r_fileReader);
+    DatabaseHeaderFileReader(std::fstream &r_fileReader);
     DatabaseHeaderFileReader *LoadId();
     DatabaseHeaderFileReader *LoadDatabaseName();
     DatabaseHeaderFileReader *LoadFileLength();

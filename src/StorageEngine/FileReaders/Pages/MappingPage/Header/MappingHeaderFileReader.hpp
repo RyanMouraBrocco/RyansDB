@@ -9,7 +9,7 @@
 class MappingHeaderFileReader
 {
 private:
-    std::ifstream &r_fileReader;
+    std::fstream &r_fileReader;
     std::shared_ptr<MappingPageHeader> p_mappingPageHeader;
     int m_currentPageOffSet;
 
@@ -17,7 +17,7 @@ private:
     void FetchPreviousPageOffSet();
 
 public:
-    MappingHeaderFileReader(std::ifstream &fileReader, int pageOffSet);
+    MappingHeaderFileReader(std::fstream &fileReader, int pageOffSet);
     MappingHeaderFileReader *LoadNextPageOffSet();
     MappingHeaderFileReader *LoadPreviousPageOffSet();
     MappingHeaderFileReader *LoadAll();

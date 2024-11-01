@@ -14,8 +14,10 @@ public:
     MappingPageHeader();
     int GetNextPageOffSet();
     int *GetNextPageOffSetRef();
+    void SetNextPageOffSet(int nextPageOffSet);
     int GetPreviousPageOffSet();
     int *GetPreviousPageOffSetRef();
+    void SetPreviousPageOffSet(int previousPageOffSet);
 };
 
 class MappingPage

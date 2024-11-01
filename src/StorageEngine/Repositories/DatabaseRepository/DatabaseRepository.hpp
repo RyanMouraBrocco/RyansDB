@@ -26,6 +26,9 @@ private:
 
     std::variant<DatabaseDefinition, Error> GetDatabaseDefinition(std::string databaseName);
 
+    void AddTableInMapping(std::fstream &file, DatabaseDefinition &databaseDefinition, int tableId, int tableOffSet);
+    void AddPageFreeSpaceForANewTable(std::fstream &file, DatabaseDefinition &databaseDefinition);
+
 public:
     DatabaseRepository();
     bool ExistsDatabase(std::string name);

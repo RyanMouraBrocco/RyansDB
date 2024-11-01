@@ -12,11 +12,11 @@
 class DatabaseFileReader
 {
 private:
-    std::ifstream &r_fileReader;
+    std::fstream &r_fileReader;
     std::shared_ptr<DatabaseDefinition> p_databaseDefintion;
 
 public:
-    DatabaseFileReader(std::ifstream &r_fileReader);
+    DatabaseFileReader(std::fstream &r_fileReader);
     DatabaseFileReader *LoadHeader();
     DatabaseFileReader *LoadMappingPage();
     DatabaseFileReader *LoadPageFreeSpace();

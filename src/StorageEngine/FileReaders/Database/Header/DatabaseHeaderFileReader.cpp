@@ -1,6 +1,6 @@
 #include "DatabaseHeaderFileReader.hpp"
 
-DatabaseHeaderFileReader::DatabaseHeaderFileReader(std::ifstream &fileReader) : r_fileReader(fileReader)
+DatabaseHeaderFileReader::DatabaseHeaderFileReader(std::fstream &fileReader) : r_fileReader(fileReader)
 {
     p_databaseHeader = std::make_shared<DatabaseHeader>();
 }
