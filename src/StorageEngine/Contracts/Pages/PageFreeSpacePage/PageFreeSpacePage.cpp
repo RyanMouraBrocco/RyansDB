@@ -16,14 +16,24 @@ int *PageFreeSpacePageHeader::GetNextPageOffSetRef()
     return &m_nextPageOffSet;
 }
 
+void PageFreeSpacePageHeader::SetNextPageOffSet(int nextPageOffSet)
+{
+    m_nextPageOffSet = nextPageOffSet;
+}
+
 int PageFreeSpacePageHeader::GetPreviousPageOffset()
 {
     return m_previousPageOffSet;
 }
 
-int *PageFreeSpacePageHeader::GetPreviousPageOffsetRef()
+int *PageFreeSpacePageHeader::GetPreviousPageOffSetRef()
 {
     return &m_previousPageOffSet;
+}
+
+void PageFreeSpacePageHeader::SetPreviousPageOffSet(int previousPageOffSet)
+{
+    m_previousPageOffSet = previousPageOffSet;
 }
 
 PageFreeSpacePage::PageFreeSpacePage()

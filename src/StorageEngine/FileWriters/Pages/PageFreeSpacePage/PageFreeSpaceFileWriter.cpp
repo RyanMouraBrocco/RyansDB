@@ -11,7 +11,7 @@ PageFreeSpaceFileWriter::PageFreeSpaceFileWriter(std::fstream &fileWriter, int p
 void PageFreeSpaceFileWriter::WriteHeader(PageFreeSpacePageHeader &header)
 {
     r_fileWriter.write(reinterpret_cast<char *>(header.GetNextPageOffSetRef()), sizeof(int));
-    r_fileWriter.write(reinterpret_cast<char *>(header.GetPreviousPageOffsetRef()), sizeof(int));
+    r_fileWriter.write(reinterpret_cast<char *>(header.GetPreviousPageOffSetRef()), sizeof(int));
 }
 
 void PageFreeSpaceFileWriter::SetHeader(PageFreeSpacePageHeader &header)

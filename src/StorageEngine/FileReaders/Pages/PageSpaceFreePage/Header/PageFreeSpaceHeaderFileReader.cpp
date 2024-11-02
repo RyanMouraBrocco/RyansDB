@@ -12,7 +12,7 @@ void PageFreeSpaceHeaderFileReader::FetchNextPageOffSet()
 
 void PageFreeSpaceHeaderFileReader::FetchPreviousPageOffSet()
 {
-    r_fileReader.read(reinterpret_cast<char *>(p_pageFreeSpacePageHeader->GetPreviousPageOffsetRef()), sizeof(int));
+    r_fileReader.read(reinterpret_cast<char *>(p_pageFreeSpacePageHeader->GetPreviousPageOffSetRef()), sizeof(int));
 }
 
 PageFreeSpaceHeaderFileReader *PageFreeSpaceHeaderFileReader::LoadNextPageOffSet()

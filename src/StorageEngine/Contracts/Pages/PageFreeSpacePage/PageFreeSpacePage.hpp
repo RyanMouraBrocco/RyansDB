@@ -15,8 +15,10 @@ public:
 
     int GetNextPageOffSet();
     int *GetNextPageOffSetRef();
+    void SetNextPageOffSet(int nextPageOffSet);
     int GetPreviousPageOffset();
-    int *GetPreviousPageOffsetRef();
+    int *GetPreviousPageOffSetRef();
+    void SetPreviousPageOffSet(int previousPageOffSet);
 };
 
 class PageFreeSpacePage

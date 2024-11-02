@@ -77,19 +77,7 @@ std::optional<Error> DatabaseRepository::CreateTableInDatabaseFile(std::string d
 
     file.seekp(0, std::ios::end);
     int tableMappingStartPosition = (int)file.tellp() + 1;
-
-    auto header = tableMappingPage.GetHeader();
-
-    for (int i = 0; i < 8; i++)
-        tableMappingPage.SetTableBlockMap(header.GetLastMappedPageIndex() + i, true);
-
-    header.SetLastMappedPageIndex(header.GetLastMappedPageIndex() + 8);
-    header.SetStartPageOffSet(tableMappingStartPosition + 8'000);
-
-    tableMappingPage.SetHeader(header);
-
-    TableMappingFileWriter tableMappinFireWriter(file, tableMappingStartPosition);
-    tableMappinFireWriter.SetAll(tableMappingPage);
+    AddTableMappingPage(file, tableMappingPage, tableMappingStartPosition);
 
     for (int i = 0; i < 8; i++)
     {
@@ -100,14 +88,7 @@ std::optional<Error> DatabaseRepository::CreateTableInDatabaseFile(std::string d
     }
 
     AddTableInMapping(file, databaseDefinition, tableMappingPage.GetHeader().GetTableId(), tableMappingStartPosition);
-    // AddPageFreeSpaceForANewTable();
-    auto pageFreeSpace = databaseDefinition.GetPageFreeSpace();
-    pageFreeSpace.AddFreePageValue(0); // tableMappingPage
-    for (int i = 0; i < 8; i++)
-        pageFreeSpace.AddFreePageValue(0);
-
-    PageFreeSpaceFileWriter pageFreeSpaceFileWriter(file);
-    pageFreeSpaceFileWriter.SetAll(pageFreeSpace);
+    AddPageFreeSpaceForANewTable(file, databaseDefinition);
 
     file.close();
 
@@ -137,6 +118,12 @@ void DatabaseRepository::AddTableInMapping(std::fstream &file, DatabaseDefinitio
             MappingFileWriter mappinFileWriter(file, nextFreePageOffSet);
             mappinFileWriter.SetAll(newMappingPage);
 
+            auto currentHeader = mapping.GetHeader();
+            currentHeader.SetNextPageOffSet(nextFreePageOffSet);
+            mapping.SetHeader(currentHeader);
+            MappingFileWriter currentMappinFileWriter(file, currentPageOffSet);
+            currentMappinFileWriter.SetAll(mapping);
+
             mapping = newMappingPage;
             mappingPageOffSet = nextFreePageOffSet;
         }
@@ -162,4 +149,78 @@ void DatabaseRepository::AddTableInMapping(std::fstream &file, DatabaseDefinitio
         MappingFileWriter mappinFileWriter(file, mappingPageOffSet);
         mappinFileWriter.SetAll(mapping);
     }
+}
+
+void DatabaseRepository::AddPageFreeSpaceForANewTable(std::fstream &file, DatabaseDefinition &databaseDefinition)
+{
+    auto pageFreeSpace = databaseDefinition.GetPageFreeSpace();
+    bool isRoot = true;
+    int pageFreeSpacePageOffSet = 0;
+    int currentPageOffSet = 96 + 8'000;
+    while (pageFreeSpace.IsFull())
+    {
+        isRoot = false;
+        int nextPageOffSet = pageFreeSpace.GetHeader().GetNextPageOffSet();
+        if (nextPageOffSet <= -1)
+        {
+            PageFreeSpacePage newFreeSpacePage;
+
+            auto header = PageFreeSpacePageHeader();
+            header.SetPreviousPageOffSet(currentPageOffSet);
+            newFreeSpacePage.SetHeader(header);
+
+            file.seekp(0, std::ios::end);
+            int nextFreePageOffSet = (int)file.tellp() + 1;
+            PageFreeSpaceFileWriter pageFreeSpaceFileWriter(file, nextFreePageOffSet);
+            pageFreeSpaceFileWriter.SetAll(newFreeSpacePage);
+
+            auto currentHeader = pageFreeSpace.GetHeader();
+            currentHeader.SetNextPageOffSet(nextFreePageOffSet);
+            pageFreeSpace.SetHeader(currentHeader);
+            PageFreeSpaceFileWriter currentPageFreeSpaceFileWriter(file, currentPageOffSet);
+            currentPageFreeSpaceFileWriter.SetAll(pageFreeSpace);
+
+            pageFreeSpace = newFreeSpacePage;
+            pageFreeSpacePageOffSet = nextFreePageOffSet;
+        }
+        else
+        {
+            pageFreeSpacePageOffSet = nextPageOffSet;
+            PageFreeSpaceFileReader pageFreeSpaceFileReader(file, nextPageOffSet);
+            pageFreeSpace = pageFreeSpaceFileReader.LoadAll()->Extract();
+        }
+
+        currentPageOffSet = nextPageOffSet;
+    }
+
+    pageFreeSpace.AddFreePageValue(0); // tableMappingPage
+    for (int i = 0; i < 8; i++)
+        pageFreeSpace.AddFreePageValue(0);
+
+    if (isRoot)
+    {
+        PageFreeSpaceFileWriter pageFreeSpaceFileWriter(file);
+        pageFreeSpaceFileWriter.SetAll(pageFreeSpace);
+    }
+    else
+    {
+        PageFreeSpaceFileWriter pageFreeSpaceFileWriter(file, pageFreeSpacePageOffSet);
+        pageFreeSpaceFileWriter.SetAll(pageFreeSpace);
+    }
+}
+
+void DatabaseRepository::AddTableMappingPage(std::fstream &file, TableMappingPage tableMappingPage, int tableMappingStartPosition)
+{
+    auto header = tableMappingPage.GetHeader();
+
+    for (int i = 0; i < 8; i++)
+        tableMappingPage.SetTableBlockMap(header.GetLastMappedPageIndex() + i, true);
+
+    header.SetLastMappedPageIndex(header.GetLastMappedPageIndex() + 8);
+    header.SetStartPageOffSet(tableMappingStartPosition + 8'000);
+
+    tableMappingPage.SetHeader(header);
+
+    TableMappingFileWriter tableMappinFireWriter(file, tableMappingStartPosition);
+    tableMappinFireWriter.SetAll(tableMappingPage);
 }

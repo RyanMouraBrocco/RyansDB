@@ -28,6 +28,7 @@ private:
 
     void AddTableInMapping(std::fstream &file, DatabaseDefinition &databaseDefinition, int tableId, int tableOffSet);
     void AddPageFreeSpaceForANewTable(std::fstream &file, DatabaseDefinition &databaseDefinition);
+    void AddTableMappingPage(std::fstream &file, TableMappingPage tableMappingPage, int tableMappingStartPosition);
 
 public:
     DatabaseRepository();
