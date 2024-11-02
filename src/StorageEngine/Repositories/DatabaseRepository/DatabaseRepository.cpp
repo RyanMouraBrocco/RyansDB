@@ -76,7 +76,8 @@ std::optional<Error> DatabaseRepository::CreateTableInDatabaseFile(std::string d
         return Error(ErrorType::Unexpected, "Error to fetch databasefile");
 
     file.seekp(0, std::ios::end);
-    int tableMappingStartPosition = (int)file.tellp() + 1;
+    int tableMappingStartPosition = (int)file.tellp();
+
     AddTableMappingPage(file, tableMappingPage, tableMappingStartPosition);
 
     for (int i = 0; i < 8; i++)
