@@ -7,12 +7,12 @@ PageFreeSpaceHeaderFileReader::PageFreeSpaceHeaderFileReader(std::fstream &fileR
 
 void PageFreeSpaceHeaderFileReader::FetchNextPageOffSet()
 {
-    r_fileReader.read(reinterpret_cast<char *>(p_pageFreeSpacePageHeader->GetNextPageOffSetRef()), sizeof(int));
+    r_fileReader.read(reinterpret_cast<char *>(p_pageFreeSpacePageHeader->GetNextPageOffSetPointer()), sizeof(int));
 }
 
 void PageFreeSpaceHeaderFileReader::FetchPreviousPageOffSet()
 {
-    r_fileReader.read(reinterpret_cast<char *>(p_pageFreeSpacePageHeader->GetPreviousPageOffSetRef()), sizeof(int));
+    r_fileReader.read(reinterpret_cast<char *>(p_pageFreeSpacePageHeader->GetPreviousPageOffSetPointer()), sizeof(int));
 }
 
 PageFreeSpaceHeaderFileReader *PageFreeSpaceHeaderFileReader::LoadNextPageOffSet()

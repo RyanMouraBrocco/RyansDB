@@ -10,11 +10,11 @@ TableMappingFileWriter::TableMappingFileWriter(std::fstream &fileWriter, int pag
 
 void TableMappingFileWriter::WriteHeader(TableMappingPageHeader &header)
 {
-    r_fileWriter.write(reinterpret_cast<char *>(header.GetTableIdRef()), sizeof(int));
-    r_fileWriter.write(reinterpret_cast<char *>(header.GetStartPageOffSetRef()), sizeof(int));
-    r_fileWriter.write(reinterpret_cast<char *>(header.GetNextPageOffSetRef()), sizeof(int));
-    r_fileWriter.write(reinterpret_cast<char *>(header.GetPreviousPageOffSetRef()), sizeof(int));
-    r_fileWriter.write(reinterpret_cast<char *>(header.GetLastMappedPageIndexRef()), sizeof(int));
+    r_fileWriter.write(reinterpret_cast<char *>(header.GetTableIdPointer()), sizeof(int));
+    r_fileWriter.write(reinterpret_cast<char *>(header.GetStartPageOffSetPointer()), sizeof(int));
+    r_fileWriter.write(reinterpret_cast<char *>(header.GetNextPageOffSetPointer()), sizeof(int));
+    r_fileWriter.write(reinterpret_cast<char *>(header.GetPreviousPageOffSetPointer()), sizeof(int));
+    r_fileWriter.write(reinterpret_cast<char *>(header.GetLastMappedPageIndexPointer()), sizeof(int));
 }
 
 void TableMappingFileWriter::SetHeader(TableMappingPageHeader &header)

@@ -17,19 +17,19 @@ public:
     TableMappingPageHeader();
     TableMappingPageHeader(int tableId);
     int GetTableId();
-    int *GetTableIdRef();
+    int *GetTableIdPointer();
     void SetTableId(int tableId);
     int GetStartPageOffSet();
-    int *GetStartPageOffSetRef();
+    int *GetStartPageOffSetPointer();
     void SetStartPageOffSet(int startPageOffSet);
     int GetNextPageOffSet();
-    int *GetNextPageOffSetRef();
+    int *GetNextPageOffSetPointer();
     void SetNextPageOffSet(int nextPageOffSet);
     int GetPreviousPageOffSet();
-    int *GetPreviousPageOffSetRef();
+    int *GetPreviousPageOffSetPointer();
     void SetPreviousPageOffSet(int previousPageOffSet);
     int GetLastMappedPageIndex();
-    int *GetLastMappedPageIndexRef();
+    int *GetLastMappedPageIndexPointer();
     void SetLastMappedPageIndex(int lastMappedPageIndex);
 };
 
@@ -43,6 +43,7 @@ public:
     TableMappingPage();
     TableMappingPage(int tableId);
     TableMappingPageHeader GetHeader();
+    TableMappingPageHeader &GetHeaderRef();
     void SetHeader(TableMappingPageHeader header);
     void SetTableBlockMap(unsigned int blockPosition, bool belongs);
     int GetTableBlockMapSize();

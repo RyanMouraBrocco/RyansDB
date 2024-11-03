@@ -11,7 +11,7 @@ int PageFreeSpacePageHeader::GetNextPageOffSet()
     return m_nextPageOffSet;
 }
 
-int *PageFreeSpacePageHeader::GetNextPageOffSetRef()
+int *PageFreeSpacePageHeader::GetNextPageOffSetPointer()
 {
     return &m_nextPageOffSet;
 }
@@ -26,7 +26,7 @@ int PageFreeSpacePageHeader::GetPreviousPageOffset()
     return m_previousPageOffSet;
 }
 
-int *PageFreeSpacePageHeader::GetPreviousPageOffSetRef()
+int *PageFreeSpacePageHeader::GetPreviousPageOffSetPointer()
 {
     return &m_previousPageOffSet;
 }
@@ -41,6 +41,11 @@ PageFreeSpacePage::PageFreeSpacePage()
 }
 
 PageFreeSpacePageHeader PageFreeSpacePage::GetHeader()
+{
+    return m_header;
+}
+
+PageFreeSpacePageHeader &PageFreeSpacePage::GetHeaderRef()
 {
     return m_header;
 }
@@ -60,7 +65,7 @@ unsigned char PageFreeSpacePage::GetFreePage(int index)
     return m_freePages[index];
 }
 
-unsigned char *PageFreeSpacePage::GetFreePageRef(int index)
+unsigned char *PageFreeSpacePage::GetFreePagePointer(int index)
 {
     return &m_freePages[index];
 }

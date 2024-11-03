@@ -13,7 +13,7 @@ int DataPageHeader::GetPageId()
     return m_pageId;
 }
 
-int *DataPageHeader::GetPageIdRef()
+int *DataPageHeader::GetPageIdPointer()
 {
     return &m_pageId;
 }
@@ -28,7 +28,7 @@ int DataPageHeader::GetPageLength()
     return m_pageLength;
 }
 
-int *DataPageHeader::GetPageLengthRef()
+int *DataPageHeader::GetPageLengthPointer()
 {
     return &m_pageLength;
 }
@@ -43,7 +43,7 @@ int DataPageHeader::GetTableId()
     return m_tableId;
 }
 
-int *DataPageHeader::GetTableIdRef()
+int *DataPageHeader::GetTableIdPointer()
 {
     return &m_tableId;
 }
@@ -71,7 +71,7 @@ DataPageHeader DataPage::GetHeader()
     return m_header;
 }
 
-DataPageHeader *DataPage::GetHeaderRef()
+DataPageHeader &DataPage::GetHeaderRef()
 {
-    return &m_header;
+    return m_header;
 }

@@ -7,12 +7,12 @@ MappingHeaderFileReader::MappingHeaderFileReader(std::fstream &fileReader, int p
 
 void MappingHeaderFileReader::FetchNextPageOffSet()
 {
-    r_fileReader.read(reinterpret_cast<char *>(p_mappingPageHeader->GetNextPageOffSetRef()), sizeof(int));
+    r_fileReader.read(reinterpret_cast<char *>(p_mappingPageHeader->GetNextPageOffSetPointer()), sizeof(int));
 }
 
 void MappingHeaderFileReader::FetchPreviousPageOffSet()
 {
-    r_fileReader.read(reinterpret_cast<char *>(p_mappingPageHeader->GetPreviousPageOffSetRef()), sizeof(int));
+    r_fileReader.read(reinterpret_cast<char *>(p_mappingPageHeader->GetPreviousPageOffSetPointer()), sizeof(int));
 }
 
 MappingHeaderFileReader *MappingHeaderFileReader::LoadNextPageOffSet()

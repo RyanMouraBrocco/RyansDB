@@ -11,7 +11,7 @@ int MappingPageHeader::GetNextPageOffSet()
     return m_nextPageOffSet;
 }
 
-int *MappingPageHeader::GetNextPageOffSetRef()
+int *MappingPageHeader::GetNextPageOffSetPointer()
 {
     return &m_nextPageOffSet;
 }
@@ -26,7 +26,7 @@ int MappingPageHeader::GetPreviousPageOffSet()
     return m_previousPageOffSet;
 }
 
-int *MappingPageHeader::GetPreviousPageOffSetRef()
+int *MappingPageHeader::GetPreviousPageOffSetPointer()
 {
     return &m_previousPageOffSet;
 }
@@ -45,6 +45,11 @@ MappingPageHeader MappingPage::GetHeader()
     return m_header;
 }
 
+MappingPageHeader &MappingPage::GetHeaderRef()
+{
+    return m_header;
+}
+
 void MappingPage::SetHeader(MappingPageHeader header)
 {
     m_header = header;
@@ -55,12 +60,12 @@ int MappingPage::GetTablesMapSize()
     return m_tableIds.size();
 }
 
-int *MappingPage::GetTableIdRefByIndex(int index)
+int *MappingPage::GetTableIdPointerByIndex(int index)
 {
     return &m_tableIds[index];
 }
 
-int *MappingPage::GetTableOffSetRefByIndex(int index)
+int *MappingPage::GetTableOffSetPointerByIndex(int index)
 {
     return &m_tableOffSets[index];
 }

@@ -10,8 +10,8 @@ MappingFileWriter::MappingFileWriter(std::fstream &fileWriter, int pageOffSet) :
 
 void MappingFileWriter::WriteHeader(MappingPageHeader &header)
 {
-    r_fileWriter.write(reinterpret_cast<char *>(header.GetNextPageOffSetRef()), sizeof(int));
-    r_fileWriter.write(reinterpret_cast<char *>(header.GetPreviousPageOffSetRef()), sizeof(int));
+    r_fileWriter.write(reinterpret_cast<char *>(header.GetNextPageOffSetPointer()), sizeof(int));
+    r_fileWriter.write(reinterpret_cast<char *>(header.GetPreviousPageOffSetPointer()), sizeof(int));
 }
 
 void MappingFileWriter::SetHeader(MappingPageHeader &header)
@@ -31,7 +31,7 @@ void MappingFileWriter::SetAll(MappingPage &mappingPage)
 
     for (short i = 0; i < tableIdsLength; i++)
     {
-        r_fileWriter.write(reinterpret_cast<char *>(mappingPage.GetTableIdRefByIndex(i)), sizeof(int));
+        r_fileWriter.write(reinterpret_cast<char *>(mappingPage.GetTableIdPointerByIndex(i)), sizeof(int));
     }
 
     if (!mappingPage.IsFull())
@@ -44,7 +44,7 @@ void MappingFileWriter::SetAll(MappingPage &mappingPage)
 
     for (short i = 0; i < tableIdsLength; i++)
     {
-        r_fileWriter.write(reinterpret_cast<char *>(mappingPage.GetTableOffSetRefByIndex(i)), sizeof(int));
+        r_fileWriter.write(reinterpret_cast<char *>(mappingPage.GetTableOffSetPointerByIndex(i)), sizeof(int));
     }
 
     if (!mappingPage.IsFull())

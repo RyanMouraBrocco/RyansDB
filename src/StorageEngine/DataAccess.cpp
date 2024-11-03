@@ -42,9 +42,9 @@ std::optional<Error> DataAccess::CreateTableInDatabaseFile(std::string databaseN
     std::shared_ptr<DataPage> dataPageBlock(new DataPage[8], std::default_delete<DataPage[]>());
     for (int i = 0; i < 8; i++)
     {
-        dataPageBlock.get()[i].GetHeaderRef()->SetPageId(i + 1);
-        dataPageBlock.get()[i].GetHeaderRef()->SetPageLength(0);
-        dataPageBlock.get()[i].GetHeaderRef()->SetTableId(tableId);
+        dataPageBlock.get()[i].GetHeaderRef().SetPageId(i + 1);
+        dataPageBlock.get()[i].GetHeaderRef().SetPageLength(0);
+        dataPageBlock.get()[i].GetHeaderRef().SetTableId(tableId);
     }
 
     return m_databaseRepository.CreateTableInDatabaseFile(databaseName, tablePage, dataPageBlock);

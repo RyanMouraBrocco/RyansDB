@@ -10,8 +10,8 @@ PageFreeSpaceFileWriter::PageFreeSpaceFileWriter(std::fstream &fileWriter, int p
 
 void PageFreeSpaceFileWriter::WriteHeader(PageFreeSpacePageHeader &header)
 {
-    r_fileWriter.write(reinterpret_cast<char *>(header.GetNextPageOffSetRef()), sizeof(int));
-    r_fileWriter.write(reinterpret_cast<char *>(header.GetPreviousPageOffSetRef()), sizeof(int));
+    r_fileWriter.write(reinterpret_cast<char *>(header.GetNextPageOffSetPointer()), sizeof(int));
+    r_fileWriter.write(reinterpret_cast<char *>(header.GetPreviousPageOffSetPointer()), sizeof(int));
 }
 
 void PageFreeSpaceFileWriter::SetHeader(PageFreeSpacePageHeader &header)
@@ -32,7 +32,7 @@ void PageFreeSpaceFileWriter::SetAll(PageFreeSpacePage &pageFreeSpace)
 
     for (short i = 0; i < freePageSize; i++)
     {
-        r_fileWriter.write(reinterpret_cast<char *>(pageFreeSpace.GetFreePageRef(i)), sizeof(unsigned char));
+        r_fileWriter.write(reinterpret_cast<char *>(pageFreeSpace.GetFreePagePointer(i)), sizeof(unsigned char));
     }
 
     if (!pageFreeSpace.IsFull())

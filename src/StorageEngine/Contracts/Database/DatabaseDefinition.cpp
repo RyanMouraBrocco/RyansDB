@@ -31,12 +31,12 @@ int DatabaseHeader::GetId()
     return m_id;
 }
 
-int *DatabaseHeader::GetIdRef()
+int *DatabaseHeader::GetIdPointer()
 {
     return &m_id;
 }
 
-char *DatabaseHeader::GetDatabaseNameRef()
+char *DatabaseHeader::GetDatabaseNamePointer()
 {
     return m_databaseName;
 }
@@ -46,7 +46,7 @@ int DatabaseHeader::GetFileLength()
     return m_fileLength;
 }
 
-int *DatabaseHeader::GetFileLengthRef()
+int *DatabaseHeader::GetFileLengthPointer()
 {
     return &m_fileLength;
 }
@@ -65,6 +65,11 @@ DatabaseDefinition::DatabaseDefinition(DatabaseHeader header, MappingPage tableM
 }
 
 DatabaseHeader DatabaseDefinition::GetHeader()
+{
+    return m_header;
+}
+
+DatabaseHeader &DatabaseDefinition::GetHeaderRef()
 {
     return m_header;
 }

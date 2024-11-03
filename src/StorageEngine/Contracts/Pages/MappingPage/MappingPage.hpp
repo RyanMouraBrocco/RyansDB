@@ -13,10 +13,10 @@ private:
 public:
     MappingPageHeader();
     int GetNextPageOffSet();
-    int *GetNextPageOffSetRef();
+    int *GetNextPageOffSetPointer();
     void SetNextPageOffSet(int nextPageOffSet);
     int GetPreviousPageOffSet();
-    int *GetPreviousPageOffSetRef();
+    int *GetPreviousPageOffSetPointer();
     void SetPreviousPageOffSet(int previousPageOffSet);
 };
 
@@ -30,10 +30,11 @@ private:
 public:
     MappingPage();
     MappingPageHeader GetHeader();
+    MappingPageHeader &GetHeaderRef();
     void SetHeader(MappingPageHeader header);
     int GetTablesMapSize();
-    int *GetTableIdRefByIndex(int index);
-    int *GetTableOffSetRefByIndex(int index);
+    int *GetTableIdPointerByIndex(int index);
+    int *GetTableOffSetPointerByIndex(int index);
     void AddTableId(int tableId);
     void AddTableOffSet(int offSet);
     bool IsFull();

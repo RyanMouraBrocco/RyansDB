@@ -21,7 +21,7 @@ int TableMappingPageHeader::GetTableId()
     return m_tableId;
 }
 
-int *TableMappingPageHeader::GetTableIdRef()
+int *TableMappingPageHeader::GetTableIdPointer()
 {
     return &m_tableId;
 }
@@ -36,7 +36,7 @@ int TableMappingPageHeader::GetStartPageOffSet()
     return m_startPageOffSet;
 }
 
-int *TableMappingPageHeader::GetStartPageOffSetRef()
+int *TableMappingPageHeader::GetStartPageOffSetPointer()
 {
     return &m_startPageOffSet;
 }
@@ -51,7 +51,7 @@ int TableMappingPageHeader::GetNextPageOffSet()
     return m_nextPageOffSet;
 }
 
-int *TableMappingPageHeader::GetNextPageOffSetRef()
+int *TableMappingPageHeader::GetNextPageOffSetPointer()
 {
     return &m_nextPageOffSet;
 }
@@ -66,7 +66,7 @@ int TableMappingPageHeader::GetPreviousPageOffSet()
     return m_previousPageOffSet;
 }
 
-int *TableMappingPageHeader::GetPreviousPageOffSetRef()
+int *TableMappingPageHeader::GetPreviousPageOffSetPointer()
 {
     return &m_previousPageOffSet;
 }
@@ -81,7 +81,7 @@ int TableMappingPageHeader::GetLastMappedPageIndex()
     return m_lastMappedPageIndex;
 }
 
-int *TableMappingPageHeader::GetLastMappedPageIndexRef()
+int *TableMappingPageHeader::GetLastMappedPageIndexPointer()
 {
     return &m_lastMappedPageIndex;
 }
@@ -101,6 +101,11 @@ TableMappingPage::TableMappingPage(int tableId)
 }
 
 TableMappingPageHeader TableMappingPage::GetHeader()
+{
+    return m_header;
+}
+
+TableMappingPageHeader &TableMappingPage::GetHeaderRef()
 {
     return m_header;
 }

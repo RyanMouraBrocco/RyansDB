@@ -25,9 +25,9 @@ void DatabaseHeaderFileWriter::SetFileLength(int *fileLength)
 void DatabaseHeaderFileWriter::SetAll(DatabaseHeader &header)
 {
     r_fileWriter.seekp(0, std::ios::beg);
-    r_fileWriter.write(reinterpret_cast<char *>(header.GetIdRef()), sizeof(int));
-    r_fileWriter.write(header.GetDatabaseNameRef(), 50 * sizeof(char));
-    r_fileWriter.write(reinterpret_cast<char *>(header.GetFileLengthRef()), sizeof(int));
+    r_fileWriter.write(reinterpret_cast<char *>(header.GetIdPointer()), sizeof(int));
+    r_fileWriter.write(header.GetDatabaseNamePointer(), 50 * sizeof(char));
+    r_fileWriter.write(reinterpret_cast<char *>(header.GetFileLengthPointer()), sizeof(int));
 
     r_fileWriter.seekp(95, std::ios::beg);
     r_fileWriter.write("\0", 1);

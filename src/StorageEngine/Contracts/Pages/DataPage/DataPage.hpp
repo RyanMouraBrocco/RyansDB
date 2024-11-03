@@ -13,13 +13,13 @@ public:
     DataPageHeader();
     DataPageHeader(int pageId, int pageLength, int tableId);
     int GetPageId();
-    int *GetPageIdRef();
+    int *GetPageIdPointer();
     void SetPageId(int pageId);
     int GetPageLength();
-    int *GetPageLengthRef();
+    int *GetPageLengthPointer();
     void SetPageLength(int pageLength);
     int GetTableId();
-    int *GetTableIdRef();
+    int *GetTableIdPointer();
     void SetTableId(int tableId);
 };
 
@@ -49,5 +49,5 @@ public:
     DataPage();
     DataPage(int pageId, int pageLength, int tableId);
     DataPageHeader GetHeader();
-    DataPageHeader *GetHeaderRef();
+    DataPageHeader &GetHeaderRef();
 };

@@ -14,10 +14,10 @@ public:
     PageFreeSpacePageHeader();
 
     int GetNextPageOffSet();
-    int *GetNextPageOffSetRef();
+    int *GetNextPageOffSetPointer();
     void SetNextPageOffSet(int nextPageOffSet);
     int GetPreviousPageOffset();
-    int *GetPreviousPageOffSetRef();
+    int *GetPreviousPageOffSetPointer();
     void SetPreviousPageOffSet(int previousPageOffSet);
 };
 
@@ -30,10 +30,11 @@ private:
 public:
     PageFreeSpacePage();
     PageFreeSpacePageHeader GetHeader();
+    PageFreeSpacePageHeader &GetHeaderRef();
     void SetHeader(PageFreeSpacePageHeader header);
     int GetFreePageSize();
     unsigned char GetFreePage(int index);
-    unsigned char *GetFreePageRef(int index);
+    unsigned char *GetFreePagePointer(int index);
     void AddFreePageValue(unsigned char value);
     bool IsFull();
 };

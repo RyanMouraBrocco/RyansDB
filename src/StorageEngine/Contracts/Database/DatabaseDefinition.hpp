@@ -17,10 +17,10 @@ public:
     DatabaseHeader(int id, std::string databaseName, int fileLength);
 
     int GetId();
-    int *GetIdRef();
-    char *GetDatabaseNameRef();
+    int *GetIdPointer();
+    char *GetDatabaseNamePointer();
     int GetFileLength();
-    int *GetFileLengthRef();
+    int *GetFileLengthPointer();
 };
 
 class DatabaseDefinition
@@ -36,6 +36,7 @@ public:
     DatabaseDefinition(DatabaseHeader header, MappingPage tableMapping, PageFreeSpacePage pageFreeSpace);
 
     DatabaseHeader GetHeader();
+    DatabaseHeader &GetHeaderRef();
     void SetHeader(DatabaseHeader header);
     MappingPage GetTableMappingPage();
     void SetTableMappingPage(MappingPage mappingPage);

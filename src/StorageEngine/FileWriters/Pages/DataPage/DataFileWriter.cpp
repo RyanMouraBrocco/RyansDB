@@ -10,9 +10,9 @@ DataFileWriter::DataFileWriter(std::fstream &fileWriter, int pageOffSet) : r_fil
 
 void DataFileWriter::WriteHeader(DataPageHeader &header)
 {
-    r_fileWriter.write(reinterpret_cast<char *>(header.GetPageIdRef()), sizeof(int));
-    r_fileWriter.write(reinterpret_cast<char *>(header.GetPageLengthRef()), sizeof(int));
-    r_fileWriter.write(reinterpret_cast<char *>(header.GetTableIdRef()), sizeof(int));
+    r_fileWriter.write(reinterpret_cast<char *>(header.GetPageIdPointer()), sizeof(int));
+    r_fileWriter.write(reinterpret_cast<char *>(header.GetPageLengthPointer()), sizeof(int));
+    r_fileWriter.write(reinterpret_cast<char *>(header.GetTableIdPointer()), sizeof(int));
 }
 
 void DataFileWriter::SetHeader(DataPageHeader &header)

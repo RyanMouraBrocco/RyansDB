@@ -7,17 +7,17 @@ DatabaseHeaderFileReader::DatabaseHeaderFileReader(std::fstream &fileReader) : r
 
 void DatabaseHeaderFileReader::FetchId()
 {
-    r_fileReader.read(reinterpret_cast<char *>(p_databaseHeader->GetIdRef()), sizeof(int));
+    r_fileReader.read(reinterpret_cast<char *>(p_databaseHeader->GetIdPointer()), sizeof(int));
 }
 
 void DatabaseHeaderFileReader::FetchDatabaseName()
 {
-    r_fileReader.read(p_databaseHeader->GetDatabaseNameRef(), 50 * sizeof(char));
+    r_fileReader.read(p_databaseHeader->GetDatabaseNamePointer(), 50 * sizeof(char));
 }
 
 void DatabaseHeaderFileReader::FetchFileLength()
 {
-    r_fileReader.read(reinterpret_cast<char *>(p_databaseHeader->GetFileLengthRef()), sizeof(int));
+    r_fileReader.read(reinterpret_cast<char *>(p_databaseHeader->GetFileLengthPointer()), sizeof(int));
 }
 
 DatabaseHeaderFileReader *DatabaseHeaderFileReader::LoadId()
