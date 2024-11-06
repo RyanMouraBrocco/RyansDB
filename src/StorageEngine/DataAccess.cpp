@@ -1,15 +1,17 @@
 #include "DataAccess.hpp"
 
+int DataAccess::CalcIdFromName(std::string name)
+{
+    std::hash<std::string> hasher;
+    return hasher(name);
+}
+
 std::optional<Error> DataAccess::CreateDatabaseFile(std::string name)
 {
     if (m_databaseRepository.ExistsDatabase(name))
         return Error(ErrorType::Unexpected, "Database already exists");
 
-    int databaseId = 0;
-    for (int i = 0; i < name.length(); i++)
-    {
-        databaseId += name[i];
-    }
+    int databaseId = CalcIdFromName(name);
 
     DatabaseDefinition databaseDefinition(databaseId, name, 16'000 + 96);
     return m_databaseRepository.CreateDatabaseFile(databaseDefinition);
@@ -28,14 +30,11 @@ std::optional<Error> DataAccess::CreateTableInDatabaseFile(std::string databaseN
     if (!m_databaseRepository.ExistsDatabase(databaseName))
         return Error(ErrorType::Unexpected, "Database does not exist");
 
-    if (m_databaseRepository.ExistsTableInDatabase(databaseName, tableName))
-        return Error(ErrorType::Unexpected, "Table already exists");
+    int tableId = CalcIdFromName(tableName);
 
-    int tableId = 0;
-    for (int i = 0; i < tableName.length(); i++)
-    {
-        tableId += tableName[i];
-    }
+    auto existsResult = m_databaseRepository.ExistsTableInDatabase(databaseName, tableId);
+    if (std::holds_alternative<Error>(existsResult) || std::get<bool>(existsResult))
+        return Error(ErrorType::Unexpected, "Table already exists");
 
     TableMappingPage tablePage(tableId);
 

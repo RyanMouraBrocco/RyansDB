@@ -8,6 +8,7 @@
 #include "optional"
 #include "string"
 #include <cstdlib>
+#include <functional> 
 
 struct TableColumnDefinition
 {
@@ -26,6 +27,8 @@ class DataAccess
 {
 private:
     DatabaseRepository m_databaseRepository;
+
+    int CalcIdFromName(std::string name);
 
 public:
     std::optional<Error> CreateDatabaseFile(std::string name);

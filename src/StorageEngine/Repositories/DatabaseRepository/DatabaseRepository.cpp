@@ -43,9 +43,38 @@ bool DatabaseRepository::ExistsDatabase(std::string name)
     return fileReader.good();
 }
 
-bool DatabaseRepository::ExistsTableInDatabase(std::string databaseName, std::string tableName)
+std::variant<bool, Error> DatabaseRepository::ExistsTableInDatabase(std::string databaseName, int tableId)
 {
-    return false;
+    std::fstream fileReader(m_databasePath + "/" + databaseName + m_databaseExtension, std::ios::binary | std::ios::in);
+
+    if (!fileReader.is_open())
+        return Error(ErrorType::Unexpected, "Error to generate databasefile");
+
+    DatabaseFileReader databaseFileReader(fileReader);
+    auto databaseFileDef = databaseFileReader.LoadMappingPage()->Extract();
+    MappingPage &mappingPage = databaseFileDef.GetTableMappingPageRef();
+    bool exists = false;
+    while (!exists)
+    {
+        for (int i = 0; i < mappingPage.GetTablesMapSize(); i++)
+        {
+            if (mappingPage.GetTableIdByIndex(i) == tableId)
+            {
+                exists = true;
+            }
+        }
+
+        auto nextPage = mappingPage.GetHeaderRef().GetNextPageOffSet();
+        if (!mappingPage.IsFull() || nextPage == -1)
+            break;
+
+        MappingFileReader mappingPageFileReader(fileReader, nextPage);
+        mappingPage = mappingPageFileReader.LoadAll()->Extract();
+    }
+
+    fileReader.close();
+
+    return exists;
 }
 
 std::optional<Error> DatabaseRepository::DropDatabaseFile(std::string name)

@@ -33,7 +33,7 @@ private:
 public:
     DatabaseRepository();
     bool ExistsDatabase(std::string name);
-    bool ExistsTableInDatabase(std::string databaseName, std::string tableName);
+    std::variant<bool, Error> ExistsTableInDatabase(std::string databaseName, int tableId);
     std::optional<Error> CreateDatabaseFile(DatabaseDefinition databaseDef);
     std::optional<Error> DropDatabaseFile(std::string name);
     std::optional<Error> CreateTableInDatabaseFile(std::string databaseName, TableMappingPage tableMappingPage, std::shared_ptr<DataPage> dataPageBlock);

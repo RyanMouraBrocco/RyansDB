@@ -65,6 +65,11 @@ int *MappingPage::GetTableIdPointerByIndex(int index)
     return &m_tableIds[index];
 }
 
+int MappingPage::GetTableIdByIndex(int index)
+{
+    return m_tableIds[index];
+}
+
 int *MappingPage::GetTableOffSetPointerByIndex(int index)
 {
     return &m_tableOffSets[index];

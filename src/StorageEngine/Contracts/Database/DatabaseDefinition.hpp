@@ -39,7 +39,9 @@ public:
     DatabaseHeader &GetHeaderRef();
     void SetHeader(DatabaseHeader header);
     MappingPage GetTableMappingPage();
+    MappingPage &GetTableMappingPageRef();
     void SetTableMappingPage(MappingPage mappingPage);
     PageFreeSpacePage GetPageFreeSpace();
+    PageFreeSpacePage &GetPageFreeSpaceRef();
     void SetPageFreeSpace(PageFreeSpacePage pageFreeSpace);
 };

@@ -84,12 +84,22 @@ MappingPage DatabaseDefinition::GetTableMappingPage()
     return m_tableMapping;
 }
 
+MappingPage &DatabaseDefinition::GetTableMappingPageRef()
+{
+    return m_tableMapping;
+}
+
 void DatabaseDefinition::SetTableMappingPage(MappingPage mappingPage)
 {
     m_tableMapping = mappingPage;
 }
 
 PageFreeSpacePage DatabaseDefinition::GetPageFreeSpace()
+{
+    return m_pageFreeSpace;
+}
+
+PageFreeSpacePage &DatabaseDefinition::GetPageFreeSpaceRef()
 {
     return m_pageFreeSpace;
 }

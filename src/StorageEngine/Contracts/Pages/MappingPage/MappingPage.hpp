@@ -34,6 +34,7 @@ public:
     void SetHeader(MappingPageHeader header);
     int GetTablesMapSize();
     int *GetTableIdPointerByIndex(int index);
+    int GetTableIdByIndex(int index);
     int *GetTableOffSetPointerByIndex(int index);
     void AddTableId(int tableId);
     void AddTableOffSet(int offSet);
