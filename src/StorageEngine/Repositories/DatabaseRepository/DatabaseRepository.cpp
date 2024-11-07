@@ -126,21 +126,39 @@ std::optional<Error> DatabaseRepository::CreateTableInDatabaseFile(std::string d
 
 void DatabaseRepository::AddTableInMapping(std::fstream &file, DatabaseDefinition &databaseDefinition, int tableId, int tableOffSet)
 {
+    auto [mappingPageOffSet, mapping] = CreateIfNotExistsLastMappingPage(file, databaseDefinition);
+    mapping.AddTableId(tableId);
+    mapping.AddTableOffSet(tableOffSet);
+    MappingFileWriter mappinFileWriter(file, mappingPageOffSet);
+    mappinFileWriter.SetAll(mapping);
+}
+
+std::tuple<int, MappingPage> DatabaseRepository::CreateIfNotExistsLastMappingPage(std::fstream &file, DatabaseDefinition &databaseDefinition)
+{
     MappingPage mapping = databaseDefinition.GetTableMappingPage();
-    bool isRoot = true;
-    int mappingPageOffSet = 0;
     int currentPageOffSet = 96;
     while (mapping.IsFull())
     {
-        isRoot = false;
         int nextPageOffSet = mapping.GetHeaderRef().GetNextPageOffSet();
-        if (nextPageOffSet <= -1)
+        if (nextPageOffSet > -1)
         {
+            MappingFileReader mappingFileReader(file, nextPageOffSet);
+            mapping = mappingFileReader.LoadAll()->Extract();
+            currentPageOffSet = nextPageOffSet;
+        }
+        else
+        {
+            auto [pageFreeSpacePageOffSet, pageFreeSpace] = CreateIfNotExistsLastPageFreeSpacePage(file, databaseDefinition);
+            pageFreeSpace.AddFreePageValue(0);
+            PageFreeSpaceFileWriter pageFreeSpaceFileWriter(file, pageFreeSpacePageOffSet);
+            pageFreeSpaceFileWriter.SetAll(pageFreeSpace);
+
             MappingPage newMappingPage;
             newMappingPage.GetHeaderRef().SetPreviousPageOffSet(currentPageOffSet);
 
             file.seekp(0, std::ios::end);
             int nextFreePageOffSet = (int)file.tellp();
+
             MappingFileWriter mappinFileWriter(file, nextFreePageOffSet);
             mappinFileWriter.SetAll(newMappingPage);
 
@@ -149,104 +167,73 @@ void DatabaseRepository::AddTableInMapping(std::fstream &file, DatabaseDefinitio
             currentMappinFileWriter.SetAll(mapping);
 
             mapping = newMappingPage;
-            mappingPageOffSet = nextFreePageOffSet;
+            currentPageOffSet = nextFreePageOffSet;
         }
-        else
-        {
-            mappingPageOffSet = nextPageOffSet;
-            MappingFileReader mappingFileReader(file, nextPageOffSet);
-            mapping = mappingFileReader.LoadAll()->Extract();
-        }
-
-        currentPageOffSet = nextPageOffSet;
     }
 
-    mapping.AddTableId(tableId);
-    mapping.AddTableOffSet(tableOffSet);
-    if (isRoot)
-    {
-        MappingFileWriter mappinFileWriter(file);
-        mappinFileWriter.SetAll(mapping);
-    }
-    else
-    {
-        MappingFileWriter mappinFileWriter(file, mappingPageOffSet);
-        mappinFileWriter.SetAll(mapping);
-    }
+    return std::tuple<int, MappingPage>(currentPageOffSet, mapping);
 }
 
 void DatabaseRepository::AddPageFreeSpaceForANewTable(std::fstream &file, DatabaseDefinition &databaseDefinition)
 {
-    auto pageFreeSpace = databaseDefinition.GetPageFreeSpace();
-    bool isRoot = true;
-    int pageFreeSpacePageOffSet = 0;
-    int currentPageOffSet = 96 + 8'000;
-    while (pageFreeSpace.IsFull())
-    {
-        isRoot = false;
-        int nextPageOffSet = pageFreeSpace.GetHeaderRef().GetNextPageOffSet();
-        if (nextPageOffSet <= -1)
-        {
-            PageFreeSpacePage newFreeSpacePage;
-            newFreeSpacePage.GetHeaderRef().SetPreviousPageOffSet(currentPageOffSet);
-
-            file.seekp(0, std::ios::end);
-            int nextFreePageOffSet = (int)file.tellp();
-            PageFreeSpaceFileWriter pageFreeSpaceFileWriter(file, nextFreePageOffSet);
-            pageFreeSpaceFileWriter.SetAll(newFreeSpacePage);
-
-            pageFreeSpace.GetHeaderRef().SetNextPageOffSet(nextFreePageOffSet);
-            PageFreeSpaceFileWriter currentPageFreeSpaceFileWriter(file, currentPageOffSet);
-            currentPageFreeSpaceFileWriter.SetAll(pageFreeSpace);
-
-            pageFreeSpace = newFreeSpacePage;
-            pageFreeSpacePageOffSet = nextFreePageOffSet;
-            nextPageOffSet = nextFreePageOffSet;
-        }
-        else
-        {
-            pageFreeSpacePageOffSet = nextPageOffSet;
-            PageFreeSpaceFileReader pageFreeSpaceFileReader(file, nextPageOffSet);
-            pageFreeSpace = pageFreeSpaceFileReader.LoadAll()->Extract();
-        }
-        currentPageOffSet = nextPageOffSet;
-    }
-
+    auto [pageFreeSpacePageOffSet, pageFreeSpace] = CreateIfNotExistsLastPageFreeSpacePage(file, databaseDefinition);
     pageFreeSpace.AddFreePageValue(0); // tableMappingPage
+
     for (int i = 0; i < 8; i++)
     {
         if (pageFreeSpace.IsFull())
         {
-            isRoot = false;
-            PageFreeSpacePage newFreeSpacePage;
-            newFreeSpacePage.GetHeaderRef().SetPreviousPageOffSet(currentPageOffSet);
-
-            file.seekp(0, std::ios::end);
-            int nextFreePageOffSet = (int)file.tellp();
-            PageFreeSpaceFileWriter pageFreeSpaceFileWriter(file, nextFreePageOffSet);
-            pageFreeSpaceFileWriter.SetAll(newFreeSpacePage);
-
-            pageFreeSpace.GetHeaderRef().SetNextPageOffSet(nextFreePageOffSet);
-            PageFreeSpaceFileWriter currentPageFreeSpaceFileWriter(file, currentPageOffSet);
-            currentPageFreeSpaceFileWriter.SetAll(pageFreeSpace);
-
-            pageFreeSpace = newFreeSpacePage;
-            pageFreeSpacePageOffSet = nextFreePageOffSet;
+            PageFreeSpaceFileWriter pageFreeSpaceFileWriter(file, pageFreeSpacePageOffSet);
+            pageFreeSpaceFileWriter.SetAll(pageFreeSpace);
+            std::tie(pageFreeSpacePageOffSet, pageFreeSpace) = CreateInBackNewPageFreeSpace(file, pageFreeSpace, pageFreeSpacePageOffSet);
         }
 
         pageFreeSpace.AddFreePageValue(0);
     }
 
-    if (isRoot)
+    PageFreeSpaceFileWriter pageFreeSpaceFileWriter(file, pageFreeSpacePageOffSet);
+    pageFreeSpaceFileWriter.SetAll(pageFreeSpace);
+}
+
+std::tuple<int, PageFreeSpacePage> DatabaseRepository::CreateIfNotExistsLastPageFreeSpacePage(std::fstream &file, DatabaseDefinition &databaseDefinition)
+{
+    auto pageFreeSpace = databaseDefinition.GetPageFreeSpace();
+    int currentPageOffSet = 96 + 8'000;
+    while (pageFreeSpace.IsFull())
     {
-        PageFreeSpaceFileWriter pageFreeSpaceFileWriter(file);
-        pageFreeSpaceFileWriter.SetAll(pageFreeSpace);
+        int nextPageOffSet = pageFreeSpace.GetHeaderRef().GetNextPageOffSet();
+        if (nextPageOffSet > -1)
+        {
+            PageFreeSpaceFileReader pageFreeSpaceFileReader(file, nextPageOffSet);
+            pageFreeSpace = pageFreeSpaceFileReader.LoadAll()->Extract();
+            currentPageOffSet = nextPageOffSet;
+        }
+        else
+        {
+            auto [nextFreePageOffSet, newFreeSpacePage] = CreateInBackNewPageFreeSpace(file, pageFreeSpace, currentPageOffSet);
+            pageFreeSpace = newFreeSpacePage;
+            currentPageOffSet = nextFreePageOffSet;
+        }
     }
-    else
-    {
-        PageFreeSpaceFileWriter pageFreeSpaceFileWriter(file, pageFreeSpacePageOffSet);
-        pageFreeSpaceFileWriter.SetAll(pageFreeSpace);
-    }
+
+    return std::tuple<int, PageFreeSpacePage>(currentPageOffSet, pageFreeSpace);
+}
+
+std::tuple<int, PageFreeSpacePage> DatabaseRepository::CreateInBackNewPageFreeSpace(std::fstream &file, PageFreeSpacePage &currentPage, int currentPageOffSet)
+{
+    PageFreeSpacePage newFreeSpacePage;
+    newFreeSpacePage.GetHeaderRef().SetPreviousPageOffSet(currentPageOffSet);
+
+    file.seekp(0, std::ios::end);
+    int nextFreePageOffSet = (int)file.tellp();
+    PageFreeSpaceFileWriter pageFreeSpaceFileWriter(file, nextFreePageOffSet);
+    pageFreeSpaceFileWriter.SetAll(newFreeSpacePage);
+
+    currentPage.GetHeaderRef().SetNextPageOffSet(nextFreePageOffSet);
+    PageFreeSpaceFileWriter currentPageFreeSpaceFileWriter(file, currentPageOffSet);
+    currentPageFreeSpaceFileWriter.SetAll(currentPage);
+
+    return std::tuple<int, PageFreeSpacePage>(nextFreePageOffSet, newFreeSpacePage);
 }
 
 void DatabaseRepository::AddTableMappingPage(std::fstream &file, TableMappingPage tableMappingPage, int tableMappingStartPosition)

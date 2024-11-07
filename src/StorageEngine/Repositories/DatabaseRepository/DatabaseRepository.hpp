@@ -15,6 +15,7 @@
 #include <fstream>
 #include <filesystem>
 #include <string.h>
+#include <tuple>
 
 class DatabaseRepository
 {
@@ -27,7 +28,10 @@ private:
     std::variant<DatabaseDefinition, Error> GetDatabaseDefinition(std::string databaseName);
 
     void AddTableInMapping(std::fstream &file, DatabaseDefinition &databaseDefinition, int tableId, int tableOffSet);
+    std::tuple<int, MappingPage> CreateIfNotExistsLastMappingPage(std::fstream &file, DatabaseDefinition &databaseDefinition);
     void AddPageFreeSpaceForANewTable(std::fstream &file, DatabaseDefinition &databaseDefinition);
+    std::tuple<int, PageFreeSpacePage> CreateIfNotExistsLastPageFreeSpacePage(std::fstream &file, DatabaseDefinition &databaseDefinition);
+    std::tuple<int, PageFreeSpacePage> CreateInBackNewPageFreeSpace(std::fstream &file, PageFreeSpacePage &currentPage, int currentPageOffSet);
     void AddTableMappingPage(std::fstream &file, TableMappingPage tableMappingPage, int tableMappingStartPosition);
 
 public:

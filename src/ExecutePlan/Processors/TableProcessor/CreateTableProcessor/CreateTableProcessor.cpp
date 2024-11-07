@@ -12,8 +12,6 @@ std::optional<Error> CreateTableProcessor::CreateTableExecution(std::string data
 
     auto tableName = identifier.GetUpperCaseLexeme();
 
-    // check if table already exists
-
     auto columnDefinitions = queryTree->GetChildren()[1];
     auto columnsResult = ExtractColumns(columnDefinitions);
     if (std::holds_alternative<Error>(columnsResult))
