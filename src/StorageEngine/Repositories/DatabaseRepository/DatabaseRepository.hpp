@@ -33,6 +33,7 @@ private:
     std::tuple<int, PageFreeSpacePage> CreateIfNotExistsLastPageFreeSpacePage(std::fstream &file, DatabaseDefinition &databaseDefinition);
     std::tuple<int, PageFreeSpacePage> CreateInBackNewPageFreeSpace(std::fstream &file, PageFreeSpacePage &currentPage, int currentPageOffSet);
     void AddTableMappingPage(std::fstream &file, TableMappingPage tableMappingPage, int tableMappingStartPosition);
+    void CreateTable(std::fstream &file, DatabaseDefinition &databaseDefinition, TableMappingPage &tableMappingPage, std::shared_ptr<DataPage> dataPageBlock);
 
 public:
     DatabaseRepository();

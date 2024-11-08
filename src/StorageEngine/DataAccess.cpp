@@ -3,7 +3,8 @@
 int DataAccess::CalcIdFromName(std::string name)
 {
     std::hash<std::string> hasher;
-    return hasher(name);
+    int hasedValue = hasher(name);
+    return hasedValue < 0 ? hasedValue * -1 : hasedValue;
 }
 
 std::optional<Error> DataAccess::CreateDatabaseFile(std::string name)

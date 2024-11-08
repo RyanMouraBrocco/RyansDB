@@ -32,6 +32,17 @@ std::optional<Error> DatabaseRepository::CreateDatabaseFile(DatabaseDefinition d
     DatabaseFileWriter databaseWriter(fileWriter);
     databaseWriter.SetAll(databaseDef);
 
+    TableMappingPage tableMappingPage(-100);
+    std::shared_ptr<DataPage> dataPageBlock(new DataPage[8], std::default_delete<DataPage[]>());
+    for (int i = 0; i < 8; i++)
+    {
+        dataPageBlock.get()[i].GetHeaderRef().SetPageId(i + 1);
+        dataPageBlock.get()[i].GetHeaderRef().SetPageLength(0);
+        dataPageBlock.get()[i].GetHeaderRef().SetTableId(-100);
+    }
+
+    CreateTable(fileWriter, databaseDef, tableMappingPage, dataPageBlock);
+
     fileWriter.close();
 
     return std::nullopt;
@@ -103,6 +114,15 @@ std::optional<Error> DatabaseRepository::CreateTableInDatabaseFile(std::string d
     if (!file.is_open())
         return Error(ErrorType::Unexpected, "Error to fetch databasefile");
 
+    CreateTable(file, databaseDefinition, tableMappingPage, dataPageBlock);
+
+    file.close();
+
+    return std::nullopt;
+}
+
+void DatabaseRepository::CreateTable(std::fstream &file, DatabaseDefinition &databaseDefinition, TableMappingPage &tableMappingPage, std::shared_ptr<DataPage> dataPageBlock)
+{
     file.seekp(0, std::ios::end);
     int tableMappingStartPosition = (int)file.tellp();
 
@@ -118,10 +138,6 @@ std::optional<Error> DatabaseRepository::CreateTableInDatabaseFile(std::string d
 
     AddTableInMapping(file, databaseDefinition, tableMappingPage.GetHeaderRef().GetTableId(), tableMappingStartPosition);
     AddPageFreeSpaceForANewTable(file, databaseDefinition);
-
-    file.close();
-
-    return std::nullopt;
 }
 
 void DatabaseRepository::AddTableInMapping(std::fstream &file, DatabaseDefinition &databaseDefinition, int tableId, int tableOffSet)
