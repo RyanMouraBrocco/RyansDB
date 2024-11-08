@@ -6,8 +6,6 @@
 #include "Protocol/Contracts/Request/RequestProtocol.hpp"
 #include "Orchestrator/RequestOrchestrator.hpp"
 #include <thread>
-
-#include "StorageEngine/BPlusTree/BPlusTree.hpp"
 #include <chrono>
 
 void EndPointsListener(Connection *connection)

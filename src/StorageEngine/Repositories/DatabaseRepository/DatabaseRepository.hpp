@@ -25,8 +25,6 @@ private:
     const int m_pageSizeInBytes = 8'000;
     const int m_databaseHeaderSizeInBytes = 96;
 
-    std::variant<DatabaseDefinition, Error> GetDatabaseDefinition(std::string databaseName);
-
     void AddTableInMapping(std::fstream &file, DatabaseDefinition &databaseDefinition, int tableId, int tableOffSet);
     std::tuple<int, MappingPage> CreateIfNotExistsLastMappingPage(std::fstream &file, DatabaseDefinition &databaseDefinition);
     void AddPageFreeSpaceForANewTable(std::fstream &file, DatabaseDefinition &databaseDefinition);
@@ -39,7 +37,8 @@ public:
     DatabaseRepository();
     bool ExistsDatabase(std::string name);
     std::variant<bool, Error> ExistsTableInDatabase(std::string databaseName, int tableId);
+    std::variant<DatabaseDefinition, Error> GetDatabaseDefinition(std::string databaseName);
     std::optional<Error> CreateDatabaseFile(DatabaseDefinition databaseDef);
     std::optional<Error> DropDatabaseFile(std::string name);
-    std::optional<Error> CreateTableInDatabaseFile(std::string databaseName, TableMappingPage tableMappingPage, std::shared_ptr<DataPage> dataPageBlock);
+    std::optional<Error> CreateTableInDatabaseFile(DatabaseDefinition &databaseDefinition, TableMappingPage tableMappingPage, std::shared_ptr<DataPage> dataPageBlock);
 };

@@ -5,10 +5,11 @@
 #include "./Contracts/Database/DatabaseDefinition.hpp"
 #include "./Contracts/Pages/MappingPage/MappingPage.hpp"
 #include "./Contracts/Pages/TableMappingPage/TableMappingPage.hpp"
+#include "./DataPageAccess/Factories/TableAccessFactory.hpp"
 #include "optional"
 #include "string"
 #include <cstdlib>
-#include <functional> 
+#include <functional>
 
 struct TableColumnDefinition
 {

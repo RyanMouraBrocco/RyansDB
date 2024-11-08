@@ -37,6 +37,12 @@ std::optional<Error> DataAccess::CreateTableInDatabaseFile(std::string databaseN
     if (std::holds_alternative<Error>(existsResult) || std::get<bool>(existsResult))
         return Error(ErrorType::Unexpected, "Table already exists");
 
+    auto databaseDefinitionResult = m_databaseRepository.GetDatabaseDefinition(databaseName);
+    if (std::holds_alternative<Error>(databaseDefinitionResult))
+        return std::get<Error>(databaseDefinitionResult);
+
+    auto databaseDefinition = std::get<DatabaseDefinition>(databaseDefinitionResult);
+
     TableMappingPage tablePage(tableId);
 
     std::shared_ptr<DataPage> dataPageBlock(new DataPage[8], std::default_delete<DataPage[]>());
@@ -47,5 +53,16 @@ std::optional<Error> DataAccess::CreateTableInDatabaseFile(std::string databaseN
         dataPageBlock.get()[i].GetHeaderRef().SetTableId(tableId);
     }
 
-    return m_databaseRepository.CreateTableInDatabaseFile(databaseName, tablePage, dataPageBlock);
+    auto tableCreationResult = m_databaseRepository.CreateTableInDatabaseFile(databaseDefinition, tablePage, dataPageBlock);
+    if (tableCreationResult.has_value())
+        return tableCreationResult;
+
+    return std::nullopt;
+
+    // auto tableAccess = new TableAccessFactory();
+    // auto specialTableAccess = tableAccess->CreateSequentialTable();
+    // return specialTableAccess->InsertOne(InsertCommand(-100, std::vector<InsertData>{
+    //                                                              InsertData("coluna 1"),
+    //                                                              InsertData("coluna 2"),
+    //                                                          }));
 }

@@ -101,15 +101,9 @@ std::optional<Error> DatabaseRepository::DropDatabaseFile(std::string name)
     }
 }
 
-std::optional<Error> DatabaseRepository::CreateTableInDatabaseFile(std::string databaseName, TableMappingPage tableMappingPage, std::shared_ptr<DataPage> dataPageBlock)
+std::optional<Error> DatabaseRepository::CreateTableInDatabaseFile(DatabaseDefinition &databaseDefinition, TableMappingPage tableMappingPage, std::shared_ptr<DataPage> dataPageBlock)
 {
-    auto databaseDefinitionResult = GetDatabaseDefinition(databaseName);
-    if (std::holds_alternative<Error>(databaseDefinitionResult))
-        return std::get<Error>(databaseDefinitionResult);
-
-    auto databaseDefinition = std::get<DatabaseDefinition>(databaseDefinitionResult);
-
-    std::fstream file(m_databasePath + "/" + databaseName + m_databaseExtension, std::ios::binary | std::ios::in | std::ios::out);
+    std::fstream file(m_databasePath + "/" + databaseDefinition.GetHeaderRef().GetDatabaseNamePointer() + m_databaseExtension, std::ios::binary | std::ios::in | std::ios::out);
 
     if (!file.is_open())
         return Error(ErrorType::Unexpected, "Error to fetch databasefile");
