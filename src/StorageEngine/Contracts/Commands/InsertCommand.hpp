@@ -11,6 +11,8 @@ private:
     double m_decimalData;
     bool m_booleanData;
 
+    int m_typeLength;
+
 public:
     InsertData(std::string stringData);
     InsertData(int integerData);
@@ -26,4 +28,6 @@ private:
 
 public:
     InsertCommand(int tableId, std::vector<InsertData> datas);
+
+    int GetAllDataLength();
 };

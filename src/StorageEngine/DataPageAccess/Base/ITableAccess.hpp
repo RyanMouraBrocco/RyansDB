@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Commands/InsertCommand.hpp"
+#include "../../Contracts/Commands/InsertCommand.hpp"
 #include "optional"
 #include "../../../Error/error.hpp"
 
